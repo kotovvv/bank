@@ -64,7 +64,7 @@ export default {
     selectedItem: 0,
 
     items: [
-      { text: "Импорт экспорт", name: "importexport", icon: "mdi-progress-upload" },
+      { text: "Импорт экспорт", name: "importexport", icon: "mdi-swap-vertical" },
       { text: "Пользователи", name: "users", icon: "mdi-account" },
       { text: "Статусы лидов", name: "statusLid", icon: "mdi-format-list-checks" },
       { text: "Поставщики", name: "providers", icon: "mdi-contact-phone-outline" },
