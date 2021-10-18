@@ -50,7 +50,7 @@
 
 <script>
 const importexport = () => import("./importexport");
-// const users = () => import("./users");
+const users = () => import("./users");
 // const statusLid = () => import("./statusLid");
 
 // const providers = () => import("./providers");
@@ -66,8 +66,8 @@ export default {
     items: [
       { text: "Импорт экспорт", name: "importexport", icon: "mdi-swap-vertical" },
       { text: "Пользователи", name: "users", icon: "mdi-account" },
-      { text: "Статусы лидов", name: "statusLid", icon: "mdi-format-list-checks" },
-      { text: "Поставщики", name: "providers", icon: "mdi-contact-phone-outline" },
+      { text: "Воронки", name: "statusLid", icon: "mdi-format-list-checks" },
+      //{ text: "Поставщики", name: "providers", icon: "mdi-contact-phone-outline" },
       // { text: "Рабочие места", name: "workPlaces", icon: "mdi-sitemap" },
       { text: "Распределение", name: "lids", icon: "mdi-account-arrow-left" },
       { text: "Управление", name: "mlids", icon: "mdi-phone-log-outline" },
@@ -77,7 +77,7 @@ export default {
   computed: {
     adminComponent() {
       if (this.adminMenu == "importexport") return importexport;
-    //   if (this.adminMenu == "users") return users;
+       if (this.adminMenu == "users") return users;
     //   if (this.adminMenu == "statusLid") return statusLid;
 
     //   if (this.adminMenu == "providers") return providers;

@@ -2744,8 +2744,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 var importexport = function importexport() {
   return __webpack_require__.e(/*! import() */ "resources_js_components_admin_importexport_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./importexport */ "./resources/js/components/admin/importexport.vue"));
-}; // const users = () => import("./users");
-// const statusLid = () => import("./statusLid");
+};
+
+var users = function users() {
+  return __webpack_require__.e(/*! import() */ "resources_js_components_admin_users_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./users */ "./resources/js/components/admin/users.vue"));
+}; // const statusLid = () => import("./statusLid");
 // const providers = () => import("./providers");
 // const mlids = () => import("../manager/mlids");
 // const lids = () => import("../crmanager/lids");
@@ -2766,14 +2769,11 @@ var importexport = function importexport() {
         name: "users",
         icon: "mdi-account"
       }, {
-        text: "Статусы лидов",
+        text: "Воронки",
         name: "statusLid",
         icon: "mdi-format-list-checks"
-      }, {
-        text: "Поставщики",
-        name: "providers",
-        icon: "mdi-contact-phone-outline"
-      }, // { text: "Рабочие места", name: "workPlaces", icon: "mdi-sitemap" },
+      }, //{ text: "Поставщики", name: "providers", icon: "mdi-contact-phone-outline" },
+      // { text: "Рабочие места", name: "workPlaces", icon: "mdi-sitemap" },
       {
         text: "Распределение",
         name: "lids",
@@ -2788,8 +2788,8 @@ var importexport = function importexport() {
   },
   computed: {
     adminComponent: function adminComponent() {
-      if (this.adminMenu == "importexport") return importexport; //   if (this.adminMenu == "users") return users;
-      //   if (this.adminMenu == "statusLid") return statusLid;
+      if (this.adminMenu == "importexport") return importexport;
+      if (this.adminMenu == "users") return users; //   if (this.adminMenu == "statusLid") return statusLid;
       //   if (this.adminMenu == "providers") return providers;
       //   if (this.adminMenu == "mlids") return mlids;
       //   if (this.adminMenu == "lids") return lids;

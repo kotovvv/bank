@@ -36844,7 +36844,7 @@ module.exports = function installComponents (component, components) {
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames not based on template
-/******/ 			if ({"resources_js_components_loginComponent_vue":1,"resources_js_components_admin_adminComponent_vue":1,"resources_js_components_admin_importexport_vue":1}[chunkId]) return "js/" + chunkId + ".js";
+/******/ 			if ({"resources_js_components_loginComponent_vue":1,"resources_js_components_admin_adminComponent_vue":1,"resources_js_components_admin_importexport_vue":1,"resources_js_components_admin_users_vue":1}[chunkId]) return "js/" + chunkId + ".js";
 /******/ 			// return url for filenames based on template
 /******/ 			return undefined;
 /******/ 		};

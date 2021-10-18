@@ -21,22 +21,22 @@ class loginController extends Controller
     public function login(Request $request)
     {
 
-            if(Auth::attempt(['name' => $request->name, 'password' => $request->password,'active'=> 1])){ 
+            if(Auth::attempt(['name' => $request->name, 'password' => $request->password])){
               $user                  = Auth::user();
               // $user = $user->name;
-             
+
               return response()->json([
                 'status'   => 'success',
                 'user' => $user,
-    
-              ]); 
-            } else { 
+
+              ]);
+            } else {
               return response()->json([
                 'status' => 'error',
                 'user'   => 'Unauthorized Access'
-              ]); 
-            } 
-  
+              ]);
+            }
+
 
     }
 
