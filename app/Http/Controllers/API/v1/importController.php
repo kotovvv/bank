@@ -53,17 +53,18 @@ class ImportController extends Controller
         $all = count($a_imp['clients']);
 
         foreach ($a_imp['clients'] as $client_val) {
-            $a_client = array_combine($a_imp['headers'], $client_val);
-            if (Client::where('inn', $a_client['inn'])->exists()) {
+            // $a_client = array_combine($a_imp['headers'], $client_val);
+            if (Client::where('inn', $client_val['inn'])->exists()) {
                 $duplicate++;
                 continue;
             }
-            //Debugbar::info($a_client);
-            $a_client['phoneNumber'] = str_replace(['+', '(', ')', '#', ' ', '-', '_'], '', $a_client['phoneNumber']);
-            if (strlen($a_client['phoneNumber']) == 10 && !in_array(substr($a_client['phoneNumber'], 0, 1), ['7', '8'])) $a_client['phoneNumber'] .= '7';
-            if (strlen($a_client['phoneNumber']) != 11) continue;
-            $a_client = array_merge($a_client, ['date_added' => date("Y-m-d H:i:s")]);
-            DB::table('clients')->insert($a_client);
+            //Debugbar::info($client_val);
+            $client_val['phoneNumber'] = str_replace(['+', '(', ')', '#', ' ', '-', '_'], '', $client_val['phoneNumber']);
+            if (strlen($client_val['phoneNumber']) == 10 && !in_array(substr($client_val['phoneNumber'], 0, 1), ['7', '8']))  .= '7';
+            if (strlen($client_val['phoneNumber']) != 11) continue;
+            $client_val['phoneNumber'] =  preg_replace('/^8/', '7',$client_val['phoneNumber'], 1 );
+            $client_val = array_merge($client_val, ['date_added' => date("Y-m-d H:i:s")]);
+            DB::table('clients')->insert($client_val);
             $inserted++;
         }
         return response()->json([

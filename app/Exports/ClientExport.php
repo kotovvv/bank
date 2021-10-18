@@ -13,13 +13,13 @@ class ClientExport implements FromCollection, WithHeadings
     */
     public function collection()
     {
-        return Client::select('inn','fullName','phoneNumber','organizationName','address','region','registration','initiator')->get();
+        return Client::select('inn','fullName','phoneNumber','organizationName','address','region','registration','initiator','date_added')->get();
     }
 
     public function headings(): array
     {
        return [
-        'inn','fullName','phoneNumber','organizationName','address','region','registration','initiator',
+        'inn','fullName','phoneNumber','organizationName','address','region','registration','initiator'
        ];
     }
 }
