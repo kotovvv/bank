@@ -4,6 +4,7 @@
       v-model="message.length"
       top
       right
+      timeout=-1
         >
      <v-card-text v-html="message"></v-card-text>
       <template v-slot:action="{ attrs }">
