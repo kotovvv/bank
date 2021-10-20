@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\v1\loginController;
 use App\Http\Controllers\API\v1\importController;
 use App\Http\Controllers\API\v1\UsersController;
+use App\Http\Controllers\API\v1\ClientsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,3 +28,6 @@ Route::post('getusers', [UsersController::class,'getrelatedusers'])->name('getre
 Route::get('users/getroles', [UsersController::class,'getroless'])->name('user.getroles');
 Route::post('user/update', [UsersController::class,'update'])->name('user.update');
 Route::delete('user/{id}', [UsersController::class,'deleteuser']);
+
+Route::get('getClients', [ClientsController::class,'getClients']);
+

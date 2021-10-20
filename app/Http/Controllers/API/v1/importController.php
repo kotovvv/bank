@@ -60,7 +60,7 @@ class ImportController extends Controller
             }
             //Debugbar::info($client_val);
             $client_val['phoneNumber'] = str_replace(['+', '(', ')', '#', ' ', '-', '_'], '', $client_val['phoneNumber']);
-            if (strlen($client_val['phoneNumber']) == 10 && !in_array(substr($client_val['phoneNumber'], 0, 1), ['7', '8']))  .= '7';
+            if (strlen($client_val['phoneNumber']) == 10 && !in_array(substr($client_val['phoneNumber'], 0, 1), ['7', '8'])) $client_val['phoneNumber'] .= '7';
             if (strlen($client_val['phoneNumber']) != 11) continue;
             $client_val['phoneNumber'] =  preg_replace('/^8/', '7',$client_val['phoneNumber'], 1 );
             $client_val = array_merge($client_val, ['date_added' => date("Y-m-d H:i:s")]);
