@@ -78,10 +78,35 @@ class ClientsController extends Controller
 
   }
 
+  public function one()
+  {
+    $clients = Client::all();
+    foreach($clients as $client){
+    for($i=1; $i < 100; $i++){
+        $time = rand(1577861163,1633070763);
+        $date = date('Y-m-d', $time);
+        $client['organizationName'] = str_replace(['ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ ','ИП ','АКЦИОНЕРНОЕ ОБЩЕСТВО '],'',$client['organizationName']);
+        $org = ['ИП','Общество с ограниченной ответсвенностью', "АКЦИОНЕРНОЕ ОБЩЕСТВО"];
+      $item = [
+        'inn' => rand('11111111111','99999999999'),
+        'fullName' => $client['fullName'],
+        'phoneNumber' => $client['phoneNumber'],
+        'organizationName' => $org[array_rand($org)].' '.$client['organizationName'],
+        'address' => $client['address'],
+        'region' => $client['region'],
+        'registration' => $date,
+        'initiator' => $client['']
+      ];
+      Client::create($item);
+    }
+    }
+    return response('All done. Ser!');
+  }
+
 
   public function getClients(Request $request)
   {
-    return Client::all();
+    return Client::limit(10000)->get();
   }
 
 

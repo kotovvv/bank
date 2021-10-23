@@ -22,7 +22,125 @@
     </v-row>
 
     <v-main>
+        <v-row>
+            <!-- registration -->
+            <v-col cols="2">
+ <v-dialog
+          ref="dialog"
+          v-model="modal"
+          :return-value.sync="dateReg"
+          persistent
+          width="290px"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              v-model="dateReg"
+              label="Регистрация (период)"
+              prepend-icon="mdi-calendar"
+              readonly
+              v-bind="attrs"
+              v-on="on"
+                  ></v-text-field>
+          </template>
+          <v-date-picker
+            v-model="dateReg"
+            scrollable
+            range
+            locale="ru-ru"
+          >
+            <v-spacer></v-spacer>
+            <v-btn
+              text
+              color="primary"
+              @click="modal = false"
+            >
+              Отменить
+            </v-btn>
+            <v-btn
+              text
+              color="primary"
+              @click="$refs.dialog.save(dateReg)"
+            >
+              Выбрать
+            </v-btn>
+          </v-date-picker>
+        </v-dialog>
+            </v-col>
+
+            <!-- download -->
+            <v-col cols="2">
+                 <v-dialog
+          ref="dialog2"
+          v-model="modal2"
+          :return-value.sync="dateAdd"
+          persistent
+          width="290px"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              v-model="dateAdd"
+              label="Заливка (период)"
+              prepend-icon="mdi-calendar"
+              readonly
+              v-bind="attrs"
+              v-on="on"
+            ></v-text-field>
+          </template>
+          <v-date-picker
+            v-model="dateAdd"
+            scrollable
+            range
+            locale="ru-ru"
+          >
+            <v-spacer></v-spacer>
+            <v-btn
+              text
+              color="primary"
+              @click="modal2 = false"
+            >
+              Отменить
+            </v-btn>
+            <v-btn
+              text
+              color="primary"
+              @click="$refs.dialog2.save(dateAdd)"
+            >
+              Выбрать
+            </v-btn>
+          </v-date-picker>
+        </v-dialog>
+            </v-col>
+
+            <!-- firm -->
+            <v-col cols="2">
+
+            </v-col>
+
+            <!-- fio -->
+            <v-col cols="2"></v-col>
+
+            <!-- inn -->
+            <v-col cols="2"></v-col>
+
+            <!-- address -->
+            <v-col cols="2"></v-col>
+
+            <!-- reg -->
+            <v-col cols="2"></v-col>
+
+        </v-row>
+
       <v-row>
+               <v-col cols="12">
+        <v-data-table
+          :headers="import_headers"
+          item-key="id"
+          :items="clients"
+          ref="importtable"
+        >
+          <template v-slot:item.id="{ item }"> </template>
+        </v-data-table>
+      </v-col>
         <v-col cols="12">
           <v-btn
             color="primary"
@@ -35,18 +153,7 @@
           >
         </v-col>
       </v-row>
-      <v-row>
-          <v-col cols="12">
- <v-data-table
-          :headers="import_headers"
-          item-key="id"
-          :items="clients"
-          ref="importtable"
-        >
-          <template v-slot:item.id="{ item }"> </template>
-        </v-data-table>
-          </v-col>
-      </v-row>
+      <v-row> </v-row>
     </v-main>
   </div>
 </template>
@@ -56,7 +163,12 @@ import XLSX from "xlsx";
 import axios from "axios";
 export default {
   data: () => ({
-      import_headers: [
+      dateReg:[],
+      dateAdd:[],
+    menu: false,
+    modal: false,
+    modal2: false,
+    import_headers: [
       { text: "", value: "id" },
       { text: "ИНН", value: "inn" },
       { text: "ФИО", value: "fullName" },
@@ -185,14 +297,30 @@ export default {
       }
       return headers;
     },
-    getClients(){
-        const self = this
+    getClients() {
+      const self = this;
       axios
         .get("/api/getClients")
         .then((res) => {
           self.clients = res.data.map(
-            ({ id,inn,fullName,phoneNumber,organizationName,address,region,registration }) => ({
-              id,inn,fullName,phoneNumber,organizationName,address,region,registration
+            ({
+              id,
+              inn,
+              fullName,
+              phoneNumber,
+              organizationName,
+              address,
+              region,
+              registration,
+            }) => ({
+              id,
+              inn,
+              fullName,
+              phoneNumber,
+              organizationName,
+              address,
+              region,
+              registration,
             })
           );
         })

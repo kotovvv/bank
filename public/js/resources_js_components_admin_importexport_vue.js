@@ -23652,11 +23652,123 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
+      dateReg: [],
+      dateAdd: [],
+      menu: false,
+      modal: false,
+      modal2: false,
       import_headers: [{
         text: "",
         value: "id"
@@ -24562,25 +24674,247 @@ var render = function() {
             [
               _c(
                 "v-col",
-                { attrs: { cols: "12" } },
+                { attrs: { cols: "2" } },
                 [
                   _c(
-                    "v-btn",
+                    "v-dialog",
                     {
+                      ref: "dialog",
                       attrs: {
-                        color: "primary",
-                        elevation: "2",
-                        outlined: "",
-                        raised: "",
-                        "x-large": ""
+                        "return-value": _vm.dateReg,
+                        persistent: "",
+                        width: "290px"
                       },
-                      on: { click: _vm.exportfile }
+                      on: {
+                        "update:returnValue": function($event) {
+                          _vm.dateReg = $event
+                        },
+                        "update:return-value": function($event) {
+                          _vm.dateReg = $event
+                        }
+                      },
+                      scopedSlots: _vm._u([
+                        {
+                          key: "activator",
+                          fn: function(ref) {
+                            var on = ref.on
+                            var attrs = ref.attrs
+                            return [
+                              _c(
+                                "v-text-field",
+                                _vm._g(
+                                  _vm._b(
+                                    {
+                                      attrs: {
+                                        label: "Регистрация (период)",
+                                        "prepend-icon": "mdi-calendar",
+                                        readonly: ""
+                                      },
+                                      model: {
+                                        value: _vm.dateReg,
+                                        callback: function($$v) {
+                                          _vm.dateReg = $$v
+                                        },
+                                        expression: "dateReg"
+                                      }
+                                    },
+                                    "v-text-field",
+                                    attrs,
+                                    false
+                                  ),
+                                  on
+                                )
+                              )
+                            ]
+                          }
+                        }
+                      ]),
+                      model: {
+                        value: _vm.modal,
+                        callback: function($$v) {
+                          _vm.modal = $$v
+                        },
+                        expression: "modal"
+                      }
                     },
-                    [_vm._v("Скачать базу")]
+                    [
+                      _vm._v(" "),
+                      _c(
+                        "v-date-picker",
+                        {
+                          attrs: { scrollable: "", range: "", locale: "ru-ru" },
+                          model: {
+                            value: _vm.dateReg,
+                            callback: function($$v) {
+                              _vm.dateReg = $$v
+                            },
+                            expression: "dateReg"
+                          }
+                        },
+                        [
+                          _c("v-spacer"),
+                          _vm._v(" "),
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { text: "", color: "primary" },
+                              on: {
+                                click: function($event) {
+                                  _vm.modal = false
+                                }
+                              }
+                            },
+                            [_vm._v("\n             Отменить\n           ")]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { text: "", color: "primary" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.$refs.dialog.save(_vm.dateReg)
+                                }
+                              }
+                            },
+                            [_vm._v("\n             Выбрать\n           ")]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
                   )
                 ],
                 1
-              )
+              ),
+              _vm._v(" "),
+              _c(
+                "v-col",
+                { attrs: { cols: "2" } },
+                [
+                  _c(
+                    "v-dialog",
+                    {
+                      ref: "dialog2",
+                      attrs: {
+                        "return-value": _vm.dateAdd,
+                        persistent: "",
+                        width: "290px"
+                      },
+                      on: {
+                        "update:returnValue": function($event) {
+                          _vm.dateAdd = $event
+                        },
+                        "update:return-value": function($event) {
+                          _vm.dateAdd = $event
+                        }
+                      },
+                      scopedSlots: _vm._u([
+                        {
+                          key: "activator",
+                          fn: function(ref) {
+                            var on = ref.on
+                            var attrs = ref.attrs
+                            return [
+                              _c(
+                                "v-text-field",
+                                _vm._g(
+                                  _vm._b(
+                                    {
+                                      attrs: {
+                                        label: "Заливка (период)",
+                                        "prepend-icon": "mdi-calendar",
+                                        readonly: ""
+                                      },
+                                      model: {
+                                        value: _vm.dateAdd,
+                                        callback: function($$v) {
+                                          _vm.dateAdd = $$v
+                                        },
+                                        expression: "dateAdd"
+                                      }
+                                    },
+                                    "v-text-field",
+                                    attrs,
+                                    false
+                                  ),
+                                  on
+                                )
+                              )
+                            ]
+                          }
+                        }
+                      ]),
+                      model: {
+                        value: _vm.modal2,
+                        callback: function($$v) {
+                          _vm.modal2 = $$v
+                        },
+                        expression: "modal2"
+                      }
+                    },
+                    [
+                      _vm._v(" "),
+                      _c(
+                        "v-date-picker",
+                        {
+                          attrs: { scrollable: "", range: "", locale: "ru-ru" },
+                          model: {
+                            value: _vm.dateAdd,
+                            callback: function($$v) {
+                              _vm.dateAdd = $$v
+                            },
+                            expression: "dateAdd"
+                          }
+                        },
+                        [
+                          _c("v-spacer"),
+                          _vm._v(" "),
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { text: "", color: "primary" },
+                              on: {
+                                click: function($event) {
+                                  _vm.modal2 = false
+                                }
+                              }
+                            },
+                            [_vm._v("\n             Отменить\n           ")]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { text: "", color: "primary" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.$refs.dialog2.save(_vm.dateAdd)
+                                }
+                              }
+                            },
+                            [_vm._v("\n             Выбрать\n           ")]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c("v-col", { attrs: { cols: "2" } }),
+              _vm._v(" "),
+              _c("v-col", { attrs: { cols: "2" } }),
+              _vm._v(" "),
+              _c("v-col", { attrs: { cols: "2" } }),
+              _vm._v(" "),
+              _c("v-col", { attrs: { cols: "2" } }),
+              _vm._v(" "),
+              _c("v-col", { attrs: { cols: "2" } })
             ],
             1
           ),
@@ -24611,10 +24945,34 @@ var render = function() {
                   })
                 ],
                 1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-col",
+                { attrs: { cols: "12" } },
+                [
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: {
+                        color: "primary",
+                        elevation: "2",
+                        outlined: "",
+                        raised: "",
+                        "x-large": ""
+                      },
+                      on: { click: _vm.exportfile }
+                    },
+                    [_vm._v("Скачать базу")]
+                  )
+                ],
+                1
               )
             ],
             1
-          )
+          ),
+          _vm._v(" "),
+          _c("v-row")
         ],
         1
       )
@@ -24650,9 +25008,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vuetify_lib_components_VCard__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuetify/lib/components/VCard */ "./node_modules/vuetify/lib/components/VCard/index.js");
 /* harmony import */ var vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! vuetify/lib/components/VGrid */ "./node_modules/vuetify/lib/components/VGrid/VCol.js");
 /* harmony import */ var vuetify_lib_components_VDataTable__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! vuetify/lib/components/VDataTable */ "./node_modules/vuetify/lib/components/VDataTable/VDataTable.js");
-/* harmony import */ var vuetify_lib_components_VMain__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! vuetify/lib/components/VMain */ "./node_modules/vuetify/lib/components/VMain/VMain.js");
-/* harmony import */ var vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! vuetify/lib/components/VGrid */ "./node_modules/vuetify/lib/components/VGrid/VRow.js");
-/* harmony import */ var vuetify_lib_components_VSnackbar__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! vuetify/lib/components/VSnackbar */ "./node_modules/vuetify/lib/components/VSnackbar/VSnackbar.js");
+/* harmony import */ var vuetify_lib_components_VDatePicker__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! vuetify/lib/components/VDatePicker */ "./node_modules/vuetify/lib/components/VDatePicker/VDatePicker.js");
+/* harmony import */ var vuetify_lib_components_VDialog__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! vuetify/lib/components/VDialog */ "./node_modules/vuetify/lib/components/VDialog/VDialog.js");
+/* harmony import */ var vuetify_lib_components_VMain__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! vuetify/lib/components/VMain */ "./node_modules/vuetify/lib/components/VMain/VMain.js");
+/* harmony import */ var vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! vuetify/lib/components/VGrid */ "./node_modules/vuetify/lib/components/VGrid/VRow.js");
+/* harmony import */ var vuetify_lib_components_VSnackbar__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! vuetify/lib/components/VSnackbar */ "./node_modules/vuetify/lib/components/VSnackbar/VSnackbar.js");
+/* harmony import */ var vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! vuetify/lib/components/VGrid */ "./node_modules/vuetify/lib/components/VGrid/VSpacer.js");
+/* harmony import */ var vuetify_lib_components_VTextField__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! vuetify/lib/components/VTextField */ "./node_modules/vuetify/lib/components/VTextField/VTextField.js");
 
 
 
@@ -24681,7 +25043,11 @@ var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__
 
 
 
-_node_modules_vuetify_loader_lib_runtime_installComponents_js__WEBPACK_IMPORTED_MODULE_4___default()(component, {VBtn: vuetify_lib_components_VBtn__WEBPACK_IMPORTED_MODULE_5__["default"],VCardText: vuetify_lib_components_VCard__WEBPACK_IMPORTED_MODULE_6__.VCardText,VCol: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_7__["default"],VDataTable: vuetify_lib_components_VDataTable__WEBPACK_IMPORTED_MODULE_8__["default"],VMain: vuetify_lib_components_VMain__WEBPACK_IMPORTED_MODULE_9__["default"],VRow: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_10__["default"],VSnackbar: vuetify_lib_components_VSnackbar__WEBPACK_IMPORTED_MODULE_11__["default"]})
+
+
+
+
+_node_modules_vuetify_loader_lib_runtime_installComponents_js__WEBPACK_IMPORTED_MODULE_4___default()(component, {VBtn: vuetify_lib_components_VBtn__WEBPACK_IMPORTED_MODULE_5__["default"],VCardText: vuetify_lib_components_VCard__WEBPACK_IMPORTED_MODULE_6__.VCardText,VCol: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_7__["default"],VDataTable: vuetify_lib_components_VDataTable__WEBPACK_IMPORTED_MODULE_8__["default"],VDatePicker: vuetify_lib_components_VDatePicker__WEBPACK_IMPORTED_MODULE_9__["default"],VDialog: vuetify_lib_components_VDialog__WEBPACK_IMPORTED_MODULE_10__["default"],VMain: vuetify_lib_components_VMain__WEBPACK_IMPORTED_MODULE_11__["default"],VRow: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_12__["default"],VSnackbar: vuetify_lib_components_VSnackbar__WEBPACK_IMPORTED_MODULE_13__["default"],VSpacer: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_14__["default"],VTextField: vuetify_lib_components_VTextField__WEBPACK_IMPORTED_MODULE_15__["default"]})
 
 
 /* hot reload */
