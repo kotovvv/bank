@@ -23759,6 +23759,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -24627,7 +24637,7 @@ var render = function() {
                       attrs,
                       false
                     ),
-                    [_vm._v("\n         X\n       ")]
+                    [_vm._v("\n          X\n        ")]
                   )
                 ]
               }
@@ -24659,7 +24669,7 @@ var render = function() {
                   dragenter: _vm.handleDragover
                 }
               },
-              [_vm._v("\n         Перетяните файл сюда\n       ")]
+              [_vm._v("\n          Перетяните файл сюда\n        ")]
             )
           ])
         ],
@@ -24671,6 +24681,7 @@ var render = function() {
         [
           _c(
             "v-row",
+            { attrs: { id: "filter" } },
             [
               _c(
                 "v-col",
@@ -24708,7 +24719,8 @@ var render = function() {
                                       attrs: {
                                         label: "Регистрация (период)",
                                         "prepend-icon": "mdi-calendar",
-                                        readonly: ""
+                                        readonly: "",
+                                        id: "datereg"
                                       },
                                       model: {
                                         value: _vm.dateReg,
@@ -24764,7 +24776,7 @@ var render = function() {
                                 }
                               }
                             },
-                            [_vm._v("\n             Отменить\n           ")]
+                            [_vm._v("\n              Отменить\n            ")]
                           ),
                           _vm._v(" "),
                           _c(
@@ -24777,7 +24789,7 @@ var render = function() {
                                 }
                               }
                             },
-                            [_vm._v("\n             Выбрать\n           ")]
+                            [_vm._v("\n              Выбрать\n            ")]
                           )
                         ],
                         1
@@ -24825,7 +24837,8 @@ var render = function() {
                                       attrs: {
                                         label: "Заливка (период)",
                                         "prepend-icon": "mdi-calendar",
-                                        readonly: ""
+                                        readonly: "",
+                                        id: "dateadd"
                                       },
                                       model: {
                                         value: _vm.dateAdd,
@@ -24881,7 +24894,7 @@ var render = function() {
                                 }
                               }
                             },
-                            [_vm._v("\n             Отменить\n           ")]
+                            [_vm._v("\n              Отменить\n            ")]
                           ),
                           _vm._v(" "),
                           _c(
@@ -24894,7 +24907,7 @@ var render = function() {
                                 }
                               }
                             },
-                            [_vm._v("\n             Выбрать\n           ")]
+                            [_vm._v("\n              Выбрать\n            ")]
                           )
                         ],
                         1
@@ -24906,15 +24919,52 @@ var render = function() {
                 1
               ),
               _vm._v(" "),
-              _c("v-col", { attrs: { cols: "2" } }),
+              _c(
+                "v-col",
+                { attrs: { cols: "2" } },
+                [
+                  _c("v-text-field", {
+                    attrs: { label: "В имени:", id: "firm" }
+                  })
+                ],
+                1
+              ),
               _vm._v(" "),
-              _c("v-col", { attrs: { cols: "2" } }),
+              _c(
+                "v-col",
+                { attrs: { cols: "2" } },
+                [_c("v-text-field", { attrs: { label: "В ФИО:", id: "fio" } })],
+                1
+              ),
               _vm._v(" "),
-              _c("v-col", { attrs: { cols: "2" } }),
+              _c(
+                "v-col",
+                { attrs: { cols: "1" } },
+                [_c("v-text-field", { attrs: { label: "ИНН", id: "inn" } })],
+                1
+              ),
               _vm._v(" "),
-              _c("v-col", { attrs: { cols: "2" } }),
+              _c(
+                "v-col",
+                { attrs: { cols: "2" } },
+                [
+                  _c("v-text-field", {
+                    attrs: { label: "В адресе", id: "address" }
+                  })
+                ],
+                1
+              ),
               _vm._v(" "),
-              _c("v-col", { attrs: { cols: "2" } })
+              _c(
+                "v-col",
+                { attrs: { cols: "1" } },
+                [
+                  _c("v-text-field", {
+                    attrs: { label: "В регионе", id: "region" }
+                  })
+                ],
+                1
+              )
             ],
             1
           ),

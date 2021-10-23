@@ -22,7 +22,7 @@
     </v-row>
 
     <v-main>
-        <v-row>
+        <v-row id="filter">
             <!-- registration -->
             <v-col cols="2">
  <v-dialog
@@ -40,6 +40,7 @@
               readonly
               v-bind="attrs"
               v-on="on"
+              id="datereg"
                   ></v-text-field>
           </template>
           <v-date-picker
@@ -84,6 +85,7 @@
               readonly
               v-bind="attrs"
               v-on="on"
+              id="dateadd"
             ></v-text-field>
           </template>
           <v-date-picker
@@ -113,20 +115,28 @@
 
             <!-- firm -->
             <v-col cols="2">
-
+<v-text-field label="В имени:" id="firm"></v-text-field>
             </v-col>
 
             <!-- fio -->
-            <v-col cols="2"></v-col>
+            <v-col cols="2">
+             <v-text-field label="В ФИО:" id="fio"></v-text-field>
+            </v-col>
 
             <!-- inn -->
-            <v-col cols="2"></v-col>
+            <v-col cols="1">
+                <v-text-field label="ИНН" id="inn"></v-text-field>
+            </v-col>
 
             <!-- address -->
-            <v-col cols="2"></v-col>
+            <v-col cols="2">
+                <v-text-field label="В адресе" id="address"></v-text-field>
+            </v-col>
 
             <!-- reg -->
-            <v-col cols="2"></v-col>
+            <v-col cols="1">
+                <v-text-field label="В регионе" id="region"></v-text-field>
+            </v-col>
 
         </v-row>
 
