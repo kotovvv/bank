@@ -1,5 +1,12 @@
 <template>
   <div>
+    <v-tabs v-model="tab">
+    <v-tab>Импорт</v-tab>
+    <v-tab>Экспорт</v-tab>
+
+  </v-tabs>
+  <v-tabs-items v-model="tab">
+      <v-tab-item>
     <v-snackbar v-model="message.length" top right timeout="-1">
       <v-card-text v-html="message"></v-card-text>
       <template v-slot:action="{ attrs }">
@@ -20,139 +27,156 @@
         </div>
       </v-col>
     </v-row>
-
-    <v-main>
-        <v-row id="filter">
-            <!-- registration -->
-            <v-col cols="2">
- <v-dialog
-          ref="dialog"
-          v-model="modal"
-          :return-value.sync="dateReg"
-          persistent
-          width="290px"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-text-field
-              v-model="dateReg"
-              label="Регистрация (период)"
-              prepend-icon="mdi-calendar"
-              readonly
-              v-bind="attrs"
-              v-on="on"
-              id="datereg"
-                  ></v-text-field>
-          </template>
-          <v-date-picker
-            v-model="dateReg"
-            scrollable
-            range
-            locale="ru-ru"
+      </v-tab-item>
+      <v-tab-item>
+      <v-row id="filter">
+        <!-- registration -->
+        <v-col cols="2">
+          <v-dialog
+            ref="dialog"
+            v-model="modal"
+            :return-value.sync="dateReg"
+            persistent
+            width="290px"
           >
-            <v-spacer></v-spacer>
-            <v-btn
-              text
-              color="primary"
-              @click="modal = false"
-            >
-              Отменить
-            </v-btn>
-            <v-btn
-              text
-              color="primary"
-              @click="$refs.dialog.save(dateReg)"
-            >
-              Выбрать
-            </v-btn>
-          </v-date-picker>
-        </v-dialog>
-            </v-col>
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model.lazy="dateReg"
+                label="Регистрация (период)"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+                id="datereg"
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model.lazy="dateReg" scrollable range locale="ru-ru">
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="modal = false">
+                Отмена
+              </v-btn>
+              <v-btn text color="primary" @click="dateReg=[];$refs.dialog.save(dateReg);modal = false">
+                Очистить
+              </v-btn>
+              <v-btn text color="primary" @click="$refs.dialog.save(dateReg)">
+                Выбрать
+              </v-btn>
+            </v-date-picker>
+          </v-dialog>
+        </v-col>
 
-            <!-- download -->
-            <v-col cols="2">
-                 <v-dialog
-          ref="dialog2"
-          v-model="modal2"
-          :return-value.sync="dateAdd"
-          persistent
-          width="290px"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-text-field
-              v-model="dateAdd"
-              label="Заливка (период)"
-              prepend-icon="mdi-calendar"
-              readonly
-              v-bind="attrs"
-              v-on="on"
-              id="dateadd"
-            ></v-text-field>
-          </template>
-          <v-date-picker
-            v-model="dateAdd"
-            scrollable
-            range
-            locale="ru-ru"
+        <!-- download -->
+        <v-col cols="2">
+          <v-dialog
+            ref="dialog2"
+            v-model="modal2"
+            :return-value.sync="dateAdd"
+            persistent
+            width="290px"
           >
-            <v-spacer></v-spacer>
-            <v-btn
-              text
-              color="primary"
-              @click="modal2 = false"
-            >
-              Отменить
-            </v-btn>
-            <v-btn
-              text
-              color="primary"
-              @click="$refs.dialog2.save(dateAdd)"
-            >
-              Выбрать
-            </v-btn>
-          </v-date-picker>
-        </v-dialog>
-            </v-col>
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model.lazy="dateAdd"
+                label="Заливка (период)"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+                id="dateadd"
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model.lazy="dateAdd" scrollable range locale="ru-ru">
+              <v-spacer></v-spacer>
+              <v-btn
+                text
+                color="primary"
+                @click="
+                  modal2 = false
+                 "
+              >
+                Отмена
+              </v-btn>
+              <v-btn
+                text
+                color="primary"
+                @click="
+                  dateAdd = [];$refs.dialog2.save(dateAdd);modal2 = false
+                "
+              >
+                Очистить
+              </v-btn>
+              <v-btn text color="primary" @click="$refs.dialog2.save(dateAdd)">
+                Выбрать
+              </v-btn>
+            </v-date-picker>
+          </v-dialog>
+        </v-col>
 
-            <!-- firm -->
-            <v-col cols="2">
-<v-text-field label="В имени:" id="firm"></v-text-field>
-            </v-col>
+        <!-- firm -->
+        <v-col cols="2">
+          <v-text-field
+            label="В имени:"
+            id="firm"
+            v-model="firm"
+          ></v-text-field>
+        </v-col>
 
-            <!-- fio -->
-            <v-col cols="2">
-             <v-text-field label="В ФИО:" id="fio"></v-text-field>
-            </v-col>
+        <!-- fio -->
+        <v-col cols="1">
+          <v-text-field label="В ФИО:" id="fio" v-model="fio"></v-text-field>
+        </v-col>
 
-            <!-- inn -->
-            <v-col cols="1">
-                <v-text-field label="ИНН" id="inn"></v-text-field>
-            </v-col>
+        <!-- inn -->
+        <v-col cols="1">
+          <v-text-field label="ИНН" id="inn" v-model.number="inn"></v-text-field>
+        </v-col>
 
-            <!-- address -->
-            <v-col cols="2">
-                <v-text-field label="В адресе" id="address"></v-text-field>
-            </v-col>
+        <!-- address -->
+        <v-col cols="2">
+          <v-text-field
+            label="В адресе"
+            id="address"
+            v-model="address"
+          ></v-text-field>
+        </v-col>
 
-            <!-- reg -->
-            <v-col cols="1">
-                <v-text-field label="В регионе" id="region"></v-text-field>
-            </v-col>
+        <!-- reg -->
+        <v-col cols="1">
+          <v-text-field
+            label="В регионе"
+            id="region"
+            v-model="region"
+          ></v-text-field>
+        </v-col>
+        <!-- btn -->
+        <v-col cols="1">
+           <v-btn
+            color="primary"
+            elevation="2"
+            outlined
+            raised
 
-        </v-row>
+            @click="getClients"
+            ><v-icon>
+        mdi-table
+      </v-icon></v-btn
+          >
+        </v-col>
+      </v-row>
 
       <v-row>
-               <v-col cols="12">
-        <v-data-table
-          :headers="import_headers"
-          item-key="id"
-          :items="clients"
-          ref="importtable"
-        >
-          <template v-slot:item.id="{ item }"> </template>
-        </v-data-table>
-      </v-col>
         <v-col cols="12">
-          <v-btn
+          <v-data-table
+            :headers="import_headers"
+            item-key="id"
+            :items="clients"
+            ref="importtable"
+          >
+            <!-- <template v-slot:item.id="{ item }"> </template> -->
+          </v-data-table>
+        </v-col>
+        <v-col cols="12">
+          <!-- <v-btn
             color="primary"
             elevation="2"
             outlined
@@ -160,21 +184,39 @@
             x-large
             @click="exportfile"
             >Скачать базу</v-btn
+          > -->
+                                <download-csv
+            :data="clients"
+            delimiter=";"
+            :name="'Clients.csv'"
           >
+            <v-btn depressed> Сохранить CSV </v-btn>
+            <v-icon> mdi-download-circle </v-icon>
+          </download-csv>
         </v-col>
       </v-row>
-      <v-row> </v-row>
-    </v-main>
+       </v-tab-item>
+    </v-tabs-items>
+
+
+
   </div>
 </template>
 
 <script>
 import XLSX from "xlsx";
 import axios from "axios";
+import JsonCSV from "vue-json-csv";
 export default {
   data: () => ({
-      dateReg:[],
-      dateAdd:[],
+      tab:null,
+    dateReg: [],
+    dateAdd: [],
+    firm: "",
+    fio: "",
+    inn: "",
+    address: "",
+    region: "",
     menu: false,
     modal: false,
     modal2: false,
@@ -193,7 +235,52 @@ export default {
     message: "",
   }),
   mounted() {
-    this.getClients();
+    // this.getClients();
+  },
+  watch: {
+    // dateReg:{
+    //    handler: function(val, oldVal) {
+    //        this.getClients(); // call it in the context of your component object
+    //    },
+    //    deep: true
+    // },
+    // dateAdd:{
+    //    handler: function(val, oldVal) {
+    //        this.getClients(); // call it in the context of your component object
+    //    },
+    //    deep: true
+    // },
+    // firm:{
+    //    handler: function(val, oldVal) {
+    //        this.getClients(); // call it in the context of your component object
+    //    },
+    //    deep: true
+    // },
+    // fio:{
+    //    handler: function(val, oldVal) {
+    //        this.getClients(); // call it in the context of your component object
+    //    },
+    //    deep: true
+    // },
+    // inn:{
+    //    handler: function(val, oldVal) {
+    //        this.getClients(); // call it in the context of your component object
+    //    },
+    //    deep: true
+    // },
+    // address:{
+    //    handler: function(val, oldVal) {
+    //        this.getClients(); // call it in the context of your component object
+    //    },
+    //    deep: true
+    // },
+    // region:{
+    //    handler: function(val, oldVal) {
+    //        this.getClients(); // call it in the context of your component object
+    //    },
+    //    deep: true
+    // },
+
   },
   methods: {
     exportfile() {
@@ -309,8 +396,14 @@ export default {
     },
     getClients() {
       const self = this;
+      let send = {};
+      const filter = document.getElementById("filter");
+      const inputs = filter.querySelectorAll("input");
+      inputs.forEach(function (el) {
+        if (el.value != "") send[el.getAttribute("id")] = el.value;
+      });
       axios
-        .get("/api/getClients")
+        .post("/api/getClients",send)
         .then((res) => {
           self.clients = res.data.map(
             ({
@@ -336,6 +429,9 @@ export default {
         })
         .catch((error) => console.log(error));
     },
+  },
+  components: {
+    downloadCsv: JsonCSV,
   },
 };
 </script>

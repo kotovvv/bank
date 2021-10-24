@@ -33,10 +33,7 @@ class ImportController extends Controller
     }
     public function export()
     {
-
-        // return Excel::download(Client::all(), 'clients.xlsx');
-        //  return Client::all()->downloadExcel();
-        return Excel::download(new ClientExport, 'users.xlsx');
+        //return Excel::download(new ClientExport, 'users.xlsx');
     }
 
     /**
