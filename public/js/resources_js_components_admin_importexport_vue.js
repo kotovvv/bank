@@ -30992,6 +30992,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 
 
@@ -31039,51 +31041,8 @@ __webpack_require__.r(__webpack_exports__);
       message: ""
     };
   },
-  mounted: function mounted() {// this.getClients();
-  },
-  watch: {// dateReg:{
-    //    handler: function(val, oldVal) {
-    //        this.getClients(); // call it in the context of your component object
-    //    },
-    //    deep: true
-    // },
-    // dateAdd:{
-    //    handler: function(val, oldVal) {
-    //        this.getClients(); // call it in the context of your component object
-    //    },
-    //    deep: true
-    // },
-    // firm:{
-    //    handler: function(val, oldVal) {
-    //        this.getClients(); // call it in the context of your component object
-    //    },
-    //    deep: true
-    // },
-    // fio:{
-    //    handler: function(val, oldVal) {
-    //        this.getClients(); // call it in the context of your component object
-    //    },
-    //    deep: true
-    // },
-    // inn:{
-    //    handler: function(val, oldVal) {
-    //        this.getClients(); // call it in the context of your component object
-    //    },
-    //    deep: true
-    // },
-    // address:{
-    //    handler: function(val, oldVal) {
-    //        this.getClients(); // call it in the context of your component object
-    //    },
-    //    deep: true
-    // },
-    // region:{
-    //    handler: function(val, oldVal) {
-    //        this.getClients(); // call it in the context of your component object
-    //    },
-    //    deep: true
-    // },
-  },
+  mounted: function mounted() {},
+  watch: {},
   methods: {
     exportfile: function exportfile() {
       var newWindow = window.open();
@@ -31952,7 +31911,7 @@ var render = function() {
                               attrs,
                               false
                             ),
-                            [_vm._v("\n        X\n      ")]
+                            [_vm._v("\n              X\n            ")]
                           )
                         ]
                       }
@@ -31988,7 +31947,11 @@ var render = function() {
                           dragenter: _vm.handleDragover
                         }
                       },
-                      [_vm._v("\n        Перетяните файл сюда\n      ")]
+                      [
+                        _vm._v(
+                          "\n              Перетяните файл сюда\n            "
+                        )
+                      ]
                     )
                   ])
                 ],
@@ -32102,7 +32065,11 @@ var render = function() {
                                     }
                                   }
                                 },
-                                [_vm._v("\n              Отмена\n            ")]
+                                [
+                                  _vm._v(
+                                    "\n                  Отмена\n                "
+                                  )
+                                ]
                               ),
                               _vm._v(" "),
                               _c(
@@ -32119,7 +32086,7 @@ var render = function() {
                                 },
                                 [
                                   _vm._v(
-                                    "\n              Очистить\n            "
+                                    "\n                  Очистить\n                "
                                   )
                                 ]
                               ),
@@ -32136,7 +32103,7 @@ var render = function() {
                                 },
                                 [
                                   _vm._v(
-                                    "\n              Выбрать\n            "
+                                    "\n                  Выбрать\n                "
                                   )
                                 ]
                               )
@@ -32247,7 +32214,11 @@ var render = function() {
                                     }
                                   }
                                 },
-                                [_vm._v("\n              Отмена\n            ")]
+                                [
+                                  _vm._v(
+                                    "\n                  Отмена\n                "
+                                  )
+                                ]
                               ),
                               _vm._v(" "),
                               _c(
@@ -32264,7 +32235,7 @@ var render = function() {
                                 },
                                 [
                                   _vm._v(
-                                    "\n              Очистить\n            "
+                                    "\n                  Очистить\n                "
                                   )
                                 ]
                               ),
@@ -32281,7 +32252,7 @@ var render = function() {
                                 },
                                 [
                                   _vm._v(
-                                    "\n              Выбрать\n            "
+                                    "\n                  Выбрать\n                "
                                   )
                                 ]
                               )
@@ -32400,7 +32371,7 @@ var render = function() {
                           },
                           on: { click: _vm.getClients }
                         },
-                        [_c("v-icon", [_vm._v("\n      mdi-table\n    ")])],
+                        [_c("v-icon", [_vm._v(" mdi-table ")])],
                         1
                       )
                     ],
@@ -32410,55 +32381,59 @@ var render = function() {
                 1
               ),
               _vm._v(" "),
-              _c(
-                "v-row",
-                [
-                  _c(
-                    "v-col",
-                    { attrs: { cols: "12" } },
-                    [
-                      _c("v-data-table", {
-                        ref: "importtable",
-                        attrs: {
-                          headers: _vm.import_headers,
-                          "item-key": "id",
-                          items: _vm.clients
-                        }
-                      })
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-col",
-                    { attrs: { cols: "12" } },
-                    [
-                      _c(
-                        "download-csv",
-                        {
-                          attrs: {
-                            data: _vm.clients,
-                            delimiter: ";",
-                            name: "Clients.csv"
-                          }
-                        },
-                        [
-                          _c("v-btn", { attrs: { depressed: "" } }, [
-                            _vm._v(" Сохранить CSV ")
-                          ]),
-                          _vm._v(" "),
-                          _c("v-icon", [_vm._v(" mdi-download-circle ")])
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
+              _vm.clients.length
+                ? [
+                    _c(
+                      "v-row",
+                      [
+                        _c(
+                          "v-col",
+                          { attrs: { cols: "12" } },
+                          [
+                            _c("v-data-table", {
+                              ref: "importtable",
+                              attrs: {
+                                headers: _vm.import_headers,
+                                "item-key": "id",
+                                items: _vm.clients
+                              }
+                            })
+                          ],
+                          1
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "v-col",
+                          { attrs: { cols: "12" } },
+                          [
+                            _c(
+                              "download-csv",
+                              {
+                                attrs: {
+                                  data: _vm.clients,
+                                  delimiter: ";",
+                                  name: "Clients.csv"
+                                }
+                              },
+                              [
+                                _c("v-btn", { attrs: { depressed: "" } }, [
+                                  _vm._v(" Сохранить CSV ")
+                                ]),
+                                _vm._v(" "),
+                                _c("v-icon", [_vm._v(" mdi-download-circle ")])
+                              ],
+                              1
+                            )
+                          ],
+                          1
+                        )
+                      ],
+                      1
+                    )
+                  ]
+                : _vm._e()
             ],
-            1
+            2
           )
         ],
         1
