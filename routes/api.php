@@ -29,6 +29,6 @@ Route::get('users/getroles', [UsersController::class,'getroless'])->name('user.g
 Route::post('user/update', [UsersController::class,'update'])->name('user.update');
 Route::delete('user/{id}', [UsersController::class,'deleteuser']);
 
-Route::get('getClients', [ClientsController::class,'getClients']);
+Route::post('getClients', [ClientsController::class,'getClients']);
 Route::get('one', [ClientsController::class,'one']);
 

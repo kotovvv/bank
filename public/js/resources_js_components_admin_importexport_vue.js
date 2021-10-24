@@ -23769,6 +23769,23 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -23776,6 +23793,11 @@ __webpack_require__.r(__webpack_exports__);
     return {
       dateReg: [],
       dateAdd: [],
+      firm: "",
+      fio: "",
+      inn: "",
+      address: "",
+      region: "",
       menu: false,
       modal: false,
       modal2: false,
@@ -23809,8 +23831,50 @@ __webpack_require__.r(__webpack_exports__);
       message: ""
     };
   },
-  mounted: function mounted() {
-    this.getClients();
+  mounted: function mounted() {// this.getClients();
+  },
+  watch: {// dateReg:{
+    //    handler: function(val, oldVal) {
+    //        this.getClients(); // call it in the context of your component object
+    //    },
+    //    deep: true
+    // },
+    // dateAdd:{
+    //    handler: function(val, oldVal) {
+    //        this.getClients(); // call it in the context of your component object
+    //    },
+    //    deep: true
+    // },
+    // firm:{
+    //    handler: function(val, oldVal) {
+    //        this.getClients(); // call it in the context of your component object
+    //    },
+    //    deep: true
+    // },
+    // fio:{
+    //    handler: function(val, oldVal) {
+    //        this.getClients(); // call it in the context of your component object
+    //    },
+    //    deep: true
+    // },
+    // inn:{
+    //    handler: function(val, oldVal) {
+    //        this.getClients(); // call it in the context of your component object
+    //    },
+    //    deep: true
+    // },
+    // address:{
+    //    handler: function(val, oldVal) {
+    //        this.getClients(); // call it in the context of your component object
+    //    },
+    //    deep: true
+    // },
+    // region:{
+    //    handler: function(val, oldVal) {
+    //        this.getClients(); // call it in the context of your component object
+    //    },
+    //    deep: true
+    // },
   },
   methods: {
     exportfile: function exportfile() {
@@ -23923,7 +23987,14 @@ __webpack_require__.r(__webpack_exports__);
     },
     getClients: function getClients() {
       var self = this;
-      axios__WEBPACK_IMPORTED_MODULE_1___default().get("/api/getClients").then(function (res) {
+      var send = {};
+      var filter = document.getElementById("filter");
+      var inputs = filter.querySelectorAll("input");
+      inputs.forEach(function (el) {
+        if (el.value != "") send[el.getAttribute("id")] = el.value;
+      });
+      if (Object.keys(send).length == 0) return;
+      axios__WEBPACK_IMPORTED_MODULE_1___default().post("/api/getClients", send).then(function (res) {
         self.clients = res.data.map(function (_ref) {
           var id = _ref.id,
               inn = _ref.inn,
@@ -24637,7 +24708,7 @@ var render = function() {
                       attrs,
                       false
                     ),
-                    [_vm._v("\n          X\n        ")]
+                    [_vm._v("\n        X\n      ")]
                   )
                 ]
               }
@@ -24669,7 +24740,7 @@ var render = function() {
                   dragenter: _vm.handleDragover
                 }
               },
-              [_vm._v("\n          Перетяните файл сюда\n        ")]
+              [_vm._v("\n        Перетяните файл сюда\n      ")]
             )
           ])
         ],
@@ -24776,7 +24847,22 @@ var render = function() {
                                 }
                               }
                             },
-                            [_vm._v("\n              Отменить\n            ")]
+                            [_vm._v("\n              Отмена\n            ")]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { text: "", color: "primary" },
+                              on: {
+                                click: function($event) {
+                                  _vm.dateReg = []
+                                  _vm.$refs.dialog.save(_vm.dateReg)
+                                  _vm.modal = false
+                                }
+                              }
+                            },
+                            [_vm._v("\n              Очистить\n            ")]
                           ),
                           _vm._v(" "),
                           _c(
@@ -24894,7 +24980,22 @@ var render = function() {
                                 }
                               }
                             },
-                            [_vm._v("\n              Отменить\n            ")]
+                            [_vm._v("\n              Отмена\n            ")]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { text: "", color: "primary" },
+                              on: {
+                                click: function($event) {
+                                  _vm.dateAdd = []
+                                  _vm.$refs.dialog2.save(_vm.dateAdd)
+                                  _vm.modal2 = false
+                                }
+                              }
+                            },
+                            [_vm._v("\n              Очистить\n            ")]
                           ),
                           _vm._v(" "),
                           _c(
@@ -24924,32 +25025,14 @@ var render = function() {
                 { attrs: { cols: "2" } },
                 [
                   _c("v-text-field", {
-                    attrs: { label: "В имени:", id: "firm" }
-                  })
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-col",
-                { attrs: { cols: "2" } },
-                [_c("v-text-field", { attrs: { label: "В ФИО:", id: "fio" } })],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-col",
-                { attrs: { cols: "1" } },
-                [_c("v-text-field", { attrs: { label: "ИНН", id: "inn" } })],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-col",
-                { attrs: { cols: "2" } },
-                [
-                  _c("v-text-field", {
-                    attrs: { label: "В адресе", id: "address" }
+                    attrs: { label: "В имени:", id: "firm" },
+                    model: {
+                      value: _vm.firm,
+                      callback: function($$v) {
+                        _vm.firm = $$v
+                      },
+                      expression: "firm"
+                    }
                   })
                 ],
                 1
@@ -24960,8 +25043,91 @@ var render = function() {
                 { attrs: { cols: "1" } },
                 [
                   _c("v-text-field", {
-                    attrs: { label: "В регионе", id: "region" }
+                    attrs: { label: "В ФИО:", id: "fio" },
+                    model: {
+                      value: _vm.fio,
+                      callback: function($$v) {
+                        _vm.fio = $$v
+                      },
+                      expression: "fio"
+                    }
                   })
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-col",
+                { attrs: { cols: "1" } },
+                [
+                  _c("v-text-field", {
+                    attrs: { label: "ИНН", id: "inn" },
+                    model: {
+                      value: _vm.inn,
+                      callback: function($$v) {
+                        _vm.inn = _vm._n($$v)
+                      },
+                      expression: "inn"
+                    }
+                  })
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-col",
+                { attrs: { cols: "2" } },
+                [
+                  _c("v-text-field", {
+                    attrs: { label: "В адресе", id: "address" },
+                    model: {
+                      value: _vm.address,
+                      callback: function($$v) {
+                        _vm.address = $$v
+                      },
+                      expression: "address"
+                    }
+                  })
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-col",
+                { attrs: { cols: "1" } },
+                [
+                  _c("v-text-field", {
+                    attrs: { label: "В регионе", id: "region" },
+                    model: {
+                      value: _vm.region,
+                      callback: function($$v) {
+                        _vm.region = $$v
+                      },
+                      expression: "region"
+                    }
+                  })
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-col",
+                { attrs: { cols: "1" } },
+                [
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: {
+                        color: "primary",
+                        elevation: "2",
+                        outlined: "",
+                        raised: ""
+                      },
+                      on: { click: _vm.getClients }
+                    },
+                    [_c("v-icon", [_vm._v("\n      mdi-table\n    ")])],
+                    1
+                  )
                 ],
                 1
               )
@@ -25060,11 +25226,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vuetify_lib_components_VDataTable__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! vuetify/lib/components/VDataTable */ "./node_modules/vuetify/lib/components/VDataTable/VDataTable.js");
 /* harmony import */ var vuetify_lib_components_VDatePicker__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! vuetify/lib/components/VDatePicker */ "./node_modules/vuetify/lib/components/VDatePicker/VDatePicker.js");
 /* harmony import */ var vuetify_lib_components_VDialog__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! vuetify/lib/components/VDialog */ "./node_modules/vuetify/lib/components/VDialog/VDialog.js");
-/* harmony import */ var vuetify_lib_components_VMain__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! vuetify/lib/components/VMain */ "./node_modules/vuetify/lib/components/VMain/VMain.js");
-/* harmony import */ var vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! vuetify/lib/components/VGrid */ "./node_modules/vuetify/lib/components/VGrid/VRow.js");
-/* harmony import */ var vuetify_lib_components_VSnackbar__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! vuetify/lib/components/VSnackbar */ "./node_modules/vuetify/lib/components/VSnackbar/VSnackbar.js");
-/* harmony import */ var vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! vuetify/lib/components/VGrid */ "./node_modules/vuetify/lib/components/VGrid/VSpacer.js");
-/* harmony import */ var vuetify_lib_components_VTextField__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! vuetify/lib/components/VTextField */ "./node_modules/vuetify/lib/components/VTextField/VTextField.js");
+/* harmony import */ var vuetify_lib_components_VIcon__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! vuetify/lib/components/VIcon */ "./node_modules/vuetify/lib/components/VIcon/VIcon.js");
+/* harmony import */ var vuetify_lib_components_VMain__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! vuetify/lib/components/VMain */ "./node_modules/vuetify/lib/components/VMain/VMain.js");
+/* harmony import */ var vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! vuetify/lib/components/VGrid */ "./node_modules/vuetify/lib/components/VGrid/VRow.js");
+/* harmony import */ var vuetify_lib_components_VSnackbar__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! vuetify/lib/components/VSnackbar */ "./node_modules/vuetify/lib/components/VSnackbar/VSnackbar.js");
+/* harmony import */ var vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! vuetify/lib/components/VGrid */ "./node_modules/vuetify/lib/components/VGrid/VSpacer.js");
+/* harmony import */ var vuetify_lib_components_VTextField__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! vuetify/lib/components/VTextField */ "./node_modules/vuetify/lib/components/VTextField/VTextField.js");
 
 
 
@@ -25097,7 +25264,8 @@ var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__
 
 
 
-_node_modules_vuetify_loader_lib_runtime_installComponents_js__WEBPACK_IMPORTED_MODULE_4___default()(component, {VBtn: vuetify_lib_components_VBtn__WEBPACK_IMPORTED_MODULE_5__["default"],VCardText: vuetify_lib_components_VCard__WEBPACK_IMPORTED_MODULE_6__.VCardText,VCol: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_7__["default"],VDataTable: vuetify_lib_components_VDataTable__WEBPACK_IMPORTED_MODULE_8__["default"],VDatePicker: vuetify_lib_components_VDatePicker__WEBPACK_IMPORTED_MODULE_9__["default"],VDialog: vuetify_lib_components_VDialog__WEBPACK_IMPORTED_MODULE_10__["default"],VMain: vuetify_lib_components_VMain__WEBPACK_IMPORTED_MODULE_11__["default"],VRow: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_12__["default"],VSnackbar: vuetify_lib_components_VSnackbar__WEBPACK_IMPORTED_MODULE_13__["default"],VSpacer: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_14__["default"],VTextField: vuetify_lib_components_VTextField__WEBPACK_IMPORTED_MODULE_15__["default"]})
+
+_node_modules_vuetify_loader_lib_runtime_installComponents_js__WEBPACK_IMPORTED_MODULE_4___default()(component, {VBtn: vuetify_lib_components_VBtn__WEBPACK_IMPORTED_MODULE_5__["default"],VCardText: vuetify_lib_components_VCard__WEBPACK_IMPORTED_MODULE_6__.VCardText,VCol: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_7__["default"],VDataTable: vuetify_lib_components_VDataTable__WEBPACK_IMPORTED_MODULE_8__["default"],VDatePicker: vuetify_lib_components_VDatePicker__WEBPACK_IMPORTED_MODULE_9__["default"],VDialog: vuetify_lib_components_VDialog__WEBPACK_IMPORTED_MODULE_10__["default"],VIcon: vuetify_lib_components_VIcon__WEBPACK_IMPORTED_MODULE_11__["default"],VMain: vuetify_lib_components_VMain__WEBPACK_IMPORTED_MODULE_12__["default"],VRow: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_13__["default"],VSnackbar: vuetify_lib_components_VSnackbar__WEBPACK_IMPORTED_MODULE_14__["default"],VSpacer: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_15__["default"],VTextField: vuetify_lib_components_VTextField__WEBPACK_IMPORTED_MODULE_16__["default"]})
 
 
 /* hot reload */
@@ -25164,7 +25332,7 @@ component.options.__file = "resources/js/components/admin/importexport.vue"
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"_args":[["axios@0.21.4","C:\\\\laragon\\\\www\\\\bank"]],"_from":"axios@0.21.4","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.4","name":"axios","escapedName":"axios","rawSpec":"0.21.4","saveSpec":null,"fetchSpec":"0.21.4"},"_requiredBy":["#DEV:/"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_spec":"0.21.4","_where":"C:\\\\laragon\\\\www\\\\bank","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
+module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"Promise based HTTP client for the browser and node.js","main":"index.js","scripts":{"test":"grunt test","start":"node ./sandbox/server.js","build":"NODE_ENV=production grunt build","preversion":"npm test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json","postversion":"git push && git push --tags","examples":"node ./examples/server.js","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","fix":"eslint --fix lib/**/*.js"},"repository":{"type":"git","url":"https://github.com/axios/axios.git"},"keywords":["xhr","http","ajax","promise","node"],"author":"Matt Zabriskie","license":"MIT","bugs":{"url":"https://github.com/axios/axios/issues"},"homepage":"https://axios-http.com","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"jsdelivr":"dist/axios.min.js","unpkg":"dist/axios.min.js","typings":"./index.d.ts","dependencies":{"follow-redirects":"^1.14.0"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}]}');
 
 /***/ })
 
