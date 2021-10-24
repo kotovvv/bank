@@ -30992,23 +30992,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
+      tab: null,
       dateReg: [],
       dateAdd: [],
       firm: "",
@@ -31904,466 +31894,103 @@ var render = function() {
     "div",
     [
       _c(
-        "v-snackbar",
+        "v-tabs",
         {
-          attrs: { top: "", right: "", timeout: "-1" },
-          scopedSlots: _vm._u([
-            {
-              key: "action",
-              fn: function(ref) {
-                var attrs = ref.attrs
-                return [
-                  _c(
-                    "v-btn",
-                    _vm._b(
-                      {
-                        attrs: { color: "pink", text: "" },
-                        on: {
-                          click: function($event) {
-                            _vm.message = ""
-                          }
-                        }
-                      },
-                      "v-btn",
-                      attrs,
-                      false
-                    ),
-                    [_vm._v("\n          X\n        ")]
-                  )
-                ]
-              }
-            }
-          ]),
           model: {
-            value: _vm.message.length,
+            value: _vm.tab,
             callback: function($$v) {
-              _vm.$set(_vm.message, "length", $$v)
+              _vm.tab = $$v
             },
-            expression: "message.length"
+            expression: "tab"
           }
         },
-        [_c("v-card-text", { domProps: { innerHTML: _vm._s(_vm.message) } })],
-        1
-      ),
-      _vm._v(" "),
-      _c(
-        "v-row",
         [
-          _c("v-col", { attrs: { cols: "12" } }, [
-            _c(
-              "div",
-              {
-                attrs: { id: "drop" },
-                on: {
-                  drop: _vm.handleDrop,
-                  dragover: _vm.handleDragover,
-                  dragenter: _vm.handleDragover
-                }
-              },
-              [_vm._v("\n          Перетяните файл сюда\n        ")]
-            )
-          ])
+          _c("v-tab", [_vm._v("Импорт")]),
+          _vm._v(" "),
+          _c("v-tab", [_vm._v("Экспорт")])
         ],
         1
       ),
       _vm._v(" "),
       _c(
-        "v-main",
+        "v-tabs-items",
+        {
+          model: {
+            value: _vm.tab,
+            callback: function($$v) {
+              _vm.tab = $$v
+            },
+            expression: "tab"
+          }
+        },
         [
           _c(
-            "v-row",
-            { attrs: { id: "filter" } },
+            "v-tab-item",
             [
               _c(
-                "v-col",
-                { attrs: { cols: "2" } },
-                [
-                  _c(
-                    "v-dialog",
+                "v-snackbar",
+                {
+                  attrs: { top: "", right: "", timeout: "-1" },
+                  scopedSlots: _vm._u([
                     {
-                      ref: "dialog",
-                      attrs: {
-                        "return-value": _vm.dateReg,
-                        persistent: "",
-                        width: "290px"
-                      },
-                      on: {
-                        "update:returnValue": function($event) {
-                          _vm.dateReg = $event
-                        },
-                        "update:return-value": function($event) {
-                          _vm.dateReg = $event
-                        }
-                      },
-                      scopedSlots: _vm._u([
-                        {
-                          key: "activator",
-                          fn: function(ref) {
-                            var on = ref.on
-                            var attrs = ref.attrs
-                            return [
-                              _c(
-                                "v-text-field",
-                                _vm._g(
-                                  _vm._b(
-                                    {
-                                      attrs: {
-                                        label: "Регистрация (период)",
-                                        "prepend-icon": "mdi-calendar",
-                                        readonly: "",
-                                        id: "datereg"
-                                      },
-                                      model: {
-                                        value: _vm.dateReg,
-                                        callback: function($$v) {
-                                          _vm.dateReg = $$v
-                                        },
-                                        expression: "dateReg"
-                                      }
-                                    },
-                                    "v-text-field",
-                                    attrs,
-                                    false
-                                  ),
-                                  on
-                                )
-                              )
-                            ]
-                          }
-                        }
-                      ]),
-                      model: {
-                        value: _vm.modal,
-                        callback: function($$v) {
-                          _vm.modal = $$v
-                        },
-                        expression: "modal"
-                      }
-                    },
-                    [
-                      _vm._v(" "),
-                      _c(
-                        "v-date-picker",
-                        {
-                          attrs: { scrollable: "", range: "", locale: "ru-ru" },
-                          model: {
-                            value: _vm.dateReg,
-                            callback: function($$v) {
-                              _vm.dateReg = $$v
-                            },
-                            expression: "dateReg"
-                          }
-                        },
-                        [
-                          _c("v-spacer"),
-                          _vm._v(" "),
+                      key: "action",
+                      fn: function(ref) {
+                        var attrs = ref.attrs
+                        return [
                           _c(
                             "v-btn",
-                            {
-                              attrs: { text: "", color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  _vm.modal = false
+                            _vm._b(
+                              {
+                                attrs: { color: "pink", text: "" },
+                                on: {
+                                  click: function($event) {
+                                    _vm.message = ""
+                                  }
                                 }
-                              }
-                            },
-                            [_vm._v("\n                Отмена\n              ")]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "v-btn",
-                            {
-                              attrs: { text: "", color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  _vm.dateReg = []
-                                  _vm.$refs.dialog.save(_vm.dateReg)
-                                  _vm.modal = false
-                                }
-                              }
-                            },
-                            [
-                              _vm._v(
-                                "\n                Очистить\n              "
-                              )
-                            ]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "v-btn",
-                            {
-                              attrs: { text: "", color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  return _vm.$refs.dialog.save(_vm.dateReg)
-                                }
-                              }
-                            },
-                            [
-                              _vm._v(
-                                "\n                Выбрать\n              "
-                              )
-                            ]
+                              },
+                              "v-btn",
+                              attrs,
+                              false
+                            ),
+                            [_vm._v("\n        X\n      ")]
                           )
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-col",
-                { attrs: { cols: "2" } },
-                [
-                  _c(
-                    "v-dialog",
-                    {
-                      ref: "dialog2",
-                      attrs: {
-                        "return-value": _vm.dateAdd,
-                        persistent: "",
-                        width: "290px"
-                      },
-                      on: {
-                        "update:returnValue": function($event) {
-                          _vm.dateAdd = $event
-                        },
-                        "update:return-value": function($event) {
-                          _vm.dateAdd = $event
-                        }
-                      },
-                      scopedSlots: _vm._u([
-                        {
-                          key: "activator",
-                          fn: function(ref) {
-                            var on = ref.on
-                            var attrs = ref.attrs
-                            return [
-                              _c(
-                                "v-text-field",
-                                _vm._g(
-                                  _vm._b(
-                                    {
-                                      attrs: {
-                                        label: "Заливка (период)",
-                                        "prepend-icon": "mdi-calendar",
-                                        readonly: "",
-                                        id: "dateadd"
-                                      },
-                                      model: {
-                                        value: _vm.dateAdd,
-                                        callback: function($$v) {
-                                          _vm.dateAdd = $$v
-                                        },
-                                        expression: "dateAdd"
-                                      }
-                                    },
-                                    "v-text-field",
-                                    attrs,
-                                    false
-                                  ),
-                                  on
-                                )
-                              )
-                            ]
-                          }
-                        }
-                      ]),
-                      model: {
-                        value: _vm.modal2,
-                        callback: function($$v) {
-                          _vm.modal2 = $$v
-                        },
-                        expression: "modal2"
+                        ]
                       }
+                    }
+                  ]),
+                  model: {
+                    value: _vm.message.length,
+                    callback: function($$v) {
+                      _vm.$set(_vm.message, "length", $$v)
                     },
-                    [
-                      _vm._v(" "),
-                      _c(
-                        "v-date-picker",
-                        {
-                          attrs: { scrollable: "", range: "", locale: "ru-ru" },
-                          model: {
-                            value: _vm.dateAdd,
-                            callback: function($$v) {
-                              _vm.dateAdd = $$v
-                            },
-                            expression: "dateAdd"
-                          }
-                        },
-                        [
-                          _c("v-spacer"),
-                          _vm._v(" "),
-                          _c(
-                            "v-btn",
-                            {
-                              attrs: { text: "", color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  _vm.modal2 = false
-                                }
-                              }
-                            },
-                            [_vm._v("\n                Отмена\n              ")]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "v-btn",
-                            {
-                              attrs: { text: "", color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  _vm.dateAdd = []
-                                  _vm.$refs.dialog2.save(_vm.dateAdd)
-                                  _vm.modal2 = false
-                                }
-                              }
-                            },
-                            [
-                              _vm._v(
-                                "\n                Очистить\n              "
-                              )
-                            ]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "v-btn",
-                            {
-                              attrs: { text: "", color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  return _vm.$refs.dialog2.save(_vm.dateAdd)
-                                }
-                              }
-                            },
-                            [
-                              _vm._v(
-                                "\n                Выбрать\n              "
-                              )
-                            ]
-                          )
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-col",
-                { attrs: { cols: "2" } },
+                    expression: "message.length"
+                  }
+                },
                 [
-                  _c("v-text-field", {
-                    attrs: { label: "В имени:", id: "firm" },
-                    model: {
-                      value: _vm.firm,
-                      callback: function($$v) {
-                        _vm.firm = $$v
-                      },
-                      expression: "firm"
-                    }
+                  _c("v-card-text", {
+                    domProps: { innerHTML: _vm._s(_vm.message) }
                   })
                 ],
                 1
               ),
               _vm._v(" "),
               _c(
-                "v-col",
-                { attrs: { cols: "1" } },
+                "v-row",
                 [
-                  _c("v-text-field", {
-                    attrs: { label: "В ФИО:", id: "fio" },
-                    model: {
-                      value: _vm.fio,
-                      callback: function($$v) {
-                        _vm.fio = $$v
+                  _c("v-col", { attrs: { cols: "12" } }, [
+                    _c(
+                      "div",
+                      {
+                        attrs: { id: "drop" },
+                        on: {
+                          drop: _vm.handleDrop,
+                          dragover: _vm.handleDragover,
+                          dragenter: _vm.handleDragover
+                        }
                       },
-                      expression: "fio"
-                    }
-                  })
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-col",
-                { attrs: { cols: "1" } },
-                [
-                  _c("v-text-field", {
-                    attrs: { label: "ИНН", id: "inn" },
-                    model: {
-                      value: _vm.inn,
-                      callback: function($$v) {
-                        _vm.inn = _vm._n($$v)
-                      },
-                      expression: "inn"
-                    }
-                  })
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-col",
-                { attrs: { cols: "2" } },
-                [
-                  _c("v-text-field", {
-                    attrs: { label: "В адресе", id: "address" },
-                    model: {
-                      value: _vm.address,
-                      callback: function($$v) {
-                        _vm.address = $$v
-                      },
-                      expression: "address"
-                    }
-                  })
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-col",
-                { attrs: { cols: "1" } },
-                [
-                  _c("v-text-field", {
-                    attrs: { label: "В регионе", id: "region" },
-                    model: {
-                      value: _vm.region,
-                      callback: function($$v) {
-                        _vm.region = $$v
-                      },
-                      expression: "region"
-                    }
-                  })
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-col",
-                { attrs: { cols: "1" } },
-                [
-                  _c(
-                    "v-btn",
-                    {
-                      attrs: {
-                        color: "primary",
-                        elevation: "2",
-                        outlined: "",
-                        raised: ""
-                      },
-                      on: { click: _vm.getClients }
-                    },
-                    [_c("v-icon", [_vm._v("\n        mdi-table\n      ")])],
-                    1
-                  )
+                      [_vm._v("\n        Перетяните файл сюда\n      ")]
+                    )
+                  ])
                 ],
                 1
               )
@@ -32372,43 +31999,458 @@ var render = function() {
           ),
           _vm._v(" "),
           _c(
-            "v-row",
+            "v-tab-item",
             [
               _c(
-                "v-col",
-                { attrs: { cols: "12" } },
+                "v-row",
+                { attrs: { id: "filter" } },
                 [
-                  _c("v-data-table", {
-                    ref: "importtable",
-                    attrs: {
-                      headers: _vm.import_headers,
-                      "item-key": "id",
-                      items: _vm.clients
-                    }
-                  })
+                  _c(
+                    "v-col",
+                    { attrs: { cols: "2" } },
+                    [
+                      _c(
+                        "v-dialog",
+                        {
+                          ref: "dialog",
+                          attrs: {
+                            "return-value": _vm.dateReg,
+                            persistent: "",
+                            width: "290px"
+                          },
+                          on: {
+                            "update:returnValue": function($event) {
+                              _vm.dateReg = $event
+                            },
+                            "update:return-value": function($event) {
+                              _vm.dateReg = $event
+                            }
+                          },
+                          scopedSlots: _vm._u([
+                            {
+                              key: "activator",
+                              fn: function(ref) {
+                                var on = ref.on
+                                var attrs = ref.attrs
+                                return [
+                                  _c(
+                                    "v-text-field",
+                                    _vm._g(
+                                      _vm._b(
+                                        {
+                                          attrs: {
+                                            label: "Регистрация (период)",
+                                            "prepend-icon": "mdi-calendar",
+                                            readonly: "",
+                                            id: "datereg"
+                                          },
+                                          model: {
+                                            value: _vm.dateReg,
+                                            callback: function($$v) {
+                                              _vm.dateReg = $$v
+                                            },
+                                            expression: "dateReg"
+                                          }
+                                        },
+                                        "v-text-field",
+                                        attrs,
+                                        false
+                                      ),
+                                      on
+                                    )
+                                  )
+                                ]
+                              }
+                            }
+                          ]),
+                          model: {
+                            value: _vm.modal,
+                            callback: function($$v) {
+                              _vm.modal = $$v
+                            },
+                            expression: "modal"
+                          }
+                        },
+                        [
+                          _vm._v(" "),
+                          _c(
+                            "v-date-picker",
+                            {
+                              attrs: {
+                                scrollable: "",
+                                range: "",
+                                locale: "ru-ru"
+                              },
+                              model: {
+                                value: _vm.dateReg,
+                                callback: function($$v) {
+                                  _vm.dateReg = $$v
+                                },
+                                expression: "dateReg"
+                              }
+                            },
+                            [
+                              _c("v-spacer"),
+                              _vm._v(" "),
+                              _c(
+                                "v-btn",
+                                {
+                                  attrs: { text: "", color: "primary" },
+                                  on: {
+                                    click: function($event) {
+                                      _vm.modal = false
+                                    }
+                                  }
+                                },
+                                [_vm._v("\n              Отмена\n            ")]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-btn",
+                                {
+                                  attrs: { text: "", color: "primary" },
+                                  on: {
+                                    click: function($event) {
+                                      _vm.dateReg = []
+                                      _vm.$refs.dialog.save(_vm.dateReg)
+                                      _vm.modal = false
+                                    }
+                                  }
+                                },
+                                [
+                                  _vm._v(
+                                    "\n              Очистить\n            "
+                                  )
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-btn",
+                                {
+                                  attrs: { text: "", color: "primary" },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.$refs.dialog.save(_vm.dateReg)
+                                    }
+                                  }
+                                },
+                                [
+                                  _vm._v(
+                                    "\n              Выбрать\n            "
+                                  )
+                                ]
+                              )
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-col",
+                    { attrs: { cols: "2" } },
+                    [
+                      _c(
+                        "v-dialog",
+                        {
+                          ref: "dialog2",
+                          attrs: {
+                            "return-value": _vm.dateAdd,
+                            persistent: "",
+                            width: "290px"
+                          },
+                          on: {
+                            "update:returnValue": function($event) {
+                              _vm.dateAdd = $event
+                            },
+                            "update:return-value": function($event) {
+                              _vm.dateAdd = $event
+                            }
+                          },
+                          scopedSlots: _vm._u([
+                            {
+                              key: "activator",
+                              fn: function(ref) {
+                                var on = ref.on
+                                var attrs = ref.attrs
+                                return [
+                                  _c(
+                                    "v-text-field",
+                                    _vm._g(
+                                      _vm._b(
+                                        {
+                                          attrs: {
+                                            label: "Заливка (период)",
+                                            "prepend-icon": "mdi-calendar",
+                                            readonly: "",
+                                            id: "dateadd"
+                                          },
+                                          model: {
+                                            value: _vm.dateAdd,
+                                            callback: function($$v) {
+                                              _vm.dateAdd = $$v
+                                            },
+                                            expression: "dateAdd"
+                                          }
+                                        },
+                                        "v-text-field",
+                                        attrs,
+                                        false
+                                      ),
+                                      on
+                                    )
+                                  )
+                                ]
+                              }
+                            }
+                          ]),
+                          model: {
+                            value: _vm.modal2,
+                            callback: function($$v) {
+                              _vm.modal2 = $$v
+                            },
+                            expression: "modal2"
+                          }
+                        },
+                        [
+                          _vm._v(" "),
+                          _c(
+                            "v-date-picker",
+                            {
+                              attrs: {
+                                scrollable: "",
+                                range: "",
+                                locale: "ru-ru"
+                              },
+                              model: {
+                                value: _vm.dateAdd,
+                                callback: function($$v) {
+                                  _vm.dateAdd = $$v
+                                },
+                                expression: "dateAdd"
+                              }
+                            },
+                            [
+                              _c("v-spacer"),
+                              _vm._v(" "),
+                              _c(
+                                "v-btn",
+                                {
+                                  attrs: { text: "", color: "primary" },
+                                  on: {
+                                    click: function($event) {
+                                      _vm.modal2 = false
+                                    }
+                                  }
+                                },
+                                [_vm._v("\n              Отмена\n            ")]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-btn",
+                                {
+                                  attrs: { text: "", color: "primary" },
+                                  on: {
+                                    click: function($event) {
+                                      _vm.dateAdd = []
+                                      _vm.$refs.dialog2.save(_vm.dateAdd)
+                                      _vm.modal2 = false
+                                    }
+                                  }
+                                },
+                                [
+                                  _vm._v(
+                                    "\n              Очистить\n            "
+                                  )
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-btn",
+                                {
+                                  attrs: { text: "", color: "primary" },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.$refs.dialog2.save(_vm.dateAdd)
+                                    }
+                                  }
+                                },
+                                [
+                                  _vm._v(
+                                    "\n              Выбрать\n            "
+                                  )
+                                ]
+                              )
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-col",
+                    { attrs: { cols: "2" } },
+                    [
+                      _c("v-text-field", {
+                        attrs: { label: "В имени:", id: "firm" },
+                        model: {
+                          value: _vm.firm,
+                          callback: function($$v) {
+                            _vm.firm = $$v
+                          },
+                          expression: "firm"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-col",
+                    { attrs: { cols: "1" } },
+                    [
+                      _c("v-text-field", {
+                        attrs: { label: "В ФИО:", id: "fio" },
+                        model: {
+                          value: _vm.fio,
+                          callback: function($$v) {
+                            _vm.fio = $$v
+                          },
+                          expression: "fio"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-col",
+                    { attrs: { cols: "1" } },
+                    [
+                      _c("v-text-field", {
+                        attrs: { label: "ИНН", id: "inn" },
+                        model: {
+                          value: _vm.inn,
+                          callback: function($$v) {
+                            _vm.inn = _vm._n($$v)
+                          },
+                          expression: "inn"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-col",
+                    { attrs: { cols: "2" } },
+                    [
+                      _c("v-text-field", {
+                        attrs: { label: "В адресе", id: "address" },
+                        model: {
+                          value: _vm.address,
+                          callback: function($$v) {
+                            _vm.address = $$v
+                          },
+                          expression: "address"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-col",
+                    { attrs: { cols: "1" } },
+                    [
+                      _c("v-text-field", {
+                        attrs: { label: "В регионе", id: "region" },
+                        model: {
+                          value: _vm.region,
+                          callback: function($$v) {
+                            _vm.region = $$v
+                          },
+                          expression: "region"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-col",
+                    { attrs: { cols: "1" } },
+                    [
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: {
+                            color: "primary",
+                            elevation: "2",
+                            outlined: "",
+                            raised: ""
+                          },
+                          on: { click: _vm.getClients }
+                        },
+                        [_c("v-icon", [_vm._v("\n      mdi-table\n    ")])],
+                        1
+                      )
+                    ],
+                    1
+                  )
                 ],
                 1
               ),
               _vm._v(" "),
               _c(
-                "v-col",
-                { attrs: { cols: "12" } },
+                "v-row",
                 [
                   _c(
-                    "download-csv",
-                    {
-                      attrs: {
-                        data: _vm.clients,
-                        delimiter: ";",
-                        name: "Clients (" + _vm.date("Y-m-d") + ").csv"
-                      }
-                    },
+                    "v-col",
+                    { attrs: { cols: "12" } },
                     [
-                      _c("v-btn", { attrs: { depressed: "" } }, [
-                        _vm._v(" Сохранить CSV ")
-                      ]),
-                      _vm._v(" "),
-                      _c("v-icon", [_vm._v(" mdi-download-circle ")])
+                      _c("v-data-table", {
+                        ref: "importtable",
+                        attrs: {
+                          headers: _vm.import_headers,
+                          "item-key": "id",
+                          items: _vm.clients
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-col",
+                    { attrs: { cols: "12" } },
+                    [
+                      _c(
+                        "download-csv",
+                        {
+                          attrs: {
+                            data: _vm.clients,
+                            delimiter: ";",
+                            name: "Clients.csv"
+                          }
+                        },
+                        [
+                          _c("v-btn", { attrs: { depressed: "" } }, [
+                            _vm._v(" Сохранить CSV ")
+                          ]),
+                          _vm._v(" "),
+                          _c("v-icon", [_vm._v(" mdi-download-circle ")])
+                        ],
+                        1
+                      )
                     ],
                     1
                   )
@@ -32417,9 +32459,7 @@ var render = function() {
               )
             ],
             1
-          ),
-          _vm._v(" "),
-          _c("v-row")
+          )
         ],
         1
       )
@@ -32458,11 +32498,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vuetify_lib_components_VDatePicker__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! vuetify/lib/components/VDatePicker */ "./node_modules/vuetify/lib/components/VDatePicker/VDatePicker.js");
 /* harmony import */ var vuetify_lib_components_VDialog__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! vuetify/lib/components/VDialog */ "./node_modules/vuetify/lib/components/VDialog/VDialog.js");
 /* harmony import */ var vuetify_lib_components_VIcon__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! vuetify/lib/components/VIcon */ "./node_modules/vuetify/lib/components/VIcon/VIcon.js");
-/* harmony import */ var vuetify_lib_components_VMain__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! vuetify/lib/components/VMain */ "./node_modules/vuetify/lib/components/VMain/VMain.js");
-/* harmony import */ var vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! vuetify/lib/components/VGrid */ "./node_modules/vuetify/lib/components/VGrid/VRow.js");
-/* harmony import */ var vuetify_lib_components_VSnackbar__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! vuetify/lib/components/VSnackbar */ "./node_modules/vuetify/lib/components/VSnackbar/VSnackbar.js");
-/* harmony import */ var vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! vuetify/lib/components/VGrid */ "./node_modules/vuetify/lib/components/VGrid/VSpacer.js");
-/* harmony import */ var vuetify_lib_components_VTextField__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! vuetify/lib/components/VTextField */ "./node_modules/vuetify/lib/components/VTextField/VTextField.js");
+/* harmony import */ var vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! vuetify/lib/components/VGrid */ "./node_modules/vuetify/lib/components/VGrid/VRow.js");
+/* harmony import */ var vuetify_lib_components_VSnackbar__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! vuetify/lib/components/VSnackbar */ "./node_modules/vuetify/lib/components/VSnackbar/VSnackbar.js");
+/* harmony import */ var vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! vuetify/lib/components/VGrid */ "./node_modules/vuetify/lib/components/VGrid/VSpacer.js");
+/* harmony import */ var vuetify_lib_components_VTabs__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! vuetify/lib/components/VTabs */ "./node_modules/vuetify/lib/components/VTabs/VTab.js");
+/* harmony import */ var vuetify_lib_components_VTabs__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! vuetify/lib/components/VTabs */ "./node_modules/vuetify/lib/components/VTabs/VTabItem.js");
+/* harmony import */ var vuetify_lib_components_VTabs__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! vuetify/lib/components/VTabs */ "./node_modules/vuetify/lib/components/VTabs/VTabs.js");
+/* harmony import */ var vuetify_lib_components_VTabs__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! vuetify/lib/components/VTabs */ "./node_modules/vuetify/lib/components/VTabs/VTabsItems.js");
+/* harmony import */ var vuetify_lib_components_VTextField__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! vuetify/lib/components/VTextField */ "./node_modules/vuetify/lib/components/VTextField/VTextField.js");
 
 
 
@@ -32496,7 +32539,10 @@ var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__
 
 
 
-_node_modules_vuetify_loader_lib_runtime_installComponents_js__WEBPACK_IMPORTED_MODULE_4___default()(component, {VBtn: vuetify_lib_components_VBtn__WEBPACK_IMPORTED_MODULE_5__["default"],VCardText: vuetify_lib_components_VCard__WEBPACK_IMPORTED_MODULE_6__.VCardText,VCol: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_7__["default"],VDataTable: vuetify_lib_components_VDataTable__WEBPACK_IMPORTED_MODULE_8__["default"],VDatePicker: vuetify_lib_components_VDatePicker__WEBPACK_IMPORTED_MODULE_9__["default"],VDialog: vuetify_lib_components_VDialog__WEBPACK_IMPORTED_MODULE_10__["default"],VIcon: vuetify_lib_components_VIcon__WEBPACK_IMPORTED_MODULE_11__["default"],VMain: vuetify_lib_components_VMain__WEBPACK_IMPORTED_MODULE_12__["default"],VRow: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_13__["default"],VSnackbar: vuetify_lib_components_VSnackbar__WEBPACK_IMPORTED_MODULE_14__["default"],VSpacer: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_15__["default"],VTextField: vuetify_lib_components_VTextField__WEBPACK_IMPORTED_MODULE_16__["default"]})
+
+
+
+_node_modules_vuetify_loader_lib_runtime_installComponents_js__WEBPACK_IMPORTED_MODULE_4___default()(component, {VBtn: vuetify_lib_components_VBtn__WEBPACK_IMPORTED_MODULE_5__["default"],VCardText: vuetify_lib_components_VCard__WEBPACK_IMPORTED_MODULE_6__.VCardText,VCol: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_7__["default"],VDataTable: vuetify_lib_components_VDataTable__WEBPACK_IMPORTED_MODULE_8__["default"],VDatePicker: vuetify_lib_components_VDatePicker__WEBPACK_IMPORTED_MODULE_9__["default"],VDialog: vuetify_lib_components_VDialog__WEBPACK_IMPORTED_MODULE_10__["default"],VIcon: vuetify_lib_components_VIcon__WEBPACK_IMPORTED_MODULE_11__["default"],VRow: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_12__["default"],VSnackbar: vuetify_lib_components_VSnackbar__WEBPACK_IMPORTED_MODULE_13__["default"],VSpacer: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_14__["default"],VTab: vuetify_lib_components_VTabs__WEBPACK_IMPORTED_MODULE_15__["default"],VTabItem: vuetify_lib_components_VTabs__WEBPACK_IMPORTED_MODULE_16__["default"],VTabs: vuetify_lib_components_VTabs__WEBPACK_IMPORTED_MODULE_17__["default"],VTabsItems: vuetify_lib_components_VTabs__WEBPACK_IMPORTED_MODULE_18__["default"],VTextField: vuetify_lib_components_VTextField__WEBPACK_IMPORTED_MODULE_19__["default"]})
 
 
 /* hot reload */

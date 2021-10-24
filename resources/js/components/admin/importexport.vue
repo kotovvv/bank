@@ -1,26 +1,12 @@
 <template>
   <div>
-    <!-- <v-tabs>
+    <v-tabs v-model="tab">
     <v-tab>Импорт</v-tab>
     <v-tab>Экспорт</v-tab>
 
   </v-tabs>
-  <v-tabs-items>
+  <v-tabs-items v-model="tab">
       <v-tab-item>
-        <v-card flat>
-          <v-card-text>
-щту
-          </v-card-text>
-        </v-card>
-      </v-tab-item>
-      <v-tab-item>
-        <v-card flat>
-          <v-card-text>
-фів
-          </v-card-text>
-        </v-card>
-      </v-tab-item>
-    </v-tabs-items> -->
     <v-snackbar v-model="message.length" top right timeout="-1">
       <v-card-text v-html="message"></v-card-text>
       <template v-slot:action="{ attrs }">
@@ -41,8 +27,8 @@
         </div>
       </v-col>
     </v-row>
-
-    <v-main>
+      </v-tab-item>
+      <v-tab-item>
       <v-row id="filter">
         <!-- registration -->
         <v-col cols="2">
@@ -202,15 +188,18 @@
                                 <download-csv
             :data="clients"
             delimiter=";"
-            :name="'Clients (' + date('Y-m-d') +').csv'"
+            :name="'Clients.csv'"
           >
             <v-btn depressed> Сохранить CSV </v-btn>
             <v-icon> mdi-download-circle </v-icon>
           </download-csv>
         </v-col>
       </v-row>
-      <v-row> </v-row>
-    </v-main>
+       </v-tab-item>
+    </v-tabs-items>
+
+
+
   </div>
 </template>
 
@@ -220,6 +209,7 @@ import axios from "axios";
 import JsonCSV from "vue-json-csv";
 export default {
   data: () => ({
+      tab:null,
     dateReg: [],
     dateAdd: [],
     firm: "",
