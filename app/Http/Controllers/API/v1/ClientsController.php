@@ -106,30 +106,31 @@ class ClientsController extends Controller
 		public function getClients(Request $request)
 		{
 				$a_filter = $request->all();
+                if (count($a_filter) == 0 ) return response([]);
 				//Debugbar::info($a_filter);
 				$sql = "SELECT * FROM `clients` WHERE 1=1";
 				foreach ($a_filter as $key => $filter_word) {
-
+                    // Debugbar::info(iconv_strlen($filter_word));
 						switch ($key) {
 								case 'datereg':
 										if (strpos($filter_word, ',')) {
 												$a_date = explode(',', $filter_word);
-												$sql .= " AND `registration` BETWEEN date($a_date[0]) AND date($a_date[1])";
+												$sql .= " AND `registration` BETWEEN date('$a_date[0]') AND date('$'a_date[1]')";
 										} else {
-												$sql .= " AND `registration` = date($filter_word)";
+												$sql .= " AND `registration` = date('$filter_word')";
 										}
 										break;
 								case 'dateadd':
 
 										if (strpos($filter_word, ',')) {
 												$a_date = explode(',', $filter_word);
-												$sql .= " AND date(`date_added`) BETWEEN date($a_date[0]) AND date($a_date[1])";
+												$sql .= " AND date(`date_added`) BETWEEN date('$a_date[0]') AND date('$a_date[1]')";
 										} else {
-												$sql .= " AND date(`date_added`) = date($filter_word)";
+												$sql .= " AND date(`date_added`) = date('$filter_word')";
 										}
 										break;
 								case 'firm':
-										if (strlen($filter_word) < 4) {
+										if (iconv_strlen($filter_word) < 4) {
 												$sql .= " AND `organizationName` LIKE ('" . $filter_word . "%')";
 										} else {
 												$sql .= " AND MATCH (organizationName) AGAINST ('" . $filter_word . "')";
@@ -149,7 +150,7 @@ class ClientsController extends Controller
 										break;
 						}
 				}
-
+                Debugbar::info($sql);
 				return DB::select(DB::raw($sql));
 		}
 

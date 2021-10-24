@@ -5,6 +5,8 @@ namespace App\Exports;
 use App\Models\Client;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Debugbar;
+use DB;
 
 class ClientExport implements FromCollection, WithHeadings
 {
@@ -13,7 +15,9 @@ class ClientExport implements FromCollection, WithHeadings
     */
     public function collection()
     {
-        return Client::select('inn','fullName','phoneNumber','organizationName','address','region','registration','initiator','date_added')->get();
+        $fields = "'inn','fullName','phoneNumber','organizationName','address','region','registration','initiator','date_added'";
+            return Client::select($fields)->get();
+
     }
 
     public function headings(): array

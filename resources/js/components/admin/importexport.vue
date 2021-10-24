@@ -1,5 +1,26 @@
 <template>
   <div>
+    <!-- <v-tabs>
+    <v-tab>Импорт</v-tab>
+    <v-tab>Экспорт</v-tab>
+
+  </v-tabs>
+  <v-tabs-items>
+      <v-tab-item>
+        <v-card flat>
+          <v-card-text>
+щту
+          </v-card-text>
+        </v-card>
+      </v-tab-item>
+      <v-tab-item>
+        <v-card flat>
+          <v-card-text>
+фів
+          </v-card-text>
+        </v-card>
+      </v-tab-item>
+    </v-tabs-items> -->
     <v-snackbar v-model="message.length" top right timeout="-1">
       <v-card-text v-html="message"></v-card-text>
       <template v-slot:action="{ attrs }">
@@ -165,11 +186,11 @@
             :items="clients"
             ref="importtable"
           >
-            <template v-slot:item.id="{ item }"> </template>
+            <!-- <template v-slot:item.id="{ item }"> </template> -->
           </v-data-table>
         </v-col>
         <v-col cols="12">
-          <v-btn
+          <!-- <v-btn
             color="primary"
             elevation="2"
             outlined
@@ -177,7 +198,15 @@
             x-large
             @click="exportfile"
             >Скачать базу</v-btn
+          > -->
+                                <download-csv
+            :data="clients"
+            delimiter=";"
+            :name="'Clients (' + date('Y-m-d') +').csv'"
           >
+            <v-btn depressed> Сохранить CSV </v-btn>
+            <v-icon> mdi-download-circle </v-icon>
+          </download-csv>
         </v-col>
       </v-row>
       <v-row> </v-row>
@@ -188,6 +217,7 @@
 <script>
 import XLSX from "xlsx";
 import axios from "axios";
+import JsonCSV from "vue-json-csv";
 export default {
   data: () => ({
     dateReg: [],
@@ -382,8 +412,6 @@ export default {
       inputs.forEach(function (el) {
         if (el.value != "") send[el.getAttribute("id")] = el.value;
       });
-if (Object.keys(send).length == 0) return
-
       axios
         .post("/api/getClients",send)
         .then((res) => {
@@ -411,6 +439,9 @@ if (Object.keys(send).length == 0) return
         })
         .catch((error) => console.log(error));
     },
+  },
+  components: {
+    downloadCsv: JsonCSV,
   },
 };
 </script>
