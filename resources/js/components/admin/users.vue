@@ -141,9 +141,9 @@ export default {
     users: [],
     group:[{fio:'Без группы', id:0}],
     roles: [
-      { id: 1, name: "Administrator" },
-      { id: 2, name: "CRM Manager" },
-      { id: 3, name: "Manager" },
+      { id: 1, name: "superAdmin" },
+      { id: 2, name: "Administrator" },
+      { id: 3, name: "Operator" },
     ],
     headers: [
       { text: "Логин", value: "name" },
@@ -194,18 +194,6 @@ export default {
   },
 
   methods: {
-    // report() {
-    //   let selectedUsers = Object.keys(this.$refs.datausers.selection);
-    //   if (selectedUsers.length) {
-    //     let self = this;
-    //     axios
-    //       .post("/api/status_users", selectedUsers)
-    //       .then((res) => {
-    //         console.log(res.data);
-    //       })
-    //       .catch((error) => console.log(error));
-    //   }
-    // },
     rolename(user) {
       user.role = (this.roles.find((r) => r.id == user.role_id)).name;
     },

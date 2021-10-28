@@ -34111,9 +34111,15 @@ var logincomponent = function logincomponent() {
 
 var admincomponent = function admincomponent() {
   return __webpack_require__.e(/*! import() */ "resources_js_components_admin_adminComponent_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./components/admin/adminComponent */ "./resources/js/components/admin/adminComponent.vue"));
-}; // const crmcomponent = () => import("./components/crmanager/crmComponent");
-// const managercomponent = () => import("./components/manager/managerComponent");
+};
 
+var administratorComponent = function administratorComponent() {
+  return __webpack_require__.e(/*! import() */ "resources_js_components_administrator_administratorComponent_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./components/administrator/administratorComponent */ "./resources/js/components/administrator/administratorComponent.vue"));
+};
+
+var operatorComponent = function operatorComponent() {
+  return __webpack_require__.e(/*! import() */ "resources_js_components_operator_operatorComponent_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./components/operator/operatorComponent */ "./resources/js/components/operator/operatorComponent.vue"));
+};
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   //  name:'main',
@@ -34127,8 +34133,8 @@ var admincomponent = function admincomponent() {
     theComponent: function theComponent() {
       if (this.user.role_id == undefined) return logincomponent;
       if (this.user.role_id == 1) return admincomponent;
-      if (this.user.role_id == 2) return crmcomponent;
-      if (this.user.role_id == 3) return managercomponent;
+      if (this.user.role_id == 2) return administratorComponent;
+      if (this.user.role_id == 3) return operatorComponent;
     }
   },
   methods: {
@@ -36844,7 +36850,7 @@ module.exports = function installComponents (component, components) {
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames not based on template
-/******/ 			if ({"resources_js_components_loginComponent_vue":1,"resources_js_components_admin_adminComponent_vue":1,"resources_js_components_admin_importexport_vue":1,"resources_js_components_admin_users_vue":1}[chunkId]) return "js/" + chunkId + ".js";
+/******/ 			if ({"resources_js_components_loginComponent_vue":1,"resources_js_components_admin_adminComponent_vue":1,"resources_js_components_administrator_administratorComponent_vue":1,"resources_js_components_operator_operatorComponent_vue":1,"resources_js_components_admin_importexport_vue":1,"resources_js_components_admin_users_vue":1,"resources_js_components_administrator_setBank_vue":1}[chunkId]) return "js/" + chunkId + ".js";
 /******/ 			// return url for filenames based on template
 /******/ 			return undefined;
 /******/ 		};
