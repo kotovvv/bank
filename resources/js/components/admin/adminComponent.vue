@@ -50,11 +50,11 @@
 
 <script>
 const importexport = () => import("./importexport");
-const users = () => import("./users");
+// const users = () => import("./users");
 // const statusLid = () => import("./statusLid");
-
+const dictionary = () => import("./dictionary");
 // const providers = () => import("./providers");
-// const mlids = () => import("../manager/mlids");
+const setBankClient = () => import("../administrator/setBankClient");
 // const lids = () => import("../crmanager/lids");
 
 export default {
@@ -65,23 +65,23 @@ export default {
 
     items: [
       { text: "Импорт экспорт", name: "importexport", icon: "mdi-swap-vertical" },
-      { text: "Пользователи", name: "users", icon: "mdi-account" },
-      { text: "Воронки", name: "statusLid", icon: "mdi-format-list-checks" },
+    //   { text: "Пользователи", name: "users", icon: "mdi-account" },
+      { text: "Справочники", name: "dictionary", icon: "mdi-format-list-checks" },
       //{ text: "Поставщики", name: "providers", icon: "mdi-contact-phone-outline" },
       // { text: "Рабочие места", name: "workPlaces", icon: "mdi-sitemap" },
-      { text: "Распределение", name: "lids", icon: "mdi-account-arrow-left" },
+      { text: "Распределение", name: "distribution", icon: "mdi-account-arrow-left" },
       { text: "Управление", name: "mlids", icon: "mdi-phone-log-outline" },
     ],
-    adminMenu: "importexport",
+    adminMenu: "distribution",
   }),
   computed: {
     adminComponent() {
       if (this.adminMenu == "importexport") return importexport;
-       if (this.adminMenu == "users") return users;
-    //   if (this.adminMenu == "statusLid") return statusLid;
+    //    if (this.adminMenu == "users") return users;
+    if (this.adminMenu == "dictionary") return dictionary;
 
     //   if (this.adminMenu == "providers") return providers;
-    //   if (this.adminMenu == "mlids") return mlids;
+    if (this.adminMenu == "distribution") return setBankClient;
     //   if (this.adminMenu == "lids") return lids;
     },
   },

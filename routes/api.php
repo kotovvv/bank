@@ -4,6 +4,8 @@ use App\Http\Controllers\API\v1\loginController;
 use App\Http\Controllers\API\v1\importController;
 use App\Http\Controllers\API\v1\UsersController;
 use App\Http\Controllers\API\v1\ClientsController;
+use App\Http\Controllers\API\v1\FunnelsController;
+use App\Http\Controllers\API\v1\BanksController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +20,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::resource('users', UsersController::class);
+Route::resource('funnels', FunnelsController::class);
+Route::resource('banks', BanksController::class);
 
 Route::post('/login',[loginController::class,'login']);
 Route::post('import',[importController::class,'store']);
@@ -30,5 +34,6 @@ Route::post('user/update', [UsersController::class,'update'])->name('user.update
 Route::delete('user/{id}', [UsersController::class,'deleteuser']);
 
 Route::post('getClients', [ClientsController::class,'getClients']);
-Route::get('one', [ClientsController::class,'one']);
+Route::get('clientsByUser/{id}', [ClientsController::class,'clientsByUser']);
+
 

@@ -59,7 +59,7 @@
 </template>
 
 <script>
-const setBank = () => import("../administrator/setBank.vue");
+const setBank = () => import("./setBankClient.vue");
 // const mlids = () => import("../operator/oclients.vue");
 
 export default {

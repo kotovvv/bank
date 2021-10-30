@@ -1,5 +1,7 @@
 <template>
   <div>
+    <v-row>
+      <v-col cols="9">
         <v-row id="filter">
           <!-- registration -->
           <v-col cols="2">
@@ -112,7 +114,7 @@
 
           <!-- fio -->
           <v-col cols="1">
-            <v-text-field label="В ФИО:" id="fio" v-model="fio"></v-text-field>
+            <v-text-field label="ФИО:" id="fio" v-model="fio"></v-text-field>
           </v-col>
 
           <!-- inn -->
@@ -153,20 +155,105 @@
             >
           </v-col>
         </v-row>
-        <template v-if="clients.length">
-        <v-row>
-          <v-col cols="12">
+      </v-col>
+      <v-col cols="3" v-if="clients.length">
+        <v-autocomplete
+          v-model="selectedBanks"
+          :items="banks"
+          outlined
+          dense
+          chips
+          small-chips
+          item-text="name"
+          item-value="id"
+          label="Назначить банк"
+          multiple
+        ></v-autocomplete>
+      </v-col>
+    </v-row>
+    <template v-if="clients.length">
+      <v-row>
+        <v-col cols="9">
+          <v-card>
+            <!-- :search="search" -->
             <v-data-table
+              v-model.lazy.trim="selected"
               :headers="import_headers"
+              :single-select="false"
               item-key="id"
+              show-select
+              @click:row="clickrow"
               :items="clients"
-              ref="clients"
+              ref="datatable"
+              :footer-props="{
+                'items-per-page-options': [50, 10, 100, 250, 500, -1],
+                'items-per-page-text': 'Показать',
+              }"
             >
+              <template
+                v-slot:top="{ pagination, options, updateOptions }"
+                :footer-props="{
+                  'items-per-page-options': [50, 10, 100, 250, 500, -1],
+                  'items-per-page-text': 'Показать',
+                }"
+              >
+                <v-row>
+                  <v-spacer></v-spacer>
+                  <v-col cols="6">
+                    <v-data-footer
+                      :pagination="pagination"
+                      :options="options"
+                      @update:options="updateOptions"
+                      :items-per-page-options="[50, 10, 100, 250, 500, -1]"
+                      :items-per-page-text="'Показать'"
+                    />
+                  </v-col>
+                </v-row>
+              </template>
             </v-data-table>
-          </v-col>
+          </v-card>
+        </v-col>
+        <v-col cols="3">
+          <div class="row">
+            <v-card class="pa-5 w-100">
+              Назначте выбранным клиентам - оператора
+              <v-card-text class="scroll-y">
+                <v-list>
+                  <v-radio-group
+                    @change="changeClientsUser"
+                    ref="radiogroup"
+                    v-model="userid"
+                    v-bind="users"
+                    id="usersradiogroup"
+                  >
 
-        </v-row>
-        </template>
+                          <v-row v-for="user in users" :key="user.id">
+                            <v-radio
+                              :label="user.fio"
+                              :value="user.id"
+                              :disabled="disableuser == user.id"
+                            >
+                            </v-radio>
+
+                              <!-- :color="usercolor(user)" -->
+                            <v-btn
+                              class="ml-3"
+                              small
+                              @click="getClients(user.id)"
+                              :value="user.hmlids"
+                              :disabled="disableuser == user.id"
+                              >{{ user.hmlids }}</v-btn
+                            >
+                          </v-row>
+
+                  </v-radio-group>
+                </v-list>
+              </v-card-text>
+            </v-card>
+          </div>
+        </v-col>
+      </v-row>
+    </template>
   </div>
 </template>
 
@@ -175,6 +262,12 @@ import axios from "axios";
 
 export default {
   data: () => ({
+    selected: [],
+    userid: null,
+    disableuser: 0,
+    selectedBanks: [],
+    banks: [],
+    users: [],
     tab: null,
     dateReg: [],
     dateAdd: [],
@@ -187,7 +280,7 @@ export default {
     modal: false,
     modal2: false,
     import_headers: [
-      { text: "", value: "id" },
+      // { text: "", value: "id" },
       { text: "ИНН", value: "inn" },
       { text: "ФИО", value: "fullName" },
       { text: "Тел", value: "phoneNumber" },
@@ -201,13 +294,57 @@ export default {
     message: "",
   }),
   mounted() {
-
+    this.getBanks();
+    this.getUsers();
   },
-  watch: {
-
-  },
+  watch: {},
   methods: {
+    getClients(id){
+            let self = this;
 
+      self.disableuser = id;
+      axios
+        .get("/api/clientsByUser/" + id)
+        .then((res) => {
+          // console.log(res.data);
+          self.clients = Object.entries(res.data).map((e) => e[1]);
+
+          // self.lids.map(function (e) {
+          //   e.user = self.users.find((u) => u.id == e.user_id).fio;
+          //   e.date_created = e.created_at.substring(0, 10);
+          //   e.provider = self.providers.find((p) => p.id == e.provider_id).name;
+          //   if (e.status_id)
+          //     e.status = self.statuses.find((s) => s.id == e.status_id).name;
+          // });
+          // self.searchAll = "";
+
+        })
+        .catch((error) => console.log(error));
+    },
+    clickrow() {},
+    changeClientsUser() {},
+    getBanks() {
+      let self = this;
+      axios
+        .get("/api/banks")
+        .then((res) => {
+          self.banks = res.data.map(({ id, name, abbr }) => ({
+            id,
+            name,
+            abbr,
+          }));
+        })
+        .catch((error) => console.log(error));
+    },
+        getUsers() {
+      let self = this;
+      axios
+        .get("/api/users")
+        .then((res) => {
+          self.users = res.data;
+           })
+        .catch((error) => console.log(error));
+    },
     getClients() {
       const self = this;
       let send = {};
@@ -244,12 +381,9 @@ export default {
         .catch((error) => console.log(error));
     },
   },
-  components: {
-
-  },
+  components: {},
 };
 </script>
 
 <style>
-
 </style>

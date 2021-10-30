@@ -2753,7 +2753,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 var setBank = function setBank() {
-  return __webpack_require__.e(/*! import() */ "resources_js_components_administrator_setBank_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../administrator/setBank.vue */ "./resources/js/components/administrator/setBank.vue"));
+  return __webpack_require__.e(/*! import() */ "resources_js_components_administrator_setBankClient_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./setBankClient.vue */ "./resources/js/components/administrator/setBankClient.vue"));
 }; // const mlids = () => import("../operator/oclients.vue");
 
 

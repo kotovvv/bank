@@ -24,7 +24,7 @@ class UsersController extends Controller
   public function index()
   {
     // return User::All();
-    return User::select(['users.*']) //, DB::raw('(SELECT COUNT(user_id) FROM lids WHERE lids.user_id = users.id) as hmlids ')
+    return User::select(['users.*', DB::raw('(SELECT COUNT(user_id) FROM clients WHERE clients.user_id = users.id) as hmlids ')]) //
 
       // ->where('users.role_id', '>', 1)
       // ->where('users.active', 1)

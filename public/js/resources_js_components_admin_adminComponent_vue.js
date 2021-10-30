@@ -2744,14 +2744,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 var importexport = function importexport() {
   return __webpack_require__.e(/*! import() */ "resources_js_components_admin_importexport_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./importexport */ "./resources/js/components/admin/importexport.vue"));
-};
+}; // const users = () => import("./users");
+// const statusLid = () => import("./statusLid");
 
-var users = function users() {
-  return __webpack_require__.e(/*! import() */ "resources_js_components_admin_users_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./users */ "./resources/js/components/admin/users.vue"));
-}; // const statusLid = () => import("./statusLid");
-// const providers = () => import("./providers");
-// const mlids = () => import("../manager/mlids");
-// const lids = () => import("../crmanager/lids");
+
+var dictionary = function dictionary() {
+  return __webpack_require__.e(/*! import() */ "resources_js_components_admin_dictionary_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./dictionary */ "./resources/js/components/admin/dictionary.vue"));
+}; // const providers = () => import("./providers");
+
+
+var setBankClient = function setBankClient() {
+  return __webpack_require__.e(/*! import() */ "resources_js_components_administrator_setBankClient_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../administrator/setBankClient */ "./resources/js/components/administrator/setBankClient.vue"));
+}; // const lids = () => import("../crmanager/lids");
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -2764,35 +2768,32 @@ var users = function users() {
         text: "Импорт экспорт",
         name: "importexport",
         icon: "mdi-swap-vertical"
-      }, {
-        text: "Пользователи",
-        name: "users",
-        icon: "mdi-account"
-      }, {
-        text: "Воронки",
-        name: "statusLid",
+      }, //   { text: "Пользователи", name: "users", icon: "mdi-account" },
+      {
+        text: "Справочники",
+        name: "dictionary",
         icon: "mdi-format-list-checks"
       }, //{ text: "Поставщики", name: "providers", icon: "mdi-contact-phone-outline" },
       // { text: "Рабочие места", name: "workPlaces", icon: "mdi-sitemap" },
       {
         text: "Распределение",
-        name: "lids",
+        name: "distribution",
         icon: "mdi-account-arrow-left"
       }, {
         text: "Управление",
         name: "mlids",
         icon: "mdi-phone-log-outline"
       }],
-      adminMenu: "importexport"
+      adminMenu: "distribution"
     };
   },
   computed: {
     adminComponent: function adminComponent() {
-      if (this.adminMenu == "importexport") return importexport;
-      if (this.adminMenu == "users") return users; //   if (this.adminMenu == "statusLid") return statusLid;
-      //   if (this.adminMenu == "providers") return providers;
-      //   if (this.adminMenu == "mlids") return mlids;
-      //   if (this.adminMenu == "lids") return lids;
+      if (this.adminMenu == "importexport") return importexport; //    if (this.adminMenu == "users") return users;
+
+      if (this.adminMenu == "dictionary") return dictionary; //   if (this.adminMenu == "providers") return providers;
+
+      if (this.adminMenu == "distribution") return setBankClient; //   if (this.adminMenu == "lids") return lids;
     }
   },
   mounted: function mounted() {},

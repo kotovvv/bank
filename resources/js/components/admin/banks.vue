@@ -2,25 +2,25 @@
   <v-card class="mx-auto" max-width="600">
     <v-data-table
       :headers="headers"
-      :items="statuses"
+      :items="Banks"
       sort-by="role_id"
       class="elevation-1"
       cols="6"
     >
       <template v-slot:item.name="{ item }">
-        <v-chip :color="item.color" dark>
+        <v-chip :style="{'background':item.color}">
           {{ item.name }}
         </v-chip>
       </template>
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Статусы</v-toolbar-title>
+          <v-toolbar-title>Банки</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
-                Добавить статус
+                Добавить Банк
               </v-btn>
             </template>
             <v-card>
@@ -39,22 +39,9 @@
                     </v-col>
                     <v-col cols="4">
                       <v-text-field
-                        v-model="editedItem.order"
-                        label="Позиция"
+                        v-model="editedItem.abr"
+                        label="Аббревиатура"
                       ></v-text-field>
-                      <v-switch
-                        v-model="editedItem.active"
-                        label="Показывать:"
-                      ></v-switch>
-                    </v-col>
-                    <v-col cols="8">
-                      <v-color-picker
-                        class="ma-2"
-                        canvas-height="100"
-                        mode="hexa"
-                        value="hexa"
-                        v-model="editedItem.color"
-                      ></v-color-picker>
                     </v-col>
                     <v-col cols="4"> </v-col>
                   </v-row>
@@ -75,15 +62,15 @@
           <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
               <v-card-title class="headline"
-                >Are you sure you want to delete this item?</v-card-title
+                >Увенены в удалении?</v-card-title
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="closeDelete"
-                  >Cancel</v-btn
+                  >Отмена</v-btn
                 >
                 <v-btn color="blue darken-1" text @click="deleteItemConfirm"
-                  >OK</v-btn
+                  >Да</v-btn
                 >
                 <v-spacer></v-spacer>
               </v-card-actions>
@@ -96,7 +83,7 @@
         <!-- <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon> -->
       </template>
       <template v-slot:no-data>
-        <v-btn color="primary" @click="getStatus"> Reset </v-btn>
+        <v-btn color="primary" @click="getBanks"> Обновить </v-btn>
       </template>
     </v-data-table>
   </v-card>
@@ -108,11 +95,11 @@ export default {
   data: () => ({
     dialog: false,
     dialogDelete: false,
-    statuses: [],
+    Banks: [],
     headers: [
       { text: "Наименование", value: "name" },
-      { text: "Позиция", value: "order" },
-      { text: "Показывать", value: "active" },
+      { text: "Аббревиатура", value: "abbr" },
+
       { text: "Действия", value: "actions", sortable: false },
     ],
 
@@ -133,7 +120,7 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "Новый статус" : "Редактировать статус";
+      return this.editedIndex === -1 ? "Новый банк" : "Редактировать банк";
     },
   },
 
@@ -147,24 +134,23 @@ export default {
   },
 
   created() {
-    // this.initialize(),
-    this.getStatus();
+    this.getBanks();
   },
 
   methods: {
-    getStatus() {
+    getBanks() {
       let self = this;
       axios
-        .get("/api/statusall")
+        .get("/api/banks")
         .then((res) => {
-          self.statuses = res.data;
+          self.Banks = res.data;
         })
         .catch((error) => console.log(error));
     },
-    saveStatus(status) {
+    saveBanks(bank) {
       let self = this;
       axios
-        .post("/api/statuses", status)
+        .post("/api/banks", bank)
         .then((res) => {
           // console.log(res);
         })
@@ -172,19 +158,19 @@ export default {
     },
     // initialize() {},
     editItem(item) {
-      this.editedIndex = this.statuses.indexOf(item);
+      this.editedIndex = this.Banks.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.statuses.indexOf(item);
+      this.editedIndex = this.Banks.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
 
     deleteItemConfirm() {
-      this.statuses.splice(this.editedIndex, 1);
+      this.Banks.splice(this.editedIndex, 1);
       this.closeDelete();
     },
 
@@ -206,11 +192,11 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
-        this.saveStatus(this.editedItem);
-        Object.assign(this.statuses[this.editedIndex], this.editedItem);
+        this.saveBanks(this.editedItem);
+        Object.assign(this.Banks[this.editedIndex], this.editedItem);
       } else {
-        this.saveStatus(this.editedItem);
-        this.statuses.push(this.editedItem);
+        this.saveBanks(this.editedItem);
+        this.Banks.push(this.editedItem);
       }
       this.close();
     },
