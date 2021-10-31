@@ -1,5 +1,13 @@
 <template>
   <div>
+    <v-snackbar v-model="snackbar" top right>
+      <v-card-text v-html="message"></v-card-text>
+      <template v-slot:action="{ attrs }">
+        <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
+          X
+        </v-btn>
+      </template>
+    </v-snackbar>
     <v-row>
       <v-col cols="9">
         <v-row id="filter">
@@ -167,13 +175,15 @@
           item-text="name"
           item-value="id"
           label="Назначить банк"
-          multiple
+          @change="setBankForClients(selectedBanks)"
         ></v-autocomplete>
+        <!-- multiple -->
       </v-col>
     </v-row>
-    <template v-if="clients.length">
+    <template>
       <v-row>
-        <v-col cols="9">
+        <v-spacer></v-spacer>
+        <v-col cols="9" v-if="clients.length">
           <v-card>
             <!-- :search="search" -->
             <v-data-table
@@ -216,36 +226,34 @@
         <v-col cols="3">
           <div class="row">
             <v-card class="pa-5 w-100">
-              Назначте выбранным клиентам - оператора
+              Операторы
               <v-card-text class="scroll-y">
                 <v-list>
                   <v-radio-group
-                    @change="changeClientsUser"
+                    @change="changeUserOfClients"
                     ref="radiogroup"
                     v-model="userid"
                     v-bind="users"
                     id="usersradiogroup"
                   >
+                    <v-row v-for="user in users" :key="user.id">
+                      <v-radio
+                        :label="user.fio"
+                        :value="user.id"
+                        :disabled="disableuser == user.id"
+                      >
+                      </v-radio>
 
-                          <v-row v-for="user in users" :key="user.id">
-                            <v-radio
-                              :label="user.fio"
-                              :value="user.id"
-                              :disabled="disableuser == user.id"
-                            >
-                            </v-radio>
-
-                              <!-- :color="usercolor(user)" -->
-                            <v-btn
-                              class="ml-3"
-                              small
-                              @click="getClients(user.id)"
-                              :value="user.hmlids"
-                              :disabled="disableuser == user.id"
-                              >{{ user.hmlids }}</v-btn
-                            >
-                          </v-row>
-
+                      <!-- :color="usercolor(user)" -->
+                      <v-btn
+                        class="ml-3"
+                        small
+                        @click="getUserClients(user.id)"
+                        :value="user.hmlids"
+                        :disabled="disableuser == user.id"
+                        >{{ user.hmlids }}</v-btn
+                      >
+                    </v-row>
                   </v-radio-group>
                 </v-list>
               </v-card-text>
@@ -292,19 +300,56 @@ export default {
     clients: [],
     headers: [],
     message: "",
+    snackbar: false,
   }),
   mounted() {
     this.getBanks();
     this.getUsers();
+    this.getClientsWithoutBanks();
   },
   watch: {},
   methods: {
-    getClients(id){
-            let self = this;
+    getClientsWithoutBanks() {
+      let self = this;
+      axios
+        .get("/api/getClientsWithoutBanks")
+        .then((res) => {
+          self.clients = Object.entries(res.data).map((e) => e[1]);
+        })
+        .catch((error) => console.log(error));
+    },
+    setBankForClients(bank_id) {
+      let self = this;
+      let send = {};
+      let user_id = this.disableuser;
+      send.user_id = this.userid;
+      send.bank_id = bank_id;
+      if (this.selected.length) {
+        send.clients = this.selected.map((i) => i.id);
+      } else {
+        send.clients = this.clients.map((i) => i.id);
+      }
+      axios
+        .post("/api/setBankForClients", send)
+        .then((res) => {
+          self.getUsers();
+          self.getUserClients(user_id);
+
+          self.selected = [];
+          self.selectedBanks = 0;
+
+          self.message =
+            "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
+          self.snackbar = true;
+        })
+        .catch((error) => console.log(error));
+    },
+    getUserClients(id) {
+      let self = this;
 
       self.disableuser = id;
       axios
-        .get("/api/clientsByUser/" + id)
+        .get("/api/getUserClients/" + id)
         .then((res) => {
           // console.log(res.data);
           self.clients = Object.entries(res.data).map((e) => e[1]);
@@ -317,12 +362,29 @@ export default {
           //     e.status = self.statuses.find((s) => s.id == e.status_id).name;
           // });
           // self.searchAll = "";
-
+          self.selectedBanks = 0;
         })
         .catch((error) => console.log(error));
     },
     clickrow() {},
-    changeClientsUser() {},
+    changeUserOfClients() {
+      let self = this;
+      let send = {};
+      send.user_id = this.userid;
+      if (this.selected) {
+        send.clients = this.selected.map((i) => i.id);
+      } else {
+        send.clients = this.clients.map((i) => i.id);
+      }
+      axios
+        .post("/api/changeUserOfClients", send)
+        .then((res) => {
+          self.getUsers();
+          self.getUserClients(self.userid);
+          self.userid = null;
+        })
+        .catch((error) => console.log(error));
+    },
     getBanks() {
       let self = this;
       axios
@@ -336,13 +398,13 @@ export default {
         })
         .catch((error) => console.log(error));
     },
-        getUsers() {
+    getUsers() {
       let self = this;
       axios
         .get("/api/users")
         .then((res) => {
           self.users = res.data;
-           })
+        })
         .catch((error) => console.log(error));
     },
     getClients() {

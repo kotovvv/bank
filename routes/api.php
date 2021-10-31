@@ -34,6 +34,9 @@ Route::post('user/update', [UsersController::class,'update'])->name('user.update
 Route::delete('user/{id}', [UsersController::class,'deleteuser']);
 
 Route::post('getClients', [ClientsController::class,'getClients']);
-Route::get('clientsByUser/{id}', [ClientsController::class,'clientsByUser']);
+Route::get('getUserClients/{id}', [ClientsController::class,'getUserClients']);
+Route::post('changeUserOfClients', [ClientsController::class,'changeUserOfClients']);
+Route::post('setBankForClients', [ClientsController::class,'setBankForClients']);
+Route::get('getClientsWithoutBanks', [ClientsController::class,'getClientsWithoutBanks']);
 
 

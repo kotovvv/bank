@@ -16588,13 +16588,11 @@ __webpack_require__.r(__webpack_exports__);
       editedIndex: -1,
       editedItem: {
         name: "",
-        active: 0,
         color: '#fff',
         order: 0
       },
       defaultItem: {
         name: "",
-        active: 0,
         color: '#fff',
         order: 0
       }
@@ -16868,13 +16866,11 @@ __webpack_require__.r(__webpack_exports__);
       editedIndex: -1,
       editedItem: {
         name: "",
-        active: 0,
         color: '#fff',
         order: 0
       },
       defaultItem: {
         name: "",
-        active: 0,
         color: '#fff',
         order: 0
       }
@@ -17273,11 +17269,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -17313,8 +17304,7 @@ __webpack_require__.r(__webpack_exports__);
       }, {
         text: "Группа",
         value: "group_id"
-      }, //   { text: "Показывать", value: "active" },
-      {
+      }, {
         text: "Действия",
         value: "actions",
         sortable: false
@@ -17324,15 +17314,13 @@ __webpack_require__.r(__webpack_exports__);
         name: "",
         fio: "",
         role_id: 0,
-        password: "" //   active: 0,
-
+        password: ""
       },
       defaultItem: {
         name: "",
         fio: "",
         role_id: 0,
-        password: "" //   active: 0,
-
+        password: ""
       }
     };
   },
@@ -18633,15 +18621,15 @@ var render = function() {
                                             _c("v-text-field", {
                                               attrs: { label: "Аббревиатура" },
                                               model: {
-                                                value: _vm.editedItem.abr,
+                                                value: _vm.editedItem.abbr,
                                                 callback: function($$v) {
                                                   _vm.$set(
                                                     _vm.editedItem,
-                                                    "abr",
+                                                    "abbr",
                                                     $$v
                                                   )
                                                 },
-                                                expression: "editedItem.abr"
+                                                expression: "editedItem.abbr"
                                               }
                                             })
                                           ],
@@ -19675,7 +19663,7 @@ var render = function() {
                                   ),
                                   [
                                     _vm._v(
-                                      "\r\n                  Добавить пользователя\r\n                "
+                                      "\n                  Добавить пользователя\n                "
                                     )
                                   ]
                                 )
@@ -19855,7 +19843,7 @@ var render = function() {
                                   },
                                   [
                                     _vm._v(
-                                      "\r\n                    Отмена\r\n                  "
+                                      "\n                    Отмена\n                  "
                                     )
                                   ]
                                 ),
@@ -19868,7 +19856,7 @@ var render = function() {
                                   },
                                   [
                                     _vm._v(
-                                      "\r\n                    Сохранить\r\n                  "
+                                      "\n                    Сохранить\n                  "
                                     )
                                   ]
                                 )
@@ -19958,7 +19946,7 @@ var render = function() {
                       }
                     }
                   },
-                  [_vm._v("\r\n            mdi-pencil\r\n          ")]
+                  [_vm._v("\n            mdi-pencil\n          ")]
                 ),
                 _vm._v(" "),
                 _c(

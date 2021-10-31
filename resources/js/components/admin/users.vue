@@ -77,12 +77,7 @@
                           label="Группа"
                         ></v-select>
                       </v-col>
-                      <!-- <v-col cols="6">
-                        <v-switch
-                          v-model="editedItem.active"
-                          label="Показывать:"
-                        ></v-switch>
-                      </v-col> -->
+
                        </v-row>
                   </v-container>
                 </v-card-text>
@@ -150,7 +145,6 @@ export default {
       { text: "ФИО", value: "fio" },
       { text: "Роль", value: "role" },
       { text: "Группа", value: "group_id" },
-    //   { text: "Показывать", value: "active" },
       { text: "Действия", value: "actions", sortable: false },
     ],
 
@@ -160,14 +154,12 @@ export default {
       fio: "",
       role_id: 0,
       password: "",
-    //   active: 0,
     },
     defaultItem: {
       name: "",
       fio: "",
       role_id: 0,
       password: "",
-    //   active: 0,
     },
   }),
 

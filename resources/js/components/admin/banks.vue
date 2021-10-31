@@ -39,7 +39,7 @@
                     </v-col>
                     <v-col cols="4">
                       <v-text-field
-                        v-model="editedItem.abr"
+                        v-model="editedItem.abbr"
                         label="Аббревиатура"
                       ></v-text-field>
                     </v-col>
@@ -106,13 +106,11 @@ export default {
     editedIndex: -1,
     editedItem: {
       name: "",
-      active: 0,
       color:'#fff',
       order:0
     },
     defaultItem: {
       name: "",
-      active: 0,
       color:'#fff',
       order:0
     },

@@ -115,13 +115,11 @@ export default {
     editedIndex: -1,
     editedItem: {
       name: "",
-      active: 0,
       color:'#fff',
       order:0
     },
     defaultItem: {
       name: "",
-      active: 0,
       color:'#fff',
       order:0
     },
