@@ -8904,6 +8904,18 @@ __webpack_require__.r(__webpack_exports__);
       }, {
         text: "Регистрация",
         value: "registration"
+      }, {
+        text: "Загрузка",
+        value: "date_added"
+      }, {
+        text: "Оператор ID",
+        value: "user_id"
+      }, {
+        text: "Оператор",
+        value: "fio"
+      }, {
+        text: "Банк:Воронка",
+        value: "banksfunnels"
       }],
       clients: [],
       headers: [],
@@ -8963,14 +8975,15 @@ __webpack_require__.r(__webpack_exports__);
         // console.log(res.data);
         self.clients = Object.entries(res.data).map(function (e) {
           return e[1];
-        }); // self.lids.map(function (e) {
-        //   e.user = self.users.find((u) => u.id == e.user_id).fio;
-        //   e.date_created = e.created_at.substring(0, 10);
-        //   e.provider = self.providers.find((p) => p.id == e.provider_id).name;
-        //   if (e.status_id)
-        //     e.status = self.statuses.find((s) => s.id == e.status_id).name;
-        // });
-        // self.searchAll = "";
+        });
+        self.clients.map(function (e) {
+          e.operator = self.users.find(function (u) {
+            return u.id == e.user_id;
+          }).fio; //   e.date_created = e.created_at.substring(0, 10);
+          //   e.provider = self.providers.find((p) => p.id == e.provider_id).name;
+          //   if (e.status_id)
+          //     e.status = self.statuses.find((s) => s.id == e.status_id).name;
+        }); // self.searchAll = "";
 
         self.selectedBanks = 0;
       })["catch"](function (error) {
@@ -9043,7 +9056,10 @@ __webpack_require__.r(__webpack_exports__);
               organizationName = _ref2.organizationName,
               address = _ref2.address,
               region = _ref2.region,
-              registration = _ref2.registration;
+              registration = _ref2.registration,
+              date_added = _ref2.date_added,
+              user_id = _ref2.user_id,
+              banksfunnels = _ref2.banksfunnels;
           return {
             id: id,
             inn: inn,
@@ -9052,7 +9068,10 @@ __webpack_require__.r(__webpack_exports__);
             organizationName: organizationName,
             address: address,
             region: region,
-            registration: registration
+            registration: registration,
+            date_added: date_added,
+            user_id: user_id,
+            banksfunnels: banksfunnels
           };
         });
       })["catch"](function (error) {

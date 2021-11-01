@@ -79,7 +79,7 @@ class ClientsController extends Controller
 
     public function getClientsWithoutBanks()
     {
-        return Client::where('banksfunnels', '')->get();
+        return Client::where('banksfunnels', '')->orWhere('user_id','')->limit(30000)->get();
     }
 
 

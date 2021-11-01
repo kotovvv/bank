@@ -296,6 +296,10 @@ export default {
       { text: "Адрес", value: "address" },
       { text: "Регион", value: "region" },
       { text: "Регистрация", value: "registration" },
+      { text: "Загрузка", value: "date_added" },
+      { text: "Оператор ID", value: "user_id" },
+      { text: "Оператор", value: "fio" },
+      { text: "Банк:Воронка", value: "banksfunnels" },
     ],
     clients: [],
     headers: [],
@@ -354,13 +358,13 @@ export default {
           // console.log(res.data);
           self.clients = Object.entries(res.data).map((e) => e[1]);
 
-          // self.lids.map(function (e) {
-          //   e.user = self.users.find((u) => u.id == e.user_id).fio;
+           self.clients.map(function (e) {
+             e.operator = self.users.find((u) => u.id == e.user_id).fio;
           //   e.date_created = e.created_at.substring(0, 10);
           //   e.provider = self.providers.find((p) => p.id == e.provider_id).name;
           //   if (e.status_id)
           //     e.status = self.statuses.find((s) => s.id == e.status_id).name;
-          // });
+           });
           // self.searchAll = "";
           self.selectedBanks = 0;
         })
@@ -428,6 +432,9 @@ export default {
               address,
               region,
               registration,
+              date_added,
+              user_id,
+              banksfunnels,
             }) => ({
               id,
               inn,
@@ -437,6 +444,9 @@ export default {
               address,
               region,
               registration,
+              date_added,
+              user_id,
+              banksfunnels,
             })
           );
         })
