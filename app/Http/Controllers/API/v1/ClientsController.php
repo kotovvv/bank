@@ -79,7 +79,7 @@ class ClientsController extends Controller
 
     public function getClientsWithoutBanks()
     {
-        return Client::where('banksfunnels', '')->orWhere('user_id','')->limit(30000)->get();
+        return Client::where('banksfunnels', '')->orWhere('user_id',0)->limit(30000)->get();
     }
 
 
@@ -99,7 +99,7 @@ class ClientsController extends Controller
     public function changeUserOfClients(Request $request)
     {
         $data = $request->All();
-        return Client::where('id', $data['clients'])->update(['user_id' => $data['user_id']]);
+        return Client::whereIn('id', $data['clients'])->update(['user_id' => $data['user_id']]);
     }
 
     public function getClients(Request $request)

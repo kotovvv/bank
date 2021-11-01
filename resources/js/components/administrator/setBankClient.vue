@@ -375,10 +375,10 @@ export default {
       let self = this;
       let send = {};
       send.user_id = this.userid;
-      if (this.selected) {
+      if (this.selected.length) {
         send.clients = this.selected.map((i) => i.id);
       } else {
-        send.clients = this.clients.map((i) => i.id);
+        send.clients = this.clients.map((i)=>(i.id));
       }
       axios
         .post("/api/changeUserOfClients", send)
