@@ -8908,11 +8908,11 @@ __webpack_require__.r(__webpack_exports__);
         text: "Загрузка",
         value: "date_added"
       }, {
+        text: "Оператор",
+        value: "operator"
+      }, {
         text: "Оператор ID",
         value: "user_id"
-      }, {
-        text: "Оператор",
-        value: "fio"
       }, {
         text: "Банк:Воронка",
         value: "banksfunnels"
