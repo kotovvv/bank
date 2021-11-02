@@ -8,40 +8,8 @@
         </v-btn>
       </template>
     </v-snackbar>
-         <v-dialog
-        transition="dialog-top-transition"
-        max-width="600"
-        v-model="dialog"
-      >
-        <template>
-          <v-card>
-            <v-toolbar
-              color="primary"
-              dark
-            ><v-icon
-      large
-      color="darken-2"
-    >
-      mdi-alert-outline
-    </v-icon></v-toolbar>
-            <v-card-text>
-              <div class="text-h4 pa-12">Отправить на {{howrows}} {{plueral(howrows,['запись','записи','записей'])}} выбранный банк?</div>
-            </v-card-text>
-            <v-card-actions class="justify-end">
-                              <v-btn
-                @click="setBankForClients(selectedBanks);dialog = false"
-              >Да</v-btn>
-              <v-spacer></v-spacer>
-              <v-btn
-                text
-                @click="dialog = false;selectedBanks=0"
-              >Нет</v-btn>
-            </v-card-actions>
-          </v-card>
-        </template>
-      </v-dialog>
     <v-row>
-         <v-col cols="9">
+      <v-col cols="9">
         <v-row id="filter">
           <!-- registration -->
           <v-col cols="2">
@@ -196,7 +164,7 @@
           </v-col>
         </v-row>
       </v-col>
-      <v-col cols="3">
+      <v-col cols="3" v-if="clients.length">
         <v-autocomplete
           v-model="selectedBanks"
           :items="banks"
@@ -207,7 +175,7 @@
           item-text="name"
           item-value="id"
           label="Назначить банк"
-          @change="dialog=true"
+          @change="setBankForClients(selectedBanks)"
         ></v-autocomplete>
         <!-- multiple -->
       </v-col>
@@ -215,7 +183,7 @@
     <template>
       <v-row>
         <v-spacer></v-spacer>
-        <v-col cols="12" v-if="clients.length">
+        <v-col cols="9" v-if="clients.length">
           <v-card>
             <!-- :search="search" -->
             <v-data-table
@@ -227,11 +195,11 @@
               @click:row="clickrow"
               :items="clients"
               ref="datatable"
-            >
-              <!-- :footer-props="{
+              :footer-props="{
                 'items-per-page-options': [50, 10, 100, 250, 500, -1],
                 'items-per-page-text': 'Показать',
-              }" -->
+              }"
+            >
               <template
                 v-slot:top="{ pagination, options, updateOptions }"
                 :footer-props="{
@@ -255,6 +223,43 @@
             </v-data-table>
           </v-card>
         </v-col>
+        <v-col cols="3">
+          <div class="row">
+            <v-card class="pa-5 w-100">
+              Операторы
+              <v-card-text class="scroll-y">
+                <v-list>
+                  <v-radio-group
+                    @change="changeUserOfClients"
+                    ref="radiogroup"
+                    v-model="userid"
+                    v-bind="users"
+                    id="usersradiogroup"
+                  >
+                    <v-row v-for="user in users" :key="user.id">
+                      <v-radio
+                        :label="user.fio"
+                        :value="user.id"
+                        :disabled="disableuser == user.id"
+                      >
+                      </v-radio>
+
+                      <!-- :color="usercolor(user)" -->
+                      <v-btn
+                        class="ml-3"
+                        small
+                        @click="getUserClients(user.id)"
+                        :value="user.hmlids"
+                        :disabled="disableuser == user.id"
+                        >{{ user.hmlids }}</v-btn
+                      >
+                    </v-row>
+                  </v-radio-group>
+                </v-list>
+              </v-card-text>
+            </v-card>
+          </div>
+        </v-col>
       </v-row>
     </template>
   </div>
@@ -265,7 +270,6 @@ import axios from "axios";
 
 export default {
   data: () => ({
-      dialog:false,
     selected: [],
     userid: null,
     disableuser: 0,
@@ -293,6 +297,8 @@ export default {
       { text: "Регион", value: "region" },
       { text: "Регистрация", value: "registration" },
       { text: "Загрузка", value: "date_added" },
+      { text: "Оператор", value: "operator" },
+      { text: "Оператор ID", value: "user_id" },
       { text: "Банк:Воронка", value: "banksfunnels" },
     ],
     clients: [],
@@ -302,20 +308,11 @@ export default {
   }),
   mounted() {
     this.getBanks();
-    // this.getUsers();
+    this.getUsers();
     this.getClientsWithoutBanks();
-  },
-  computed: {
-      howrows: function(){
-        return this.selected.length? this.selected.length:this.clients.length
-      },
   },
   watch: {},
   methods: {
-
-plueral(number, words){
-    return words[(number % 100 > 4 && number % 100 < 20) ? 2 : [2, 0, 1, 1, 1, 2][(number % 10 < 5) ? Math.abs(number) % 10 : 5]];
-      },
     getClientsWithoutBanks() {
       let self = this;
       axios
@@ -328,6 +325,8 @@ plueral(number, words){
     setBankForClients(bank_id) {
       let self = this;
       let send = {};
+      let user_id = this.disableuser;
+      send.user_id = this.userid;
       send.bank_id = bank_id;
       if (this.selected.length) {
         send.clients = this.selected.map((i) => i.id);
@@ -337,7 +336,8 @@ plueral(number, words){
       axios
         .post("/api/setBankForClients", send)
         .then((res) => {
-          self.getClientsWithoutBanks()
+          self.getUsers();
+          self.getUserClients(user_id);
 
           self.selected = [];
           self.selectedBanks = 0;
@@ -348,7 +348,47 @@ plueral(number, words){
         })
         .catch((error) => console.log(error));
     },
+    getUserClients(id) {
+      let self = this;
+
+      self.disableuser = id;
+      axios
+        .get("/api/getUserClients/" + id)
+        .then((res) => {
+          // console.log(res.data);
+          self.clients = Object.entries(res.data).map((e) => e[1]);
+
+           self.clients.map(function (e) {
+             e.operator = self.users.find((u) => u.id == e.user_id).fio;
+          //   e.date_created = e.created_at.substring(0, 10);
+          //   e.provider = self.providers.find((p) => p.id == e.provider_id).name;
+          //   if (e.status_id)
+          //     e.status = self.statuses.find((s) => s.id == e.status_id).name;
+           });
+          // self.searchAll = "";
+          self.selectedBanks = 0;
+        })
+        .catch((error) => console.log(error));
+    },
     clickrow() {},
+    changeUserOfClients() {
+      let self = this;
+      let send = {};
+      send.user_id = this.userid;
+      if (this.selected.length) {
+        send.clients = this.selected.map((i) => i.id);
+      } else {
+        send.clients = this.clients.map((i)=>(i.id));
+      }
+      axios
+        .post("/api/changeUserOfClients", send)
+        .then((res) => {
+          self.getUsers();
+          self.getUserClients(self.userid);
+          self.userid = null;
+        })
+        .catch((error) => console.log(error));
+    },
     getBanks() {
       let self = this;
       axios
@@ -362,7 +402,15 @@ plueral(number, words){
         })
         .catch((error) => console.log(error));
     },
-
+    getUsers() {
+      let self = this;
+      axios
+        .get("/api/users")
+        .then((res) => {
+          self.users = res.data;
+        })
+        .catch((error) => console.log(error));
+    },
     getClients() {
       const self = this;
       let send = {};
@@ -385,6 +433,7 @@ plueral(number, words){
               region,
               registration,
               date_added,
+              user_id,
               banksfunnels,
             }) => ({
               id,
@@ -396,6 +445,7 @@ plueral(number, words){
               region,
               registration,
               date_added,
+              user_id,
               banksfunnels,
             })
           );

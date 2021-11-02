@@ -51,7 +51,7 @@ class Client extends Model
     }
 
 
-    public static function setBankFunnels($a_clients, $bank_id, $funnel = 0)
+    public static function setBankFunnels($a_clients, $bank_id, $funnel)
     {
         if (is_array($a_clients)) {
             $i = 0;

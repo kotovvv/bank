@@ -79,14 +79,15 @@ class ClientsController extends Controller
 
     public function getClientsWithoutBanks()
     {
-        return Client::where('banksfunnels', '')->orWhere('user_id',0)->limit(30000)->get();
+        return Client::where('banksfunnels', '')->limit(10000)->get();
     }
 
 
     public function setBankForClients(Request $request)
     {
         $data = $request->All();
-        $bankfunnels = Client::setBankFunnels($data['clients'], $data['bank_id']);
+if(!isset($data['funnel'])) $data['funnel'] = 0;
+        $bankfunnels = Client::setBankFunnels($data['clients'], $data['bank_id'],$data['funnel']);
         // Debugbar::info($bankfunnels);
         return response($bankfunnels);
     }

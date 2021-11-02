@@ -2753,28 +2753,35 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 var setBank = function setBank() {
-  return __webpack_require__.e(/*! import() */ "resources_js_components_administrator_setBankClient_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./setBankClient.vue */ "./resources/js/components/administrator/setBankClient.vue"));
-}; // const mlids = () => import("../operator/oclients.vue");
+  return __webpack_require__.e(/*! import() */ "resources_js_components_administrator_setBank_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./setBank.vue */ "./resources/js/components/administrator/setBank.vue"));
+};
 
+var setOperator = function setOperator() {
+  return __webpack_require__.e(/*! import() */ "resources_js_components_administrator_setOperator_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./setOperator.vue */ "./resources/js/components/administrator/setOperator.vue"));
+};
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ['user'],
+  props: ["user"],
   data: function data() {
     return {
       drawer: null,
       selectedItem: 0,
       administratorMenu: "setBank",
       items: [{
-        text: "Распределение",
+        text: "Основная база",
         name: "setBank",
-        icon: "mdi-account-arrow-left"
-      } //   { text: "Управление", name: "mlids", icon: "mdi-phone-log-outline" },
-      ]
+        icon: "mdi-database"
+      }, {
+        text: "Банки",
+        name: "setOperator",
+        icon: "mdi-playlist-plus"
+      }]
     };
   },
   computed: {
     managerComponent: function managerComponent() {
-      if (this.administratorMenu == "setBank") return setBank; //   if (this.administratorMenu == "mlids") return mlids;
+      if (this.administratorMenu == "setBank") return setBank;
+      if (this.administratorMenu == "setOperator") return setOperator;
     }
   },
   methods: {}

@@ -13,7 +13,7 @@
     <v-app-bar app>
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-      <v-toolbar-title>Пользователь в системе: {{user.fio}}</v-toolbar-title>
+      <v-toolbar-title>Пользователь в системе: {{ user.fio }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn @click="$emit('login', {})">ВЫХОД</v-btn>
     </v-app-bar>
@@ -59,24 +59,24 @@
 </template>
 
 <script>
-const setBank = () => import("./setBankClient.vue");
-// const mlids = () => import("../operator/oclients.vue");
+const setBank = () => import("./setBank.vue");
+const setOperator = () => import("./setOperator.vue");
 
 export default {
-  props:['user'],
+  props: ["user"],
   data: () => ({
     drawer: null,
     selectedItem: 0,
     administratorMenu: "setBank",
     items: [
-      { text: "Распределение", name: "setBank", icon: "mdi-account-arrow-left" },
-    //   { text: "Управление", name: "mlids", icon: "mdi-phone-log-outline" },
+      { text: "Основная база", name: "setBank", icon: "mdi-database" },
+      { text: "Банки", name: "setOperator", icon: "mdi-playlist-plus" },
     ],
   }),
   computed: {
     managerComponent() {
       if (this.administratorMenu == "setBank") return setBank;
-    //   if (this.administratorMenu == "mlids") return mlids;
+      if (this.administratorMenu == "setOperator") return setOperator;
     },
   },
   methods: {},

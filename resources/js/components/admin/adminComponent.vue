@@ -50,26 +50,25 @@
 
 <script>
 const importxls = () => import("./importxls");
-// const users = () => import("./users");
-// const statusLid = () => import("./statusLid");
 const dictionary = () => import("./dictionary");
-// const providers = () => import("./providers");
 const setBank = () => import("../administrator/setBank");
-// const lids = () => import("../crmanager/lids");
+const setOperator = () => import("../administrator/setOperator.vue");
 
 export default {
-  props:['user'],
+  props: ["user"],
   data: () => ({
     drawer: null,
     selectedItem: 0,
 
     items: [
       { text: "Импорт", name: "importxls", icon: "mdi-swap-vertical" },
-    //   { text: "Пользователи", name: "users", icon: "mdi-account" },
-      { text: "Основная база", name: "distribution", icon: "mdi-account-arrow-left" },
-      { text: "Справочники", name: "dictionary", icon: "mdi-format-list-checks" },
-      //{ text: "Поставщики", name: "providers", icon: "mdi-contact-phone-outline" },
-      // { text: "Рабочие места", name: "workPlaces", icon: "mdi-sitemap" },
+      { text: "Основная база", name: "distribution", icon: "mdi-database" },
+      { text: "Банки", name: "setOperator", icon: "mdi-playlist-plus" },
+      {
+        text: "Справочники",
+        name: "dictionary",
+        icon: "mdi-format-list-checks",
+      },
       { text: "Управление", name: "mlids", icon: "mdi-phone-log-outline" },
     ],
     adminMenu: "distribution",
@@ -77,17 +76,12 @@ export default {
   computed: {
     adminComponent() {
       if (this.adminMenu == "importxls") return importxls;
-    //    if (this.adminMenu == "users") return users;
-    if (this.adminMenu == "dictionary") return dictionary;
-
-    //   if (this.adminMenu == "providers") return providers;
-    if (this.adminMenu == "distribution") return setBank;
-    //   if (this.adminMenu == "lids") return lids;
+      if (this.adminMenu == "dictionary") return dictionary;
+      if (this.administratorMenu == "setOperator") return setOperator;
+      if (this.adminMenu == "distribution") return setBank;
     },
   },
-  mounted:function (){
-
-  },
+  mounted: function () {},
   methods: {},
 };
 </script>
