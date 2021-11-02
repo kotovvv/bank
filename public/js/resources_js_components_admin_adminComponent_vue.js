@@ -2742,8 +2742,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-var importexport = function importexport() {
-  return __webpack_require__.e(/*! import() */ "resources_js_components_admin_importexport_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./importexport */ "./resources/js/components/admin/importexport.vue"));
+var importxls = function importxls() {
+  return __webpack_require__.e(/*! import() */ "resources_js_components_admin_importxls_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./importxls */ "./resources/js/components/admin/importxls.vue"));
 }; // const users = () => import("./users");
 // const statusLid = () => import("./statusLid");
 
@@ -2753,8 +2753,8 @@ var dictionary = function dictionary() {
 }; // const providers = () => import("./providers");
 
 
-var setBankClient = function setBankClient() {
-  return __webpack_require__.e(/*! import() */ "resources_js_components_administrator_setBankClient_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../administrator/setBankClient */ "./resources/js/components/administrator/setBankClient.vue"));
+var setBank = function setBank() {
+  return __webpack_require__.e(/*! import() */ "resources_js_components_administrator_setBank_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../administrator/setBank */ "./resources/js/components/administrator/setBank.vue"));
 }; // const lids = () => import("../crmanager/lids");
 
 
@@ -2765,21 +2765,21 @@ var setBankClient = function setBankClient() {
       drawer: null,
       selectedItem: 0,
       items: [{
-        text: "Импорт экспорт",
-        name: "importexport",
+        text: "Импорт",
+        name: "importxls",
         icon: "mdi-swap-vertical"
       }, //   { text: "Пользователи", name: "users", icon: "mdi-account" },
       {
+        text: "Основная база",
+        name: "distribution",
+        icon: "mdi-account-arrow-left"
+      }, {
         text: "Справочники",
         name: "dictionary",
         icon: "mdi-format-list-checks"
       }, //{ text: "Поставщики", name: "providers", icon: "mdi-contact-phone-outline" },
       // { text: "Рабочие места", name: "workPlaces", icon: "mdi-sitemap" },
       {
-        text: "Распределение",
-        name: "distribution",
-        icon: "mdi-account-arrow-left"
-      }, {
         text: "Управление",
         name: "mlids",
         icon: "mdi-phone-log-outline"
@@ -2789,11 +2789,11 @@ var setBankClient = function setBankClient() {
   },
   computed: {
     adminComponent: function adminComponent() {
-      if (this.adminMenu == "importexport") return importexport; //    if (this.adminMenu == "users") return users;
+      if (this.adminMenu == "importxls") return importxls; //    if (this.adminMenu == "users") return users;
 
       if (this.adminMenu == "dictionary") return dictionary; //   if (this.adminMenu == "providers") return providers;
 
-      if (this.adminMenu == "distribution") return setBankClient; //   if (this.adminMenu == "lids") return lids;
+      if (this.adminMenu == "distribution") return setBank; //   if (this.adminMenu == "lids") return lids;
     }
   },
   mounted: function mounted() {},

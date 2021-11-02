@@ -49,12 +49,12 @@
 </template>
 
 <script>
-const importexport = () => import("./importexport");
+const importxls = () => import("./importxls");
 // const users = () => import("./users");
 // const statusLid = () => import("./statusLid");
 const dictionary = () => import("./dictionary");
 // const providers = () => import("./providers");
-const setBankClient = () => import("../administrator/setBankClient");
+const setBank = () => import("../administrator/setBank");
 // const lids = () => import("../crmanager/lids");
 
 export default {
@@ -64,24 +64,24 @@ export default {
     selectedItem: 0,
 
     items: [
-      { text: "Импорт экспорт", name: "importexport", icon: "mdi-swap-vertical" },
+      { text: "Импорт", name: "importxls", icon: "mdi-swap-vertical" },
     //   { text: "Пользователи", name: "users", icon: "mdi-account" },
+      { text: "Основная база", name: "distribution", icon: "mdi-account-arrow-left" },
       { text: "Справочники", name: "dictionary", icon: "mdi-format-list-checks" },
       //{ text: "Поставщики", name: "providers", icon: "mdi-contact-phone-outline" },
       // { text: "Рабочие места", name: "workPlaces", icon: "mdi-sitemap" },
-      { text: "Распределение", name: "distribution", icon: "mdi-account-arrow-left" },
       { text: "Управление", name: "mlids", icon: "mdi-phone-log-outline" },
     ],
     adminMenu: "distribution",
   }),
   computed: {
     adminComponent() {
-      if (this.adminMenu == "importexport") return importexport;
+      if (this.adminMenu == "importxls") return importxls;
     //    if (this.adminMenu == "users") return users;
     if (this.adminMenu == "dictionary") return dictionary;
 
     //   if (this.adminMenu == "providers") return providers;
-    if (this.adminMenu == "distribution") return setBankClient;
+    if (this.adminMenu == "distribution") return setBank;
     //   if (this.adminMenu == "lids") return lids;
     },
   },
