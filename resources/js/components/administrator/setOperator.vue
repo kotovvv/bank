@@ -58,11 +58,9 @@
                 <v-btn
                   text
                   color="primary"
-                  @click="
-                    dateAdd = [];
+                  @click="dateAdd = [];
                     $refs.dialog2.save(dateAdd);
-                    modal2 = false;
-                  "
+                    modal2 = false;"
                 >
                   Очистить
                 </v-btn>
@@ -164,10 +162,18 @@
         <v-col cols="3">
           <div class="row">
             <v-card class="pa-5 w-100">
-                <template v-if="clients.length">
-              <v-text-field label="Сколько отобрать записей?" v-model.number="hmrow"></v-text-field>
-    <v-card-text>из: {{clients.length}} и назначить оператору</v-card-text>
-    </template>
+              <template v-if="clients.length">
+                <v-text-field
+                  label="Введите число"
+                  v-model.number.lazy="hmrow"
+                  @input="selectRow"
+                  :max="clients.length"
+                  :messages="'Сколько записей пометить?'"
+                ></v-text-field>
+                <v-card-text
+                  >из: <span class="text-h5">{{ clients.length }}</span> и назначить оператору</v-card-text
+                >
+              </template>
               <v-card-text class="scroll-y">
                 <v-list>
                   <v-radio-group
@@ -245,11 +251,11 @@ export default {
     clients: [],
     headers: [],
     funnels: [],
-    selectedFunnel:0,
-    selectedBank:0,
+    selectedFunnel: 0,
+    selectedBank: 0,
     message: "",
     snackbar: false,
-    hmrow:'',
+    hmrow: "",
   }),
   mounted() {
     this.getBanks();
@@ -258,29 +264,24 @@ export default {
   },
   watch: {},
   methods: {
+      selectRow(){
+          this.selected = this.clients.slice(0,this.hmrow)
+      },
     getUserClients(id) {
       let self = this;
-
       self.disableuser = id;
       axios
         .get("/api/getUserClients/" + id)
         .then((res) => {
-          // console.log(res.data);
           self.clients = Object.entries(res.data).map((e) => e[1]);
-
           self.clients.map(function (e) {
             e.operator = self.users.find((u) => u.id == e.user_id).fio;
-            //   e.date_created = e.created_at.substring(0, 10);
-            //   e.provider = self.providers.find((p) => p.id == e.provider_id).name;
-            //   if (e.status_id)
-            //     e.status = self.statuses.find((s) => s.id == e.status_id).name;
           });
-          // self.searchAll = "";
           self.selectedBanks = 0;
         })
         .catch((error) => console.log(error));
     },
-        getFunnels() {
+    getFunnels() {
       let self = this;
       axios
         .get("/api/funnels")
@@ -303,7 +304,7 @@ export default {
         .post("/api/changeUserOfClients", send)
         .then((res) => {
           self.getUsers();
-          self.getUserClients(self.userid);
+          self.getClients()
           self.userid = null;
         })
         .catch((error) => console.log(error));
@@ -327,6 +328,7 @@ export default {
         .get("/api/users")
         .then((res) => {
           self.users = res.data;
+          self.hmrow=''
         })
         .catch((error) => console.log(error));
     },
@@ -338,6 +340,9 @@ export default {
       inputs.forEach(function (el) {
         if (el.value != "") send[el.getAttribute("id")] = el.value;
       });
+      if (this.selectedBank) send.bank_id = this.selectedBank;
+      if (this.selectedFunnel) send.funnel_id = this.selectedFunnel;
+      send.user_id = 0
       axios
         .post("/api/getClients", send)
         .then((res) => {

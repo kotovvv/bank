@@ -115,7 +115,7 @@ class ClientsController extends Controller
                 case 'datereg':
                     if (strpos($filter_word, ',')) {
                         $a_date = explode(',', $filter_word);
-                        $sql .= " AND `registration` BETWEEN date('$a_date[0]') AND date('$'a_date[1]')";
+                        $sql .= " AND `registration` BETWEEN date('$a_date[0]') AND date('$a_date[1]')";
                     } else {
                         $sql .= " AND `registration` = date('$filter_word')";
                     }
@@ -148,8 +148,18 @@ class ClientsController extends Controller
                 case 'region':
                     $sql .= " AND MATCH (region) AGAINST ('" . $filter_word . "')";
                     break;
+                case 'bank_id':
+                    $sql .= " AND `banksfunnels` LIKE '%\"" . $filter_word . ":%'";
+                    break;
+                case 'funnel_id':
+                    $sql .= " AND `banksfunnels` LIKE '%:" . $filter_word . "\"%'";
+                    break;
+                case 'user_id':
+                    $sql .= " AND `user_id` = '" . $filter_word . "'";
+                    break;
             }
         }
+        $sql .= " LIMIT 10000";
         // Debugbar::info($sql);
         return DB::select(DB::raw($sql));
     }
