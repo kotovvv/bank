@@ -8802,65 +8802,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
@@ -8919,55 +8860,21 @@ __webpack_require__.r(__webpack_exports__);
       }],
       clients: [],
       headers: [],
+      funnels: [],
+      selectedFunnel: 0,
+      selectedBank: 0,
       message: "",
-      snackbar: false
+      snackbar: false,
+      hmrow: ''
     };
   },
   mounted: function mounted() {
     this.getBanks();
+    this.getFunnels();
     this.getUsers();
-    this.getClientsWithoutBanks();
   },
   watch: {},
   methods: {
-    getClientsWithoutBanks: function getClientsWithoutBanks() {
-      var self = this;
-      axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/getClientsWithoutBanks").then(function (res) {
-        self.clients = Object.entries(res.data).map(function (e) {
-          return e[1];
-        });
-      })["catch"](function (error) {
-        return console.log(error);
-      });
-    },
-    setBankForClients: function setBankForClients(bank_id) {
-      var self = this;
-      var send = {};
-      var user_id = this.disableuser;
-      send.user_id = this.userid;
-      send.bank_id = bank_id;
-
-      if (this.selected.length) {
-        send.clients = this.selected.map(function (i) {
-          return i.id;
-        });
-      } else {
-        send.clients = this.clients.map(function (i) {
-          return i.id;
-        });
-      }
-
-      axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/setBankForClients", send).then(function (res) {
-        self.getUsers();
-        self.getUserClients(user_id);
-        self.selected = [];
-        self.selectedBanks = 0;
-        self.message = "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
-        self.snackbar = true;
-      })["catch"](function (error) {
-        return console.log(error);
-      });
-    },
     getUserClients: function getUserClients(id) {
       var self = this;
       self.disableuser = id;
@@ -8986,6 +8893,14 @@ __webpack_require__.r(__webpack_exports__);
         }); // self.searchAll = "";
 
         self.selectedBanks = 0;
+      })["catch"](function (error) {
+        return console.log(error);
+      });
+    },
+    getFunnels: function getFunnels() {
+      var self = this;
+      axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/funnels").then(function (res) {
+        self.funnels = res.data;
       })["catch"](function (error) {
         return console.log(error);
       });
@@ -9940,7 +9855,7 @@ var render = function() {
         [
           _c(
             "v-col",
-            { attrs: { cols: "9" } },
+            { attrs: { cols: "12" } },
             [
               _c(
                 "v-row",
@@ -9948,149 +9863,27 @@ var render = function() {
                 [
                   _c(
                     "v-col",
-                    { attrs: { cols: "2" } },
+                    { attrs: { cols: "3" } },
                     [
-                      _c(
-                        "v-dialog",
-                        {
-                          ref: "dialog",
-                          attrs: {
-                            "return-value": _vm.dateReg,
-                            persistent: "",
-                            width: "290px"
-                          },
-                          on: {
-                            "update:returnValue": function($event) {
-                              _vm.dateReg = $event
-                            },
-                            "update:return-value": function($event) {
-                              _vm.dateReg = $event
-                            }
-                          },
-                          scopedSlots: _vm._u([
-                            {
-                              key: "activator",
-                              fn: function(ref) {
-                                var on = ref.on
-                                var attrs = ref.attrs
-                                return [
-                                  _c(
-                                    "v-text-field",
-                                    _vm._g(
-                                      _vm._b(
-                                        {
-                                          attrs: {
-                                            label: "Регистрация (период)",
-                                            "prepend-icon": "mdi-calendar",
-                                            readonly: "",
-                                            id: "datereg"
-                                          },
-                                          model: {
-                                            value: _vm.dateReg,
-                                            callback: function($$v) {
-                                              _vm.dateReg = $$v
-                                            },
-                                            expression: "dateReg"
-                                          }
-                                        },
-                                        "v-text-field",
-                                        attrs,
-                                        false
-                                      ),
-                                      on
-                                    )
-                                  )
-                                ]
-                              }
-                            }
-                          ]),
-                          model: {
-                            value: _vm.modal,
-                            callback: function($$v) {
-                              _vm.modal = $$v
-                            },
-                            expression: "modal"
-                          }
+                      _c("v-autocomplete", {
+                        attrs: {
+                          items: _vm.banks,
+                          outlined: "",
+                          dense: "",
+                          chips: "",
+                          "small-chips": "",
+                          "item-text": "name",
+                          "item-value": "id",
+                          label: "Банк"
                         },
-                        [
-                          _vm._v(" "),
-                          _c(
-                            "v-date-picker",
-                            {
-                              attrs: {
-                                scrollable: "",
-                                range: "",
-                                locale: "ru-ru"
-                              },
-                              model: {
-                                value: _vm.dateReg,
-                                callback: function($$v) {
-                                  _vm.dateReg = $$v
-                                },
-                                expression: "dateReg"
-                              }
-                            },
-                            [
-                              _c("v-spacer"),
-                              _vm._v(" "),
-                              _c(
-                                "v-btn",
-                                {
-                                  attrs: { text: "", color: "primary" },
-                                  on: {
-                                    click: function($event) {
-                                      _vm.modal = false
-                                    }
-                                  }
-                                },
-                                [
-                                  _vm._v(
-                                    "\n                Отмена\n              "
-                                  )
-                                ]
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "v-btn",
-                                {
-                                  attrs: { text: "", color: "primary" },
-                                  on: {
-                                    click: function($event) {
-                                      _vm.dateReg = []
-                                      _vm.$refs.dialog.save(_vm.dateReg)
-                                      _vm.modal = false
-                                    }
-                                  }
-                                },
-                                [
-                                  _vm._v(
-                                    "\n                Очистить\n              "
-                                  )
-                                ]
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "v-btn",
-                                {
-                                  attrs: { text: "", color: "primary" },
-                                  on: {
-                                    click: function($event) {
-                                      return _vm.$refs.dialog.save(_vm.dateReg)
-                                    }
-                                  }
-                                },
-                                [
-                                  _vm._v(
-                                    "\n                Выбрать\n              "
-                                  )
-                                ]
-                              )
-                            ],
-                            1
-                          )
-                        ],
-                        1
-                      )
+                        model: {
+                          value: _vm.selectedBank,
+                          callback: function($$v) {
+                            _vm.selectedBank = $$v
+                          },
+                          expression: "selectedBank"
+                        }
+                      })
                     ],
                     1
                   ),
@@ -10246,88 +10039,25 @@ var render = function() {
                   _vm._v(" "),
                   _c(
                     "v-col",
-                    { attrs: { cols: "2" } },
+                    { attrs: { cols: "3" } },
                     [
-                      _c("v-text-field", {
-                        attrs: { label: "Наименование:", id: "firm" },
+                      _c("v-autocomplete", {
+                        attrs: {
+                          items: _vm.funnels,
+                          outlined: "",
+                          dense: "",
+                          chips: "",
+                          "small-chips": "",
+                          "item-text": "name",
+                          "item-value": "id",
+                          label: "Статус"
+                        },
                         model: {
-                          value: _vm.firm,
+                          value: _vm.selectedFunnel,
                           callback: function($$v) {
-                            _vm.firm = $$v
+                            _vm.selectedFunnel = $$v
                           },
-                          expression: "firm"
-                        }
-                      })
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-col",
-                    { attrs: { cols: "1" } },
-                    [
-                      _c("v-text-field", {
-                        attrs: { label: "ФИО:", id: "fio" },
-                        model: {
-                          value: _vm.fio,
-                          callback: function($$v) {
-                            _vm.fio = $$v
-                          },
-                          expression: "fio"
-                        }
-                      })
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-col",
-                    { attrs: { cols: "1" } },
-                    [
-                      _c("v-text-field", {
-                        attrs: { label: "ИНН", id: "inn" },
-                        model: {
-                          value: _vm.inn,
-                          callback: function($$v) {
-                            _vm.inn = _vm._n($$v)
-                          },
-                          expression: "inn"
-                        }
-                      })
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-col",
-                    { attrs: { cols: "2" } },
-                    [
-                      _c("v-text-field", {
-                        attrs: { label: "Адрес", id: "address" },
-                        model: {
-                          value: _vm.address,
-                          callback: function($$v) {
-                            _vm.address = $$v
-                          },
-                          expression: "address"
-                        }
-                      })
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-col",
-                    { attrs: { cols: "1" } },
-                    [
-                      _c("v-text-field", {
-                        attrs: { label: "Регион", id: "region" },
-                        model: {
-                          value: _vm.region,
-                          callback: function($$v) {
-                            _vm.region = $$v
-                          },
-                          expression: "region"
+                          expression: "selectedFunnel"
                         }
                       })
                     ],
@@ -10354,47 +10084,37 @@ var render = function() {
                       )
                     ],
                     1
-                  )
+                  ),
+                  _vm._v(" "),
+                  _c("v-spacer"),
+                  _vm._v(" "),
+                  _vm.selected.length
+                    ? _c(
+                        "v-col",
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: {
+                                color: "primary",
+                                elevation: "2",
+                                outlined: "",
+                                raised: ""
+                              },
+                              on: { click: _vm.delBankClients }
+                            },
+                            [_vm._v("удалить банк")]
+                          )
+                        ],
+                        1
+                      )
+                    : _vm._e()
                 ],
                 1
               )
             ],
             1
-          ),
-          _vm._v(" "),
-          _vm.clients.length
-            ? _c(
-                "v-col",
-                { attrs: { cols: "3" } },
-                [
-                  _c("v-autocomplete", {
-                    attrs: {
-                      items: _vm.banks,
-                      outlined: "",
-                      dense: "",
-                      chips: "",
-                      "small-chips": "",
-                      "item-text": "name",
-                      "item-value": "id",
-                      label: "Назначить банк"
-                    },
-                    on: {
-                      change: function($event) {
-                        return _vm.setBankForClients(_vm.selectedBanks)
-                      }
-                    },
-                    model: {
-                      value: _vm.selectedBanks,
-                      callback: function($$v) {
-                        _vm.selectedBanks = $$v
-                      },
-                      expression: "selectedBanks"
-                    }
-                  })
-                ],
-                1
-              )
-            : _vm._e()
+          )
         ],
         1
       ),
@@ -10511,7 +10231,29 @@ var render = function() {
                     "v-card",
                     { staticClass: "pa-5 w-100" },
                     [
-                      _vm._v("\n            Операторы\n            "),
+                      _vm.clients.length
+                        ? [
+                            _c("v-text-field", {
+                              attrs: { label: "Сколько отобрать записей?" },
+                              model: {
+                                value: _vm.hmrow,
+                                callback: function($$v) {
+                                  _vm.hmrow = _vm._n($$v)
+                                },
+                                expression: "hmrow"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("v-card-text", [
+                              _vm._v(
+                                "из: " +
+                                  _vm._s(_vm.clients.length) +
+                                  " и назначить оператору"
+                              )
+                            ])
+                          ]
+                        : _vm._e(),
+                      _vm._v(" "),
                       _c(
                         "v-card-text",
                         { staticClass: "scroll-y" },
@@ -10581,7 +10323,7 @@ var render = function() {
                         1
                       )
                     ],
-                    1
+                    2
                   )
                 ],
                 1
@@ -10689,7 +10431,7 @@ component.options.__file = "resources/js/components/administrator/setOperator.vu
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"Promise based HTTP client for the browser and node.js","main":"index.js","scripts":{"test":"grunt test","start":"node ./sandbox/server.js","build":"NODE_ENV=production grunt build","preversion":"npm test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json","postversion":"git push && git push --tags","examples":"node ./examples/server.js","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","fix":"eslint --fix lib/**/*.js"},"repository":{"type":"git","url":"https://github.com/axios/axios.git"},"keywords":["xhr","http","ajax","promise","node"],"author":"Matt Zabriskie","license":"MIT","bugs":{"url":"https://github.com/axios/axios/issues"},"homepage":"https://axios-http.com","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"jsdelivr":"dist/axios.min.js","unpkg":"dist/axios.min.js","typings":"./index.d.ts","dependencies":{"follow-redirects":"^1.14.0"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}]}');
+module.exports = JSON.parse('{"_args":[["axios@0.21.4","C:\\\\laragon\\\\www\\\\bank"]],"_from":"axios@0.21.4","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.4","name":"axios","escapedName":"axios","rawSpec":"0.21.4","saveSpec":null,"fetchSpec":"0.21.4"},"_requiredBy":["#DEV:/"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_spec":"0.21.4","_where":"C:\\\\laragon\\\\www\\\\bank","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
 
 /***/ })
 

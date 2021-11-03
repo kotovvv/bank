@@ -52,7 +52,7 @@
 const importxls = () => import("./importxls");
 const dictionary = () => import("./dictionary");
 const setBank = () => import("../administrator/setBank");
-const setOperator = () => import("../administrator/setOperator.vue");
+const setOperator = () => import("../administrator/setOperator");
 
 export default {
   props: ["user"],
@@ -71,13 +71,13 @@ export default {
       },
       { text: "Управление", name: "mlids", icon: "mdi-phone-log-outline" },
     ],
-    adminMenu: "distribution",
+    adminMenu: "setOperator",
   }),
   computed: {
     adminComponent() {
       if (this.adminMenu == "importxls") return importxls;
       if (this.adminMenu == "dictionary") return dictionary;
-      if (this.administratorMenu == "setOperator") return setOperator;
+      if (this.adminMenu == "setOperator") return setOperator;
       if (this.adminMenu == "distribution") return setBank;
     },
   },

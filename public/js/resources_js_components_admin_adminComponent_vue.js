@@ -2755,7 +2755,7 @@ var setBank = function setBank() {
 };
 
 var setOperator = function setOperator() {
-  return __webpack_require__.e(/*! import() */ "resources_js_components_administrator_setOperator_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../administrator/setOperator.vue */ "./resources/js/components/administrator/setOperator.vue"));
+  return __webpack_require__.e(/*! import() */ "resources_js_components_administrator_setOperator_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../administrator/setOperator */ "./resources/js/components/administrator/setOperator.vue"));
 };
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -2785,14 +2785,14 @@ var setOperator = function setOperator() {
         name: "mlids",
         icon: "mdi-phone-log-outline"
       }],
-      adminMenu: "distribution"
+      adminMenu: "setOperator"
     };
   },
   computed: {
     adminComponent: function adminComponent() {
       if (this.adminMenu == "importxls") return importxls;
       if (this.adminMenu == "dictionary") return dictionary;
-      if (this.administratorMenu == "setOperator") return setOperator;
+      if (this.adminMenu == "setOperator") return setOperator;
       if (this.adminMenu == "distribution") return setBank;
     }
   },

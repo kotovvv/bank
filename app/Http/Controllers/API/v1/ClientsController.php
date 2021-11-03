@@ -86,8 +86,8 @@ class ClientsController extends Controller
     public function setBankForClients(Request $request)
     {
         $data = $request->All();
-if(!isset($data['funnel'])) $data['funnel'] = 0;
-        $bankfunnels = Client::setBankFunnels($data['clients'], $data['bank_id'],$data['funnel']);
+        if (!isset($data['funnel'])) $data['funnel'] = 0;
+        $bankfunnels = Client::setBankFunnels($data['clients'], $data['bank_id'], $data['funnel']);
         // Debugbar::info($bankfunnels);
         return response($bankfunnels);
     }

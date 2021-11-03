@@ -9,56 +9,22 @@
       </template>
     </v-snackbar>
     <v-row>
-      <v-col cols="9">
+      <v-col cols="12">
         <v-row id="filter">
-          <!-- registration -->
-          <v-col cols="2">
-            <v-dialog
-              ref="dialog"
-              v-model="modal"
-              :return-value.sync="dateReg"
-              persistent
-              width="290px"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  v-model.lazy="dateReg"
-                  label="Регистрация (период)"
-                  prepend-icon="mdi-calendar"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                  id="datereg"
-                ></v-text-field>
-              </template>
-              <v-date-picker
-                v-model.lazy="dateReg"
-                scrollable
-                range
-                locale="ru-ru"
-              >
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="modal = false">
-                  Отмена
-                </v-btn>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="
-                    dateReg = [];
-                    $refs.dialog.save(dateReg);
-                    modal = false;
-                  "
-                >
-                  Очистить
-                </v-btn>
-                <v-btn text color="primary" @click="$refs.dialog.save(dateReg)">
-                  Выбрать
-                </v-btn>
-              </v-date-picker>
-            </v-dialog>
+          <!-- bank -->
+          <v-col cols="3">
+            <v-autocomplete
+              v-model="selectedBank"
+              :items="banks"
+              outlined
+              dense
+              chips
+              small-chips
+              item-text="name"
+              item-value="id"
+              label="Банк"
+            ></v-autocomplete>
           </v-col>
-
           <!-- download -->
           <v-col cols="2">
             <v-dialog
@@ -110,47 +76,21 @@
               </v-date-picker>
             </v-dialog>
           </v-col>
-
-          <!-- firm -->
-          <v-col cols="2">
-            <v-text-field
-              label="Наименование:"
-              id="firm"
-              v-model="firm"
-            ></v-text-field>
+          <!-- status -->
+          <v-col cols="3">
+            <v-autocomplete
+              v-model="selectedFunnel"
+              :items="funnels"
+              outlined
+              dense
+              chips
+              small-chips
+              item-text="name"
+              item-value="id"
+              label="Статус"
+            ></v-autocomplete>
           </v-col>
 
-          <!-- fio -->
-          <v-col cols="1">
-            <v-text-field label="ФИО:" id="fio" v-model="fio"></v-text-field>
-          </v-col>
-
-          <!-- inn -->
-          <v-col cols="1">
-            <v-text-field
-              label="ИНН"
-              id="inn"
-              v-model.number="inn"
-            ></v-text-field>
-          </v-col>
-
-          <!-- address -->
-          <v-col cols="2">
-            <v-text-field
-              label="Адрес"
-              id="address"
-              v-model="address"
-            ></v-text-field>
-          </v-col>
-
-          <!-- reg -->
-          <v-col cols="1">
-            <v-text-field
-              label="Регион"
-              id="region"
-              v-model="region"
-            ></v-text-field>
-          </v-col>
           <!-- btn -->
           <v-col cols="1">
             <v-btn
@@ -162,22 +102,20 @@
               ><v-icon> mdi-table </v-icon></v-btn
             >
           </v-col>
+          <v-spacer></v-spacer>
+
+          <!-- del bank -->
+          <v-col v-if="selected.length">
+            <v-btn
+              color="primary"
+              elevation="2"
+              outlined
+              raised
+              @click="delBankClients"
+              >удалить банк</v-btn
+            >
+          </v-col>
         </v-row>
-      </v-col>
-      <v-col cols="3" v-if="clients.length">
-        <v-autocomplete
-          v-model="selectedBanks"
-          :items="banks"
-          outlined
-          dense
-          chips
-          small-chips
-          item-text="name"
-          item-value="id"
-          label="Назначить банк"
-          @change="setBankForClients(selectedBanks)"
-        ></v-autocomplete>
-        <!-- multiple -->
       </v-col>
     </v-row>
     <template>
@@ -226,7 +164,10 @@
         <v-col cols="3">
           <div class="row">
             <v-card class="pa-5 w-100">
-              Операторы
+                <template v-if="clients.length">
+              <v-text-field label="Сколько отобрать записей?" v-model.number="hmrow"></v-text-field>
+    <v-card-text>из: {{clients.length}} и назначить оператору</v-card-text>
+    </template>
               <v-card-text class="scroll-y">
                 <v-list>
                   <v-radio-group
@@ -303,51 +244,20 @@ export default {
     ],
     clients: [],
     headers: [],
+    funnels: [],
+    selectedFunnel:0,
+    selectedBank:0,
     message: "",
     snackbar: false,
+    hmrow:'',
   }),
   mounted() {
     this.getBanks();
+    this.getFunnels();
     this.getUsers();
-    this.getClientsWithoutBanks();
   },
   watch: {},
   methods: {
-    getClientsWithoutBanks() {
-      let self = this;
-      axios
-        .get("/api/getClientsWithoutBanks")
-        .then((res) => {
-          self.clients = Object.entries(res.data).map((e) => e[1]);
-        })
-        .catch((error) => console.log(error));
-    },
-    setBankForClients(bank_id) {
-      let self = this;
-      let send = {};
-      let user_id = this.disableuser;
-      send.user_id = this.userid;
-      send.bank_id = bank_id;
-      if (this.selected.length) {
-        send.clients = this.selected.map((i) => i.id);
-      } else {
-        send.clients = this.clients.map((i) => i.id);
-      }
-      axios
-        .post("/api/setBankForClients", send)
-        .then((res) => {
-          self.getUsers();
-          self.getUserClients(user_id);
-
-          self.selected = [];
-          self.selectedBanks = 0;
-
-          self.message =
-            "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
-          self.snackbar = true;
-        })
-        .catch((error) => console.log(error));
-    },
     getUserClients(id) {
       let self = this;
 
@@ -358,15 +268,24 @@ export default {
           // console.log(res.data);
           self.clients = Object.entries(res.data).map((e) => e[1]);
 
-           self.clients.map(function (e) {
-             e.operator = self.users.find((u) => u.id == e.user_id).fio;
-          //   e.date_created = e.created_at.substring(0, 10);
-          //   e.provider = self.providers.find((p) => p.id == e.provider_id).name;
-          //   if (e.status_id)
-          //     e.status = self.statuses.find((s) => s.id == e.status_id).name;
-           });
+          self.clients.map(function (e) {
+            e.operator = self.users.find((u) => u.id == e.user_id).fio;
+            //   e.date_created = e.created_at.substring(0, 10);
+            //   e.provider = self.providers.find((p) => p.id == e.provider_id).name;
+            //   if (e.status_id)
+            //     e.status = self.statuses.find((s) => s.id == e.status_id).name;
+          });
           // self.searchAll = "";
           self.selectedBanks = 0;
+        })
+        .catch((error) => console.log(error));
+    },
+        getFunnels() {
+      let self = this;
+      axios
+        .get("/api/funnels")
+        .then((res) => {
+          self.funnels = res.data;
         })
         .catch((error) => console.log(error));
     },
@@ -378,7 +297,7 @@ export default {
       if (this.selected.length) {
         send.clients = this.selected.map((i) => i.id);
       } else {
-        send.clients = this.clients.map((i)=>(i.id));
+        send.clients = this.clients.map((i) => i.id);
       }
       axios
         .post("/api/changeUserOfClients", send)

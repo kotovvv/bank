@@ -59,7 +59,7 @@
 </template>
 
 <script>
-const setBank = () => import("./setBank.vue");
+const setBank = () => import("./setBank.vue")
 const setOperator = () => import("./setOperator.vue");
 
 export default {
