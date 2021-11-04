@@ -113,8 +113,9 @@ class ClientsController extends Controller
         return response($bankfunnels);
     }
 
-    public function getUserClients($id)
+    public function getUserClients($id,$bank_id = null)
     {
+        DebugBar::info($bank_id);
         return Client::where('user_id', $id)->orderByDesc('date_added')->get();
     }
 
@@ -123,7 +124,7 @@ class ClientsController extends Controller
         $data = $request->All();
         $a_log = [];
         foreach ($data['clients'] as $cl) {
-            $a_log = ['client_id' => $cl, 'user_id' => $data['user_id'], 'other' => '0', 'date_add' => Now()];
+            $a_log[] = ['client_id' => $cl, 'user_id' => $data['user_id'], 'other' => '0', 'date_add' => Now()];
         }
         Log::insert($a_log);
         return Client::whereIn('id', $data['clients'])->update(['user_id' => $data['user_id']]);

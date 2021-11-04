@@ -53,6 +53,7 @@ const importxls = () => import("./importxls");
 const dictionary = () => import("./dictionary");
 const setBank = () => import("../administrator/setBank");
 const setOperator = () => import("../administrator/setOperator");
+const oclients = () => import("../operator/oclients");
 
 export default {
   props: ["user"],
@@ -64,12 +65,12 @@ export default {
       { text: "Импорт", name: "importxls", icon: "mdi-swap-vertical" },
       { text: "Основная база", name: "setBank", icon: "mdi-database" },
       { text: "Банки", name: "setOperator", icon: "mdi-playlist-plus" },
+      { text: "Управление", name: "oclients", icon: "mdi-phone-log-outline" },
       {
         text: "Справочники",
         name: "dictionary",
         icon: "mdi-format-list-checks",
       },
-      { text: "Управление", name: "mlids", icon: "mdi-phone-log-outline" },
     ],
     adminMenu: "setBank",
   }),
@@ -79,6 +80,7 @@ export default {
       if (this.adminMenu == "dictionary") return dictionary;
       if (this.adminMenu == "setOperator") return setOperator;
       if (this.adminMenu == "setBank") return setBank;
+      if (this.adminMenu == "oclients") return oclients;
     },
   },
   mounted: function () {},
