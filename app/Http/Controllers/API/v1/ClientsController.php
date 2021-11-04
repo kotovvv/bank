@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API\v1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Client;
-use App\Models\Bank;
+use App\Models\Log;
 use DB;
 use Debugbar;
 
@@ -80,13 +80,20 @@ class ClientsController extends Controller
     public function delBankFromClients(Request $request)
     {
         $data = $request->All();
-        DebugBar::info($data);
-        return Client::delBankFromClients($data['clients'],$data['bank_id']);
+        return Client::delBankFromClients($data['clients'], $data['bank_id']);
     }
+
+    public function getClientsWithBankAndClient_id(Request $request)
+    {
+        $data = $request->All();
+        //SELECT * FROM `clients` WHERE `user_id` = 109 AND `banksfunnels` LIKE "%\"1:%"  ORDER BY `date_added` DESC
+        return Client::where('user_id', $data['user_id'])->where('banksfunnels', 'like', '%"' . $data['bank_id'] . ':%')->orderByDesc('date_added')->get();
+    }
+
 
     public function getClientsWithoutBanks()
     {
-        return Client::where('banksfunnels', '')->limit(10000)->get();
+        return Client::where('banksfunnels', '')->orderByDesc('date_added')->limit(10000)->get();
     }
 
 
@@ -94,19 +101,31 @@ class ClientsController extends Controller
     {
         $data = $request->All();
         if (!isset($data['funnel'])) $data['funnel'] = 0;
+        if (isset($data['funnel']) && isset($data['user_id'])) {
+            $a_log = [];
+            foreach ($data['clients'] as $cl) {
+                $a_log = ['client_id' => $cl, 'user_id' => $data['user_id'], 'funnel_id' => $data['funnel'], 'date_add' => Now()];
+            }
+            Log::insert($a_log);
+        }
         $bankfunnels = Client::setBankFunnels($data['clients'], $data['bank_id'], $data['funnel']);
         // Debugbar::info($bankfunnels);
         return response($bankfunnels);
     }
 
-    public function getUserClients(Request $request, $id)
+    public function getUserClients($id)
     {
-        return Client::where('user_id', $id)->get();
+        return Client::where('user_id', $id)->orderByDesc('date_added')->get();
     }
 
     public function changeUserOfClients(Request $request)
     {
         $data = $request->All();
+        $a_log = [];
+        foreach ($data['clients'] as $cl) {
+            $a_log = ['client_id' => $cl, 'user_id' => $data['user_id'], 'other' => '0', 'date_add' => Now()];
+        }
+        Log::insert($a_log);
         return Client::whereIn('id', $data['clients'])->update(['user_id' => $data['user_id']]);
     }
 
@@ -115,7 +134,8 @@ class ClientsController extends Controller
         $a_filter = $request->all();
         if (count($a_filter) == 0) return response([]);
         //Debugbar::info($a_filter);
-        $sql = "SELECT * FROM `clients` WHERE 1=1";
+        $head_sql = "SELECT * FROM `clients` WHERE 1=1";
+        $sql = '';
         foreach ($a_filter as $key => $filter_word) {
             // Debugbar::info(iconv_strlen($filter_word));
             switch ($key) {
@@ -164,9 +184,11 @@ class ClientsController extends Controller
                 case 'user_id':
                     $sql .= " AND `user_id` = '" . $filter_word . "'";
                     break;
-            }
+                default:
+                    $sql .= " AND 1 != 1";
+                    }
         }
-        $sql .= " LIMIT 10000";
+        $sql = $head_sql . $sql . " ORDER BY `date_added` DESC LIMIT 10000";
         // Debugbar::info($sql);
         return DB::select(DB::raw($sql));
     }

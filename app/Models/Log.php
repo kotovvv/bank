@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Bank extends Model
+class Log extends Model
 {
     public $timestamps = false;
+    public $incrementing = false;
     use HasFactory;
     protected $fillable = [
-        'name', 'abr'
+        'client_id', 'user_id','funnel_id','other','date_add'
     ];
 
 }

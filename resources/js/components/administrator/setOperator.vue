@@ -417,7 +417,7 @@ export default {
       const filter = document.getElementById("filter");
       const inputs = filter.querySelectorAll("input");
       inputs.forEach(function (el) {
-        if (el.value != "") send[el.getAttribute("id")] = el.value;
+        if (el.value != "" && el.getAttribute("id")) send[el.getAttribute("id")] = el.value;
       });
       if (this.selectedBank) send.bank_id = this.selectedBank;
       if (this.selectedFunnel) send.funnel_id = this.selectedFunnel;
