@@ -8,6 +8,38 @@
         </v-btn>
       </template>
     </v-snackbar>
+             <v-dialog
+        transition="dialog-top-transition"
+        max-width="600"
+        v-model="dialog"
+      >
+        <template>
+          <v-card>
+            <v-toolbar
+              color="primary"
+              dark
+            ><v-icon
+      large
+      color="darken-2"
+    >
+      mdi-alert-outline
+    </v-icon></v-toolbar>
+            <v-card-text>
+              <div class="text-h4 pa-12">Точно удалить выбранный банк из {{selected.length}}  {{plueral(selected.length,['выделенной строки','выделенных строк','выделенных строк'])}} ?</div>
+            </v-card-text>
+            <v-card-actions class="justify-end">
+                              <v-btn
+                @click="delBankFromClients(selectedBank);dialog = false"
+              >Да</v-btn>
+              <v-spacer></v-spacer>
+              <v-btn
+                text
+                @click="dialog = false;selectedBanks=0"
+              >Нет</v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
     <v-row>
       <v-col cols="12">
         <v-row id="filter">
@@ -103,13 +135,13 @@
           <v-spacer></v-spacer>
 
           <!-- del bank -->
-          <v-col v-if="selected.length">
+          <v-col v-if="selected.length && selectedBank">
             <v-btn
               color="primary"
               elevation="2"
               outlined
               raised
-              @click="delBankClients"
+              @click="dialog = true"
               >удалить банк</v-btn
             >
           </v-col>
@@ -256,6 +288,7 @@ export default {
     message: "",
     snackbar: false,
     hmrow: "",
+    dialog:false,
   }),
   mounted() {
     this.getBanks();
@@ -264,6 +297,30 @@ export default {
   },
   watch: {},
   methods: {
+      delBankFromClients(bank_id){
+          let self = this
+          let send = {}
+          send.bank_id = bank_id
+          send.clients = this.selected.map(i => {return i.id})
+      axios
+        .post("/api/delBankFromClients",send)
+        .then((res) => {
+            if(self.disableuser){
+                 self.getUserClients(self.disableuser)
+            }else{
+                self.getClients()
+            }
+self.message =
+            "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
+          self.snackbar = true;
+          self.selected = []
+        })
+        .catch((error) => console.log(error));
+
+      },
+      plueral(number, words){
+    return words[(number % 100 > 4 && number % 100 < 20) ? 2 : [2, 0, 1, 1, 1, 2][(number % 10 < 5) ? Math.abs(number) % 10 : 5]];
+      },
       selectRow(){
           this.selected = this.clients.slice(0,this.hmrow)
       },

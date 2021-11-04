@@ -77,6 +77,13 @@ class ClientsController extends Controller
     {
     }
 
+    public function delBankFromClients(Request $request)
+    {
+        $data = $request->All();
+        DebugBar::info($data);
+        return Client::delBankFromClients($data['clients'],$data['bank_id']);
+    }
+
     public function getClientsWithoutBanks()
     {
         return Client::where('banksfunnels', '')->limit(10000)->get();

@@ -70,4 +70,25 @@ class Client extends Model
         }
         return false;
     }
+
+
+    public static function delBankFromClients($a_clients, $bank_id)
+    {
+        if (is_array($a_clients)) {
+            $i = 0;
+            $all = count($a_clients);
+            foreach ($a_clients as $client_id) {
+                $a_bankfunnel = self::toArrayBanksFunnels($client_id);
+                if (array_key_exists($bank_id, $a_bankfunnel)) {
+                    unset($a_bankfunnel[$bank_id]);
+                }else{
+                    continue;
+                }
+                Client::where('id', $client_id)->update(['banksfunnels' => self::toStrArrayBanksFunnels($a_bankfunnel)]);
+                $i++;
+            }
+            return ['all' => $all, 'done' => $i];
+        }
+        return false;
+    }
 }
