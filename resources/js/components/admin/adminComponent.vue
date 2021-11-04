@@ -62,7 +62,7 @@ export default {
 
     items: [
       { text: "Импорт", name: "importxls", icon: "mdi-swap-vertical" },
-      { text: "Основная база", name: "distribution", icon: "mdi-database" },
+      { text: "Основная база", name: "setBank", icon: "mdi-database" },
       { text: "Банки", name: "setOperator", icon: "mdi-playlist-plus" },
       {
         text: "Справочники",
@@ -71,14 +71,14 @@ export default {
       },
       { text: "Управление", name: "mlids", icon: "mdi-phone-log-outline" },
     ],
-    adminMenu: "setOperator",
+    adminMenu: "setBank",
   }),
   computed: {
     adminComponent() {
       if (this.adminMenu == "importxls") return importxls;
       if (this.adminMenu == "dictionary") return dictionary;
       if (this.adminMenu == "setOperator") return setOperator;
-      if (this.adminMenu == "distribution") return setBank;
+      if (this.adminMenu == "setBank") return setBank;
     },
   },
   mounted: function () {},

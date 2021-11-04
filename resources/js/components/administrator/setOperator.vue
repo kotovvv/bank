@@ -8,38 +8,52 @@
         </v-btn>
       </template>
     </v-snackbar>
-             <v-dialog
-        transition="dialog-top-transition"
-        max-width="600"
-        v-model="dialog"
-      >
-        <template>
-          <v-card>
-            <v-toolbar
-              color="primary"
-              dark
-            ><v-icon
-      large
-      color="darken-2"
+    <v-dialog
+      transition="dialog-top-transition"
+      max-width="600"
+      v-model="dialog"
     >
-      mdi-alert-outline
-    </v-icon></v-toolbar>
-            <v-card-text>
-              <div class="text-h4 pa-12">Точно удалить выбранный банк из {{selected.length}}  {{plueral(selected.length,['выделенной строки','выделенных строк','выделенных строк'])}} ?</div>
-            </v-card-text>
-            <v-card-actions class="justify-end">
-                              <v-btn
-                @click="delBankFromClients(selectedBank);dialog = false"
-              >Да</v-btn>
-              <v-spacer></v-spacer>
-              <v-btn
-                text
-                @click="dialog = false;selectedBanks=0"
-              >Нет</v-btn>
-            </v-card-actions>
-          </v-card>
-        </template>
-      </v-dialog>
+      <template>
+        <v-card>
+          <v-toolbar color="primary" dark
+            ><v-icon large color="darken-2">
+              mdi-alert-outline
+            </v-icon></v-toolbar
+          >
+          <v-card-text>
+            <div class="text-h4 pa-12">
+              Точно удалить выбранный банк из {{ selected.length }}
+              {{
+                plueral(selected.length, [
+                  "выделенной строки",
+                  "выделенных строк",
+                  "выделенных строк",
+                ])
+              }}
+              ?
+            </div>
+          </v-card-text>
+          <v-card-actions class="justify-end">
+            <v-btn
+              @click="
+                delBankFromClients(selectedBank);
+                dialog = false;
+              "
+              >Да</v-btn
+            >
+            <v-spacer></v-spacer>
+            <v-btn
+              text
+              @click="
+                dialog = false;
+                selectedBanks = 0;
+              "
+              >Нет</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </template>
+    </v-dialog>
     <v-row>
       <v-col cols="12">
         <v-row id="filter">
@@ -90,9 +104,11 @@
                 <v-btn
                   text
                   color="primary"
-                  @click="dateAdd = [];
+                  @click="
+                    dateAdd = [];
                     $refs.dialog2.save(dateAdd);
-                    modal2 = false;"
+                    modal2 = false;
+                  "
                 >
                   Очистить
                 </v-btn>
@@ -203,7 +219,8 @@
                   :messages="'Сколько записей пометить?'"
                 ></v-text-field>
                 <v-card-text
-                  >из: <span class="text-h5">{{ clients.length }}</span> и назначить оператору</v-card-text
+                  >из: <span class="text-h5">{{ clients.length }}</span> и
+                  назначить оператору</v-card-text
                 >
               </template>
               <v-card-text class="scroll-y">
@@ -288,7 +305,7 @@ export default {
     message: "",
     snackbar: false,
     hmrow: "",
-    dialog:false,
+    dialog: false,
   }),
   mounted() {
     this.getBanks();
@@ -297,33 +314,38 @@ export default {
   },
   watch: {},
   methods: {
-      delBankFromClients(bank_id){
-          let self = this
-          let send = {}
-          send.bank_id = bank_id
-          send.clients = this.selected.map(i => {return i.id})
+    delBankFromClients(bank_id) {
+      let self = this;
+      let send = {};
+      send.bank_id = bank_id;
+      send.clients = this.selected.map((i) => {
+        return i.id;
+      });
       axios
-        .post("/api/delBankFromClients",send)
+        .post("/api/delBankFromClients", send)
         .then((res) => {
-            if(self.disableuser){
-                 self.getUserClients(self.disableuser)
-            }else{
-                self.getClients()
-            }
-self.message =
+          if (self.disableuser) {
+            self.getUserClients(self.disableuser);
+          } else {
+            self.getClients();
+          }
+          self.message =
             "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
           self.snackbar = true;
-          self.selected = []
+          self.selected = [];
         })
         .catch((error) => console.log(error));
-
-      },
-      plueral(number, words){
-    return words[(number % 100 > 4 && number % 100 < 20) ? 2 : [2, 0, 1, 1, 1, 2][(number % 10 < 5) ? Math.abs(number) % 10 : 5]];
-      },
-      selectRow(){
-          this.selected = this.clients.slice(0,this.hmrow)
-      },
+    },
+    plueral(number, words) {
+      return words[
+        number % 100 > 4 && number % 100 < 20
+          ? 2
+          : [2, 0, 1, 1, 1, 2][number % 10 < 5 ? Math.abs(number) % 10 : 5]
+      ];
+    },
+    selectRow() {
+      this.selected = this.clients.slice(0, this.hmrow);
+    },
     getUserClients(id) {
       let self = this;
       self.disableuser = id;
@@ -361,7 +383,7 @@ self.message =
         .post("/api/changeUserOfClients", send)
         .then((res) => {
           self.getUsers();
-          self.getClients()
+          self.getClients();
           self.userid = null;
         })
         .catch((error) => console.log(error));
@@ -385,7 +407,7 @@ self.message =
         .get("/api/users")
         .then((res) => {
           self.users = res.data;
-          self.hmrow=''
+          self.hmrow = "";
         })
         .catch((error) => console.log(error));
     },
@@ -399,7 +421,7 @@ self.message =
       });
       if (this.selectedBank) send.bank_id = this.selectedBank;
       if (this.selectedFunnel) send.funnel_id = this.selectedFunnel;
-      send.user_id = 0
+      send.user_id = 0;
       axios
         .post("/api/getClients", send)
         .then((res) => {
