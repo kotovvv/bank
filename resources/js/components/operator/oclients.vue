@@ -12,45 +12,47 @@
       transition="dialog-top-transition"
       max-width="600"
       v-model="dialog"
+      persistent
     >
       <template>
         <v-card>
           <v-toolbar color="primary" dark
-            ><v-icon large color="darken-2">
-              mdi-alert-outline
-            </v-icon></v-toolbar
-          >
-          <v-card-text>
-            <div class="text-h4 pa-12">
-              Точно удалить выбранный банк из {{ selected.length }}
-              {{
-                plueral(selected.length, [
-                  "выделенной строки",
-                  "выделенных строк",
-                  "выделенных строк",
-                ])
-              }}
-              ?
-            </div>
-          </v-card-text>
-          <v-card-actions class="justify-end">
-            <v-btn
-              @click="
-                delBankFromClients(selectedBank);
-                dialog = false;
-              "
-              >Да</v-btn
-            >
+            ><v-icon large color="darken-2"> mdi-account-card-details </v-icon>
             <v-spacer></v-spacer>
-            <v-btn
-              text
-              @click="
-                dialog = false;
-                selectedBanks = 0;
-              "
-              >Нет</v-btn
-            >
-          </v-card-actions>
+            <v-btn icon dark @click="dialog = false">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-card-text>
+            <v-row class="pt-3">
+              <v-col cols="8">
+                <ul>
+                  <li><b>ФИО: </b>{{ selected.fullName }}</li>
+                  <li><b>Тел: </b>{{ selected.phoneNumber }}</li>
+                  <li><b>Наименование: </b>{{ selected.organizationName }}</li>
+                  <li><b>ИНН: </b>{{ selected.inn }}</li>
+                  <li><b>Адрес: </b>{{ selected.address }}</li>
+                  <li><b>Регион: </b>{{ selected.region }}</li>
+                  <li><b>Регистрация: </b>{{ selected.registration }}</li>
+                </ul>
+              </v-col>
+              <v-col cols="4">
+                Выбор статуса
+                <v-container class="px-0" fluid>
+                  <v-radio-group v-model="selectedFunnel">
+                    <v-radio
+                      v-for="funnel in funnels"
+                      :key="funnel.id"
+                      color="funnel.color"
+                      :label="`${funnel.name}`"
+                      :value="funnel.id"
+                      @click="setBankForClients"
+                    ></v-radio>
+                  </v-radio-group>
+                </v-container>
+              </v-col>
+            </v-row>
+          </v-card-text>
         </v-card>
       </template>
     </v-dialog>
@@ -69,6 +71,7 @@
               item-text="name"
               item-value="id"
               label="Банк"
+              @change="changeFilter"
             ></v-autocomplete>
           </v-col>
         </v-row>
@@ -76,18 +79,17 @@
     </v-row>
     <template>
       <v-row>
-        <v-spacer></v-spacer>
         <v-col cols="12">
           <v-card>
             <!-- :search="search" -->
+            <!-- v-model.lazy.trim="selected" -->
             <v-data-table
-              v-model.lazy.trim="selected"
               :headers="import_headers"
-              :single-select="false"
+              :single-select="true"
               item-key="id"
               show-select
               @click:row="clickrow"
-              :items="clients"
+              :items="filterClients"
               ref="datatable"
               :footer-props="{
                 'items-per-page-options': [50, 10, 100, 250, 500, -1],
@@ -127,9 +129,8 @@ import axios from "axios";
 
 export default {
   data: () => ({
-
-      import_headers: [
-          // { text: "", value: "id" },
+    import_headers: [
+      // { text: "", value: "id" },
       { text: "ИНН", value: "inn" },
       { text: "ФИО", value: "fullName" },
       { text: "Тел", value: "phoneNumber" },
@@ -138,6 +139,7 @@ export default {
       { text: "Регион", value: "region" },
       { text: "Регистрация", value: "registration" },
     ],
+    filterClients: [],
     clients: [],
     selected: [],
     banks: [],
@@ -146,16 +148,47 @@ export default {
     selectedFunnel: 0,
     message: "",
     snackbar: false,
-    dialog:false
+    dialog: false,
   }),
   mounted() {
     this.getBanks();
     this.getFunnels();
-    this.getUserClients()
+    this.getUserClients();
   },
   watch: {},
   methods: {
+    setBankForClients() {
+      let self = this;
+      let send = {};
+      send.bank_id = self.selectedBank;
+      send.user_id = self.$attrs.user.id;
+      send.funnel = self.selectedFunnel;
+      send.clients = [self.selected.id];
 
+      axios
+        .post("/api/setBankForClients", send)
+        .then((res) => {
+          self.getUserClients();
+          self.selected = [];
+          self.dialog = false;
+          self.message =
+            "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
+          self.snackbar = true;
+        })
+        .catch((error) => console.log(error));
+    },
+    changeFilter() {
+      const self = this;
+      let bank_id = 0;
+      if (self.selectedBank) {
+        bank_id = self.selectedBank;
+        self.filterClients = self.clients.filter(
+          (i) => i.banksfunnels.indexOf('"' + bank_id + ":") >= 0
+        );
+      } else {
+        self.filterClients = self.clients;
+      }
+    },
     plueral(number, words) {
       return words[
         number % 100 > 4 && number % 100 < 20
@@ -167,10 +200,15 @@ export default {
     getUserClients() {
       const self = this;
       const id = self.$attrs.user.id;
-         axios
-        .get("/api/getUserClients/" + id + "/0")
+      let bank_id = 0;
+      let funnel_id = 0;
+      //   if (self.selectedBank) bank_id = self.selectedBank;
+      axios
+        .get("/api/getUserClients/" + id + "/" + bank_id+'/'+funnel_id)
         .then((res) => {
           self.clients = Object.entries(res.data).map((e) => e[1]);
+
+          self.changeFilter();
         })
         .catch((error) => console.log(error));
     },
@@ -183,7 +221,11 @@ export default {
         })
         .catch((error) => console.log(error));
     },
-    clickrow() {},
+    clickrow(i, row) {
+      row.select(true);
+      this.selected = row.item;
+      this.dialog = true;
+    },
     getBanks() {
       let self = this;
       axios

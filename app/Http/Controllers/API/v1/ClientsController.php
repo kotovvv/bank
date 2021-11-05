@@ -100,6 +100,7 @@ class ClientsController extends Controller
     public function setBankForClients(Request $request)
     {
         $data = $request->All();
+        DebugBar::info( $data);
         if (!isset($data['funnel'])) $data['funnel'] = 0;
         if (isset($data['funnel']) && isset($data['user_id'])) {
             $a_log = [];
@@ -113,10 +114,11 @@ class ClientsController extends Controller
         return response($bankfunnels);
     }
 
-    public function getUserClients($id,$bank_id = null)
+    public function getUserClients($id,$bank_id = null,$funnel=null)
     {
-        DebugBar::info($bank_id);
-        return Client::where('user_id', $id)->orderByDesc('date_added')->get();
+if($bank_id == 0 && $funnel != null) return Client::where('user_id', $id)->where('banksfunnels','like','%:'.$funnel.'"%')->orderByDesc('date_added')->get();
+if($bank_id != 0 && $funnel != null) return Client::where('user_id', $id)->where('banksfunnels','like','%:'.$funnel.'"%')->where('banksfunnels','like','%"'.$bank_id.':%')->orderByDesc('date_added')->get();
+if($bank_id == null && $funnel == null) return Client::where('user_id', $id)->orderByDesc('date_added')->get();
     }
 
     public function changeUserOfClients(Request $request)
