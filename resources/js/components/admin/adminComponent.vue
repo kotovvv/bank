@@ -72,7 +72,7 @@ export default {
         icon: "mdi-format-list-checks",
       },
     ],
-    adminMenu: "oclients",
+    adminMenu: "setBank",
   }),
   computed: {
     adminComponent() {

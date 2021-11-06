@@ -8,40 +8,48 @@
         </v-btn>
       </template>
     </v-snackbar>
-         <v-dialog
-        transition="dialog-top-transition"
-        max-width="600"
-        v-model="dialog"
-      >
-        <template>
-          <v-card>
-            <v-toolbar
-              color="primary"
-              dark
-            ><v-icon
-      large
-      color="darken-2"
+    <v-dialog
+      transition="dialog-top-transition"
+      max-width="600"
+      v-model="dialog"
     >
-      mdi-alert-outline
-    </v-icon></v-toolbar>
-            <v-card-text>
-              <div class="text-h4 pa-12">Отправить на {{howrows}} {{plueral(howrows,['запись','записи','записей'])}} выбранный банк?</div>
-            </v-card-text>
-            <v-card-actions class="justify-end">
-                              <v-btn
-                @click="setBankForClients(selectedBanks);dialog = false"
-              >Да</v-btn>
-              <v-spacer></v-spacer>
-              <v-btn
-                text
-                @click="dialog = false;selectedBanks=0"
-              >Нет</v-btn>
-            </v-card-actions>
-          </v-card>
-        </template>
-      </v-dialog>
+      <template>
+        <v-card>
+          <v-toolbar color="primary" dark
+            ><v-icon large color="darken-2">
+              mdi-alert-outline
+            </v-icon></v-toolbar
+          >
+          <v-card-text>
+            <div class="text-h4 pa-12">
+              Отправить на {{ howrows }}
+              {{ plueral(howrows, ["запись", "записи", "записей"]) }} выбранный
+              банк?
+            </div>
+          </v-card-text>
+          <v-card-actions class="justify-end">
+            <v-btn
+              @click="
+                setBankForClients(selectedBanks);
+                dialog = false;
+              "
+              >Да</v-btn
+            >
+            <v-spacer></v-spacer>
+            <v-btn
+              text
+              @click="
+                dialog = false;
+                selectedBanks = 0;
+              "
+              >Нет</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </template>
+    </v-dialog>
     <v-row>
-         <v-col cols="9">
+      <v-col cols="10">
         <v-row id="filter">
           <!-- registration -->
           <v-col cols="2">
@@ -153,7 +161,7 @@
           </v-col>
 
           <!-- fio -->
-          <v-col cols="1">
+          <v-col cols="2">
             <v-text-field label="ФИО:" id="fio" v-model="fio"></v-text-field>
           </v-col>
 
@@ -167,7 +175,7 @@
           </v-col>
 
           <!-- address -->
-          <v-col cols="2">
+          <v-col cols="1">
             <v-text-field
               label="Адрес"
               id="address"
@@ -196,7 +204,7 @@
           </v-col>
         </v-row>
       </v-col>
-      <v-col cols="3">
+      <v-col cols="2">
         <v-autocomplete
           v-model="selectedBanks"
           :items="banks"
@@ -207,7 +215,7 @@
           item-text="name"
           item-value="id"
           label="Назначить банк"
-          @change="dialog=true"
+          @change="dialog = true"
         ></v-autocomplete>
         <!-- multiple -->
       </v-col>
@@ -240,8 +248,24 @@
                 }"
               >
                 <v-row>
-                  <v-spacer></v-spacer>
                   <v-col cols="6">
+                    <v-row class="justify-start align-end mb-5">
+                      <span class="ml-10 ">Отобрать</span>
+                      <span class="mx-4 hmrows">
+                      <v-text-field
+                        label="Сколько?"
+                        @input="selectRow"
+                        :max="clients.length"
+                        v-model.number.lazy="hmrow"
+                        hide-details="auto"
+                      ></v-text-field>
+                      </span>
+                     <span> записей из {{ clients.length }}</span>
+                     <v-spacer></v-spacer>
+                    </v-row>
+                  </v-col>
+                  <v-spacer></v-spacer>
+                  <!-- <v-col cols="6">
                     <v-data-footer
                       :pagination="pagination"
                       :options="options"
@@ -249,7 +273,7 @@
                       :items-per-page-options="[50, 10, 100, 250, 500, -1]"
                       :items-per-page-text="'Показать'"
                     />
-                  </v-col>
+                  </v-col> -->
                 </v-row>
               </template>
             </v-data-table>
@@ -265,7 +289,7 @@ import axios from "axios";
 
 export default {
   data: () => ({
-      dialog:false,
+    dialog: false,
     selected: [],
     userid: null,
     disableuser: 0,
@@ -299,6 +323,7 @@ export default {
     headers: [],
     message: "",
     snackbar: false,
+    hmrow: "",
   }),
   mounted() {
     this.getBanks();
@@ -306,16 +331,23 @@ export default {
     this.getClientsWithoutBanks();
   },
   computed: {
-      howrows: function(){
-        return this.selected.length? this.selected.length:this.clients.length
-      },
+
+    howrows: function () {
+      return this.selected.length ? this.selected.length : this.clients.length;
+    },
   },
   watch: {},
   methods: {
-
-plueral(number, words){
-    return words[(number % 100 > 4 && number % 100 < 20) ? 2 : [2, 0, 1, 1, 1, 2][(number % 10 < 5) ? Math.abs(number) % 10 : 5]];
-      },
+        selectRow() {
+      this.selected = this.clients.slice(0, this.hmrow);
+    },
+    plueral(number, words) {
+      return words[
+        number % 100 > 4 && number % 100 < 20
+          ? 2
+          : [2, 0, 1, 1, 1, 2][number % 10 < 5 ? Math.abs(number) % 10 : 5]
+      ];
+    },
     getClientsWithoutBanks() {
       let self = this;
       axios
@@ -337,7 +369,7 @@ plueral(number, words){
       axios
         .post("/api/setBankForClients", send)
         .then((res) => {
-          self.getClientsWithoutBanks()
+          self.getClientsWithoutBanks();
 
           self.selected = [];
           self.selectedBanks = 0;
@@ -407,5 +439,9 @@ plueral(number, words){
 };
 </script>
 
-<style>
+<style scoped>
+.hmrows{
+    width:100px
+}
 </style>
+
