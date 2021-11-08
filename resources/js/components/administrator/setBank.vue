@@ -223,7 +223,7 @@
     <template>
       <v-row>
         <v-spacer></v-spacer>
-        <v-col cols="12" v-if="clients.length">
+        <v-col cols="12" v-if="filterClients.length">
           <v-card>
             <!-- :search="search" -->
             <v-data-table
@@ -233,7 +233,7 @@
               item-key="id"
               show-select
               @click:row="clickrow"
-              :items="clients"
+              :items="filterClients"
               ref="datatable"
             >
               <!-- :footer-props="{
@@ -250,19 +250,30 @@
                 <v-row>
                   <v-col cols="6">
                     <v-row class="justify-start align-end mb-5">
-                      <span class="ml-10 ">Отобрать</span>
+                      <span class="ml-10">Отобрать</span>
                       <span class="mx-4 hmrows">
-                      <v-text-field
-                        label="Сколько?"
-                        @input="selectRow"
-                        :max="clients.length"
-                        v-model.number.lazy="hmrow"
-                        hide-details="auto"
-                      ></v-text-field>
+                        <v-text-field
+                          label="Сколько?"
+                          @input="selectRow"
+                          :max="filterClients.length"
+                          v-model.number.lazy="hmrow"
+                          hide-details="auto"
+                        ></v-text-field>
                       </span>
-                     <span> записей из {{ clients.length }}</span>
-                     <v-spacer></v-spacer>
+                      <span> записей из {{ filterClients.length }}</span>
+                      <v-spacer></v-spacer>
                     </v-row>
+                  </v-col>
+                  <v-col>
+                    <v-select
+                      v-model="hidedBank"
+                      :items="banks"
+                      item-text="name"
+                      item-value="id"
+                      :menu-props="{ maxHeight: '400' }"
+                      label="Спрятать банки"
+                      multiple
+                    ></v-select>
                   </v-col>
                   <v-spacer></v-spacer>
                   <!-- <v-col cols="6">
@@ -295,6 +306,7 @@ export default {
     disableuser: 0,
     selectedBanks: [],
     banks: [],
+    hidedBank: [],
     users: [],
     tab: null,
     dateReg: [],
@@ -320,6 +332,7 @@ export default {
       { text: "Банк:Воронка", value: "banksfunnels" },
     ],
     clients: [],
+    banksfunnels: [],
     headers: [],
     message: "",
     snackbar: false,
@@ -331,15 +344,24 @@ export default {
     this.getClientsWithoutBanks();
   },
   computed: {
-
+    filterClients() {
+      let re = "";
+      re = this.hidedBank.map((i) => '"' + i + ":").join("|");
+      re = "(" + re + ")";
+      let reg = new RegExp(re);
+      console.log( reg.test('"1:0'))
+      return this.clients.filter((i) => {
+        return !this.hidedBank.length || !reg.test(i.banksfunnels);
+      });
+    },
     howrows: function () {
-      return this.selected.length ? this.selected.length : this.clients.length;
+      return this.selected.length ? this.selected.length : this.filterClients.length;
     },
   },
   watch: {},
   methods: {
-        selectRow() {
-      this.selected = this.clients.slice(0, this.hmrow);
+    selectRow() {
+      this.selected = this.filterClients.slice(0, this.hmrow);
     },
     plueral(number, words) {
       return words[
@@ -364,7 +386,7 @@ export default {
       if (this.selected.length) {
         send.clients = this.selected.map((i) => i.id);
       } else {
-        send.clients = this.clients.map((i) => i.id);
+        send.clients = this.filterClients.map((i) => i.id);
       }
       axios
         .post("/api/setBankForClients", send)
@@ -440,8 +462,8 @@ export default {
 </script>
 
 <style scoped>
-.hmrows{
-    width:100px
+.hmrows {
+  width: 100px;
 }
 </style>
 
