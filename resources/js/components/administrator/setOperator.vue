@@ -8,58 +8,13 @@
         </v-btn>
       </template>
     </v-snackbar>
-    <v-dialog
-      transition="dialog-top-transition"
-      max-width="600"
-      v-model="dialog"
-    >
-      <template>
-        <v-card>
-          <v-toolbar color="primary" dark
-            ><v-icon large color="darken-2">
-              mdi-alert-outline
-            </v-icon></v-toolbar
-          >
-          <v-card-text>
-            <div class="text-h4 pa-12">
-              Точно удалить выбранный банк из {{ selected.length }}
-              {{
-                plueral(selected.length, [
-                  "выделенной строки",
-                  "выделенных строк",
-                  "выделенных строк",
-                ])
-              }}
-              ?
-            </div>
-          </v-card-text>
-          <v-card-actions class="justify-end">
-            <v-btn
-              @click="
-                delBankFromClients(selectedBank);
-                dialog = false;
-              "
-              >Да</v-btn
-            >
-            <v-spacer></v-spacer>
-            <v-btn
-              text
-              @click="
-                dialog = false;
-                selectedBanks = 0;
-              "
-              >Нет</v-btn
-            >
-          </v-card-actions>
-        </v-card>
-      </template>
-    </v-dialog>
+
     <v-row>
       <v-col cols="12">
         <v-row id="filter">
           <!-- bank -->
-          <v-col cols="3">
-            <v-autocomplete
+          <v-col cols="2">
+            <v-select
               v-model="selectedBank"
               :items="banks"
               outlined
@@ -69,61 +24,82 @@
               item-text="name"
               item-value="id"
               label="Банк"
-            ></v-autocomplete>
+              hide-details=true
+            ></v-select>
           </v-col>
-          <!-- download -->
+          <!-- registration -->
           <v-col cols="2">
             <v-dialog
-              ref="dialog2"
-              v-model="modal2"
-              :return-value.sync="dateAdd"
+              ref="dialog"
+              v-model="modal"
+              :return-value.sync="dateReg"
               persistent
               width="290px"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
-                  v-model.lazy="dateAdd"
-                  label="Загрузка (период)"
-                  prepend-icon="mdi-calendar"
+                  v-model.lazy="dateReg"
+                  label="Регистрация (период)"
                   readonly
                   v-bind="attrs"
                   v-on="on"
-                  id="dateadd"
+                  id="datereg"
                 ></v-text-field>
               </template>
               <v-date-picker
-                v-model.lazy="dateAdd"
+                v-model.lazy="dateReg"
                 scrollable
                 range
                 locale="ru-ru"
               >
                 <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="modal2 = false">
+                <v-btn text color="primary" @click="modal = false">
                   Отмена
                 </v-btn>
                 <v-btn
                   text
                   color="primary"
                   @click="
-                    dateAdd = [];
-                    $refs.dialog2.save(dateAdd);
-                    modal2 = false;
+                    dateReg = [];
+                    $refs.dialog.save(dateReg);
+                    modal = false;
                   "
                 >
                   Очистить
                 </v-btn>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="$refs.dialog2.save(dateAdd)"
-                >
+                <v-btn text color="primary" @click="$refs.dialog.save(dateReg)">
                   Выбрать
                 </v-btn>
               </v-date-picker>
             </v-dialog>
           </v-col>
+          <!-- firm -->
+          <v-col cols="2">
+            <v-text-field
+              label="Наименование:"
+              id="firm"
+              v-model="firm"
+            ></v-text-field>
+          </v-col>
+          <!-- address -->
+          <v-col cols="1">
+            <v-text-field
+              label="Адрес"
+              id="address"
+              v-model="address"
+            ></v-text-field>
+          </v-col>
+
+          <!-- reg -->
+          <v-col cols="1">
+            <v-text-field
+              label="Регион"
+              id="region"
+              v-model="region"
+            ></v-text-field>
+          </v-col>
           <!-- status -->
-          <v-col cols="3">
+          <!-- <v-col cols="3">
             <v-autocomplete
               v-model="selectedFunnel"
               :items="funnels"
@@ -135,7 +111,7 @@
               item-value="id"
               label="Статус"
             ></v-autocomplete>
-          </v-col>
+          </v-col> -->
 
           <!-- btn -->
           <v-col cols="1">
@@ -158,7 +134,7 @@
               outlined
               raised
               @click="dialog = true"
-              >удалить банк</v-btn
+              >снять банк</v-btn
             >
           </v-col>
         </v-row>
@@ -226,7 +202,7 @@
               <v-card-text class="scroll-y">
                 <v-list>
                   <v-radio-group
-                    @change="changeUserOfClients"
+                    @change="dialogset = true"
                     ref="radiogroup"
                     v-model="userid"
                     v-bind="users"
@@ -258,6 +234,91 @@
         </v-col>
       </v-row>
     </template>
+    <v-dialog
+      transition="dialog-top-transition"
+      max-width="600"
+      v-model="dialogset"
+    >
+      <template>
+        <v-card>
+          <v-toolbar color="primary" dark
+            ><v-icon large color="darken-2">
+              mdi-alert-outline
+            </v-icon></v-toolbar
+          >
+          <v-card-text>
+            <div class="text-h4 pa-12">
+              Точно назначить выбранных клиентов оператору?
+            </div>
+          </v-card-text>
+          <v-card-actions class="justify-end">
+            <v-btn
+              @click="changeUserOfClients()
+                dialogset = false;
+              "
+              >Да</v-btn
+            >
+            <v-spacer></v-spacer>
+            <v-btn
+              text
+              @click="
+                dialogset = false;
+                hmrow = '';
+                userid=0
+                selected=[]
+              "
+              >Нет</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </template>
+    </v-dialog>
+    <v-dialog
+      transition="dialog-top-transition"
+      max-width="600"
+      v-model="dialog"
+    >
+      <template>
+        <v-card>
+          <v-toolbar color="primary" dark
+            ><v-icon large color="darken-2">
+              mdi-alert-outline
+            </v-icon></v-toolbar
+          >
+          <v-card-text>
+            <div class="text-h4 pa-12">
+              Точно удалить выбранный банк из {{ selected.length }}
+              {{
+                plueral(selected.length, [
+                  "выделенной строки",
+                  "выделенных строк",
+                  "выделенных строк",
+                ])
+              }}
+              ?
+            </div>
+          </v-card-text>
+          <v-card-actions class="justify-end">
+            <v-btn
+              @click="
+                delBankFromClients(selectedBank);
+                dialog = false;
+              "
+              >Да</v-btn
+            >
+            <v-spacer></v-spacer>
+            <v-btn
+              text
+              @click="
+                dialog = false;
+                selectedBanks = 0;
+              "
+              >Нет</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </template>
+    </v-dialog>
   </div>
 </template>
 
@@ -306,6 +367,12 @@ export default {
     snackbar: false,
     hmrow: "",
     dialog: false,
+    dialogset:false,
+    dateReg: [],
+    dateAdd: [],
+    firm: "",
+    address: "",
+    region: "",
   }),
   mounted() {
     this.getBanks();
@@ -417,7 +484,8 @@ export default {
       const filter = document.getElementById("filter");
       const inputs = filter.querySelectorAll("input");
       inputs.forEach(function (el) {
-        if (el.value != "" && el.getAttribute("id")) send[el.getAttribute("id")] = el.value;
+        if (el.value != "" && el.getAttribute("id"))
+          send[el.getAttribute("id")] = el.value;
       });
       if (this.selectedBank) send.bank_id = this.selectedBank;
       if (this.selectedFunnel) send.funnel_id = this.selectedFunnel;

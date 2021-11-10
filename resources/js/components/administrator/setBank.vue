@@ -205,6 +205,7 @@
         </v-row>
       </v-col>
       <v-col cols="2">
+
         <v-autocomplete
           v-model="selectedBanks"
           :items="banks"
@@ -216,8 +217,20 @@
           item-value="id"
           label="Назначить банк"
           @change="dialog = true"
+          hide-details=true
         ></v-autocomplete>
         <!-- multiple -->
+        <v-select
+          v-model="hidedBank"
+          :items="banks"
+          item-text="name"
+          item-value="id"
+          :menu-props="{ maxHeight: '400' }"
+          label="Спрятать назначенные"
+          multiple
+          hide-details=true
+        ></v-select>
+
       </v-col>
     </v-row>
     <template>
@@ -236,16 +249,8 @@
               :items="filterClients"
               ref="datatable"
             >
-              <!-- :footer-props="{
-                'items-per-page-options': [50, 10, 100, 250, 500, -1],
-                'items-per-page-text': 'Показать',
-              }" -->
               <template
-                v-slot:top="{ pagination, options, updateOptions }"
-                :footer-props="{
-                  'items-per-page-options': [50, 10, 100, 250, 500, -1],
-                  'items-per-page-text': 'Показать',
-                }"
+              v-slot:top="{  }"
               >
                 <v-row>
                   <v-col cols="6">
@@ -264,27 +269,7 @@
                       <v-spacer></v-spacer>
                     </v-row>
                   </v-col>
-                  <v-col>
-                    <v-select
-                      v-model="hidedBank"
-                      :items="banks"
-                      item-text="name"
-                      item-value="id"
-                      :menu-props="{ maxHeight: '400' }"
-                      label="Спрятать банки"
-                      multiple
-                    ></v-select>
-                  </v-col>
                   <v-spacer></v-spacer>
-                  <!-- <v-col cols="6">
-                    <v-data-footer
-                      :pagination="pagination"
-                      :options="options"
-                      @update:options="updateOptions"
-                      :items-per-page-options="[50, 10, 100, 250, 500, -1]"
-                      :items-per-page-text="'Показать'"
-                    />
-                  </v-col> -->
                 </v-row>
               </template>
             </v-data-table>
@@ -349,13 +334,15 @@ export default {
       re = this.hidedBank.map((i) => '"' + i + ":").join("|");
       re = "(" + re + ")";
       let reg = new RegExp(re);
-      console.log( reg.test('"1:0'))
+      console.log(reg.test('"1:0'));
       return this.clients.filter((i) => {
         return !this.hidedBank.length || !reg.test(i.banksfunnels);
       });
     },
     howrows: function () {
-      return this.selected.length ? this.selected.length : this.filterClients.length;
+      return this.selected.length
+        ? this.selected.length
+        : this.filterClients.length;
     },
   },
   watch: {},
@@ -395,6 +382,7 @@ export default {
 
           self.selected = [];
           self.selectedBanks = 0;
+          self.hmrow =''
 
           self.message =
             "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
