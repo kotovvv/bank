@@ -184,6 +184,9 @@ if($bank_id == null && $funnel == null) return Client::where('user_id', $id)->or
                 case 'funnel_id':
                     $sql .= " AND `banksfunnels` LIKE '%:" . $filter_word . "\"%'";
                     break;
+                case 'banksfunnelsNotEmpty':
+                    $sql .= " AND `banksfunnels` != ''";
+                    break;
                 case 'user_id':
                     $sql .= " AND `user_id` = '" . $filter_word . "'";
                     break;

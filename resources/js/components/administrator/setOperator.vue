@@ -161,22 +161,13 @@
               }"
             >
               <template
-                v-slot:top="{ pagination, options, updateOptions }"
-                :footer-props="{
-                  'items-per-page-options': [50, 10, 100, 250, 500, -1],
-                  'items-per-page-text': 'Показать',
-                }"
+                v-slot:top="{  }"
               >
+
                 <v-row>
                   <v-spacer></v-spacer>
-                  <v-col cols="6">
-                    <v-data-footer
-                      :pagination="pagination"
-                      :options="options"
-                      @update:options="updateOptions"
-                      :items-per-page-options="[50, 10, 100, 250, 500, -1]"
-                      :items-per-page-text="'Показать'"
-                    />
+                   <v-col cols="6">
+
                   </v-col>
                 </v-row>
               </template>
@@ -378,6 +369,7 @@ export default {
     this.getBanks();
     this.getFunnels();
     this.getUsers();
+    this.getClients(false)
   },
   watch: {},
   methods: {
@@ -478,9 +470,10 @@ export default {
         })
         .catch((error) => console.log(error));
     },
-    getClients() {
+    getClients(empty = true) {
       const self = this;
       let send = {};
+      if (empty){
       const filter = document.getElementById("filter");
       const inputs = filter.querySelectorAll("input");
       inputs.forEach(function (el) {
@@ -489,6 +482,9 @@ export default {
       });
       if (this.selectedBank) send.bank_id = this.selectedBank;
       if (this.selectedFunnel) send.funnel_id = this.selectedFunnel;
+    }else{
+        send.banksfunnelsNotEmpty = 1
+    }
       send.user_id = 0;
       axios
         .post("/api/getClients", send)

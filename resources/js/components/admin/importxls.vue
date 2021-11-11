@@ -26,8 +26,13 @@
           @dragenter="handleDragover"
         >
           Перетяните файл сюда
+
+        </div>
+        <div id="selectFile" class="mt-10">
+            Выбор для загрузки<input type="file" @change="handleDrop">
         </div>
       </v-col>
+
     </v-row>
     <v-row>
       <v-col cols="12">
@@ -108,7 +113,7 @@ export default {
       e.preventDefault();
       let self = this;
       //   console.log("DROPPED");
-      var files = e.dataTransfer.files,
+      var files = e.target.files || e.dataTransfer.files,
         i,
         f;
       for (i = 0, f = files[i]; i != files.length; ++i) {
@@ -193,5 +198,25 @@ export default {
   text-align: center;
   font: 20pt bold, "Roboto";
   color: #bbb;
+
+}
+
+#selectFile{
+    margin:auto;
+    padding: 10px 20px;
+    border:2px solid grey;
+    max-width: 200px;
+    position:relative
+    }
+#selectFile input {
+  position: absolute;
+  cursor: pointer;
+  top: 0px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
 }
 </style>
