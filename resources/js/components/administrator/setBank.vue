@@ -334,7 +334,6 @@ export default {
       re = this.hidedBank.map((i) => '"' + i + ":").join("|");
       re = "(" + re + ")";
       let reg = new RegExp(re);
-      console.log(reg.test('"1:0'));
       return this.clients.filter((i) => {
         return !this.hidedBank.length || !reg.test(i.banksfunnels);
       });

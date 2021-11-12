@@ -24,7 +24,7 @@
               item-text="name"
               item-value="id"
               label="Банк"
-              hide-details=true
+              hide-details="true"
             ></v-select>
           </v-col>
           <!-- registration -->
@@ -120,7 +120,10 @@
               elevation="2"
               outlined
               raised
-              @click="getClients"
+              @click="
+                getClients;
+                this.firstRequest = false;
+              "
               ><v-icon> mdi-table </v-icon></v-btn
             >
           </v-col>
@@ -134,7 +137,7 @@
               outlined
               raised
               @click="dialog = true"
-              >снять банк</v-btn
+              >Открепить банк</v-btn
             >
           </v-col>
         </v-row>
@@ -153,22 +156,17 @@
               item-key="id"
               show-select
               @click:row="clickrow"
-              :items="clients"
+              :items="filterClients"
               ref="datatable"
               :footer-props="{
                 'items-per-page-options': [50, 10, 100, 250, 500, -1],
                 'items-per-page-text': 'Показать',
               }"
             >
-              <template
-                v-slot:top="{  }"
-              >
-
+              <template v-slot:top="{}">
                 <v-row>
                   <v-spacer></v-spacer>
-                   <v-col cols="6">
-
-                  </v-col>
+                  <v-col cols="6"> </v-col>
                 </v-row>
               </template>
             </v-data-table>
@@ -186,7 +184,7 @@
                   :messages="'Сколько записей пометить?'"
                 ></v-text-field>
                 <v-card-text
-                  >из: <span class="text-h5">{{ clients.length }}</span> и
+                  >из: <span class="text-h5">{{ filterClients.length }}</span> и
                   назначить оператору</v-card-text
                 >
               </template>
@@ -244,7 +242,8 @@
           </v-card-text>
           <v-card-actions class="justify-end">
             <v-btn
-              @click="changeUserOfClients()
+              @click="
+                changeUserOfClients();
                 dialogset = false;
               "
               >Да</v-btn
@@ -255,8 +254,8 @@
               @click="
                 dialogset = false;
                 hmrow = '';
-                userid=0
-                selected=[]
+                userid = 0;
+                selected = [];
               "
               >Нет</v-btn
             >
@@ -278,7 +277,7 @@
           >
           <v-card-text>
             <div class="text-h4 pa-12">
-              Точно удалить выбранный банк из {{ selected.length }}
+              Точно открепить выбранный банк из {{ selected.length }}
               {{
                 plueral(selected.length, [
                   "выделенной строки",
@@ -358,20 +357,33 @@ export default {
     snackbar: false,
     hmrow: "",
     dialog: false,
-    dialogset:false,
+    dialogset: false,
     dateReg: [],
     dateAdd: [],
     firm: "",
     address: "",
     region: "",
+    firstRequest: true,
   }),
   mounted() {
     this.getBanks();
     this.getFunnels();
     this.getUsers();
-    this.getClients(false)
+    this.getClients(this.firstRequest);
   },
   watch: {},
+  computed: {
+    filterClients() {
+        return this.clients.filter((i) => {
+        return !this.selectedBank || new RegExp("\"" + this.selectedBank + ":").test(i.banksfunnels);
+      });
+    },
+    howrows: function () {
+      return this.selected.length
+        ? this.selected.length
+        : this.filterClients.length;
+    },
+  },
   methods: {
     delBankFromClients(bank_id) {
       let self = this;
@@ -436,13 +448,13 @@ export default {
       if (this.selected.length) {
         send.clients = this.selected.map((i) => i.id);
       } else {
-        send.clients = this.clients.map((i) => i.id);
+        send.clients = this.filterClients.map((i) => i.id);
       }
       axios
         .post("/api/changeUserOfClients", send)
         .then((res) => {
           self.getUsers();
-          self.getClients();
+          self.getClients(self.firstRequest);
           self.userid = null;
         })
         .catch((error) => console.log(error));
@@ -470,21 +482,21 @@ export default {
         })
         .catch((error) => console.log(error));
     },
-    getClients(empty = true) {
+    getClients(empty = false) {
       const self = this;
       let send = {};
-      if (empty){
-      const filter = document.getElementById("filter");
-      const inputs = filter.querySelectorAll("input");
-      inputs.forEach(function (el) {
-        if (el.value != "" && el.getAttribute("id"))
-          send[el.getAttribute("id")] = el.value;
-      });
-      if (this.selectedBank) send.bank_id = this.selectedBank;
-      if (this.selectedFunnel) send.funnel_id = this.selectedFunnel;
-    }else{
-        send.banksfunnelsNotEmpty = 1
-    }
+      if (empty) {
+        send.banksfunnelsNotEmpty = 1;
+      } else {
+        const filter = document.getElementById("filter");
+        const inputs = filter.querySelectorAll("input");
+        inputs.forEach(function (el) {
+          if (el.value != "" && el.getAttribute("id"))
+            send[el.getAttribute("id")] = el.value;
+        });
+        if (this.selectedBank) send.bank_id = this.selectedBank;
+        if (this.selectedFunnel) send.funnel_id = this.selectedFunnel;
+      }
       send.user_id = 0;
       axios
         .post("/api/getClients", send)
