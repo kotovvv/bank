@@ -25,7 +25,27 @@
               item-value="id"
               label="Банк"
               hide-details="true"
-            ></v-select>
+            >
+              <template v-slot:item="{ active, item, attrs, on }">
+                <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      <v-row no-gutters align="center">
+                        <span>{{ item.name }}</span>
+                        <v-spacer></v-spacer>
+                        <v-chip
+                          text-color="white"
+                          class="indigo darken-4"
+                          small
+                          v-if="item.hm > 0"
+                          >{{ item.hm }}</v-chip
+                        >
+                      </v-row>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-select>
           </v-col>
           <!-- registration -->
           <v-col cols="2">
@@ -374,8 +394,17 @@ export default {
   watch: {},
   computed: {
     filterClients() {
-        return this.clients.filter((i) => {
-        return !this.selectedBank || new RegExp("\"" + this.selectedBank + ":").test(i.banksfunnels);
+      let regfirm = new RegExp("^" + this.firm);
+      let regaddress = new RegExp(this.address);
+      let regregion = new RegExp(this.region);
+      return this.clients.filter((i) => {
+        return (
+          (!this.selectedBank ||
+            new RegExp('"' + this.selectedBank + ":").test(i.banksfunnels)) &&
+          (!this.firm || regfirm.test(i.organizationName)) &&
+          (!this.address || regaddress.test(i.address)) &&
+          (!this.region || regregion.test(i.region))
+        );
       });
     },
     howrows: function () {
@@ -427,6 +456,7 @@ export default {
           self.clients.map(function (e) {
             e.operator = self.users.find((u) => u.id == e.user_id).fio;
           });
+          self.howmanybank();
           self.selectedBanks = 0;
         })
         .catch((error) => console.log(error));
@@ -464,10 +494,11 @@ export default {
       axios
         .get("/api/banks")
         .then((res) => {
-          self.banks = res.data.map(({ id, name, abbr }) => ({
+          self.banks = res.data.map(({ id, name, abbr, hm }) => ({
             id,
             name,
             abbr,
+            hm,
           }));
         })
         .catch((error) => console.log(error));
@@ -481,6 +512,32 @@ export default {
           self.hmrow = "";
         })
         .catch((error) => console.log(error));
+    },
+    howmanybank() {
+      let self = this;
+      let a = {};
+      self.clients.map(function (i) {
+        let client = "";
+        let el = {};
+        client = i.banksfunnels.replace(/"/g, "");
+        if (/,/.test(client)) {
+          //many clients
+          client.split(",").map((i) => {
+            el = i.split(":");
+            if (a[el[0]] === undefined) a[el[0]] = 0;
+            a[el[0]] += 1;
+          });
+        } else {
+          //one client
+          el = client.split(":");
+          if (a[el[0]] === undefined) a[el[0]] = 0;
+          a[el[0]] += 1;
+        }
+      });
+      self.banks = self.banks.map(function (i) {
+        if (i.id > 0) i.hm = a[i.id];
+        return i;
+      });
     },
     getClients(empty = false) {
       const self = this;
@@ -528,6 +585,7 @@ export default {
               banksfunnels,
             })
           );
+          self.howmanybank();
         })
         .catch((error) => console.log(error));
     },
