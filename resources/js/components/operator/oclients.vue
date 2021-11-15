@@ -160,7 +160,7 @@
 
           <v-card-text>
             <div class="text-h4 pa-12">
-              Установить выбранный статус "{{selectedFunnnelName}}" для {{ selected !={}?selected.fullName : ""}}?
+              Установить выбранный статус "{{selectedFunnnelName()}}" для {{ selected !={}?selected.fullName : ""}}?
             </div>
           </v-card-text>
           <v-card-actions class="justify-end">
