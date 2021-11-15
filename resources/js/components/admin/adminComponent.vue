@@ -65,7 +65,7 @@ export default {
       { text: "Импорт", name: "importxls", icon: "mdi-swap-vertical" },
       { text: "Основная база", name: "setBank", icon: "mdi-database" },
       { text: "Банки", name: "setOperator", icon: "mdi-playlist-plus" },
-      { text: "Управление", name: "oclients", icon: "mdi-phone-log-outline" },
+      { text: "Оператор", name: "oclients", icon: "mdi-phone-log-outline" },
       {
         text: "Справочники",
         name: "dictionary",

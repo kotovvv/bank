@@ -46,7 +46,7 @@
                       color="funnel.color"
                       :label="`${funnel.name}`"
                       :value="funnel.id"
-                      @click="setBankForClients"
+                      @click="dialogf = true"
                     ></v-radio>
                   </v-radio-group>
                 </v-container>
@@ -61,7 +61,7 @@
         <v-row id="filter">
           <!-- bank -->
           <v-col cols="3">
-            <v-autocomplete
+                        <v-select
               v-model="selectedBank"
               :items="banks"
               outlined
@@ -71,9 +71,31 @@
               item-text="name"
               item-value="id"
               label="Банк"
-              @change="changeFilter"
-            ></v-autocomplete>
+              hide-details="true"
+               @change="changeFilter"
+            >
+              <template v-slot:item="{ active, item, attrs, on }">
+                <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      <v-row no-gutters align="center">
+                        <span>{{ item.name }}</span>
+                        <v-spacer></v-spacer>
+                        <v-chip
+                          text-color="white"
+                          class="indigo darken-4"
+                          small
+                          v-if="item.hm > 0"
+                          >{{ item.hm }}</v-chip
+                        >
+                      </v-row>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-select>
           </v-col>
+          <v-col>Всего: <span class="text-h5">{{all}}</span></v-col>
         </v-row>
       </v-col>
     </v-row>
@@ -121,6 +143,42 @@
         </v-col>
       </v-row>
     </template>
+        <v-dialog
+      transition="dialog-top-transition"
+      max-width="600"
+      v-model="dialogf"
+    >
+      <template>
+        <v-card>
+          <v-toolbar color="primary" dark
+            ><v-icon large color="darken-2">
+              mdi-alert-outline
+            </v-icon></v-toolbar
+          >
+          <v-card-text>
+            <div class="text-h4 pa-12">
+              Установить выбранный статус  {{ selected[0].fullName }}?
+            </div>
+          </v-card-text>
+          <v-card-actions class="justify-end">
+            <v-btn
+              @click="dialogf = false;setBankForClients;
+              "
+              >Да</v-btn
+            >
+            <v-spacer></v-spacer>
+            <v-btn
+              text
+              @click="
+                dialogf = false;
+
+              "
+              >Нет</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </template>
+    </v-dialog>
   </div>
 </template>
 
@@ -129,6 +187,9 @@ import axios from "axios";
 
 export default {
   data: () => ({
+      dialogf:false,
+    all:'',
+    done:'',
     import_headers: [
       // { text: "", value: "id" },
       { text: "ИНН", value: "inn" },
@@ -157,6 +218,46 @@ export default {
   },
   watch: {},
   methods: {
+      howmanybank() {
+        let self = this;
+        let a = {};
+        self.clients.map(function (i) {
+          let client = "";
+          let el = {};
+          client = i.banksfunnels.replace(/"/g, "");
+          if (/,/.test(client)) {
+            //many clients
+            client.split(",").map((i) => {
+              el = i.split(":");
+              if (a[el[0]] === undefined) a[el[0]] = 0;
+              a[el[0]] += 1;
+            });
+          } else {
+            //one client
+            el = client.split(":");
+            if (a[el[0]] === undefined) a[el[0]] = 0;
+            a[el[0]] += 1;
+          }
+        });
+        self.banks = self.banks.map(function (i) {
+          if (i.id > 0) i.hm = a[i.id];
+          return i;
+        });
+      },
+ getBanks() {
+        let self = this;
+        axios
+          .get("/api/banks")
+          .then((res) => {
+            self.banks = res.data.map(({ id, name, abbr, hm }) => ({
+              id,
+              name,
+              abbr,
+              hm,
+            }));
+          })
+          .catch((error) => console.log(error));
+      },
     setBankForClients() {
       let self = this;
       let send = {};
@@ -209,6 +310,8 @@ export default {
           self.clients = Object.entries(res.data).map((e) => e[1]);
 
           self.changeFilter();
+          self. howmanybank()
+          self.all = self.clients.length
         })
         .catch((error) => console.log(error));
     },
@@ -226,19 +329,7 @@ export default {
       this.selected = row.item;
       this.dialog = true;
     },
-    getBanks() {
-      let self = this;
-      axios
-        .get("/api/banks")
-        .then((res) => {
-          self.banks = res.data.map(({ id, name, abbr }) => ({
-            id,
-            name,
-            abbr,
-          }));
-        })
-        .catch((error) => console.log(error));
-    },
+
   },
   components: {},
 };
