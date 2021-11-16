@@ -219,7 +219,8 @@ export default {
   },
   methods: {
           selectedFunnnelName:function(){
-          return this.funnels != []?this.funnels.find(i => i.id == this.selectedFunnel).name:''
+              return 'aaa'
+        //   return this.funnels != []?this.funnels.find(i => i.id == this.selectedFunnel).name:''
       }  ,
     howmanybank() {
       let self = this;

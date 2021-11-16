@@ -11,7 +11,7 @@ class Log extends Model
     public $incrementing = false;
     use HasFactory;
     protected $fillable = [
-        'client_id', 'user_id','funnel_id','other','date_add'
+        'client_id', 'user_id','bank_id','funnel_id','other','dateadd','timeadd'
     ];
 
 }

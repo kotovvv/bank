@@ -369,7 +369,7 @@ export default {
       let self = this;
       let send = {};
       send.bank_id = bank_id;
-      if (this.selected.length) {
+      if (this.selected.length > 0) {
         send.clients = this.selected.map((i) => i.id);
       } else {
         send.clients = this.filterClients.map((i) => i.id);
