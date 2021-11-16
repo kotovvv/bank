@@ -536,6 +536,8 @@ export default {
           self.getUsers();
           self.getClients(self.firstRequest);
           self.userid = null;
+          self.disableuser=0
+          self.selected=[]
         })
         .catch((error) => console.log(error));
     },
