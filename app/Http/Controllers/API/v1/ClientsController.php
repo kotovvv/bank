@@ -100,12 +100,12 @@ class ClientsController extends Controller
     public function setBankForClients(Request $request)
     {
         $data = $request->All();
-        DebugBar::info( $data);
+        // DebugBar::info( $data);
         if (!isset($data['funnel'])) $data['funnel'] = 0;
         if (isset($data['funnel']) && isset($data['user_id'])) {
             $a_log = [];
             foreach ($data['clients'] as $cl) {
-                $a_log = ['client_id' => $cl, 'user_id' => $data['user_id'], 'funnel_id' => $data['funnel'], 'date_add' => Now()];
+                $a_log = ['client_id' => $cl, 'user_id' => $data['user_id'],'bank_id' =>$data['bank_id'],  'funnel_id' => $data['funnel'], 'dateadd' => Now(), 'timeadd' => Now()];
             }
             Log::insert($a_log);
         }
@@ -118,7 +118,7 @@ class ClientsController extends Controller
     {
         if($bank_id == 0 && $funnel == 0) {
             //  SELECT `client_id` FROM `logs` WHERE `user_id` = 1 AND DATE(`date_add`) = DATE(NOW())
-        $done_today = Log::select('client_id')->where('user_id', $id)->whereDate('date_add',NOW())->get();
+        $done_today = Log::select('client_id')->where('user_id', $id)->where('dateadd',date('Y-m-d'))->whereNotNull('bank_id')->get();
         return Client::where('user_id', $id)->whereNotIn('id',$done_today)->orderByDesc('date_added')->get();
         };
 if($bank_id == 0 && $funnel != null) return Client::where('user_id', $id)->where('banksfunnels','like','%:'.$funnel.'"%')->orderByDesc('date_added')->get();
@@ -131,7 +131,7 @@ if($bank_id == null && $funnel == null) return Client::where('user_id', $id)->or
         $data = $request->All();
         $a_log = [];
         foreach ($data['clients'] as $cl) {
-            $a_log[] = ['client_id' => $cl, 'user_id' => $data['user_id'], 'other' => '0', 'date_add' => Now()];
+            $a_log[] = ['client_id' => $cl, 'user_id' => $data['user_id'], 'other' => '0', 'dateadd' => Now(), 'timeadd' => Now()];
         }
         Log::insert($a_log);
         return Client::whereIn('id', $data['clients'])->update(['user_id' => $data['user_id']]);

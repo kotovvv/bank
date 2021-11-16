@@ -149,6 +149,16 @@
           </v-col>
           <v-spacer></v-spacer>
 
+          <v-col v-if="selected.length && disableuser > 0">
+            <v-btn
+              color="primary"
+              elevation="2"
+              outlined
+              raised
+              @click="dialogo = true"
+              >Открепить оператора</v-btn
+            >
+          </v-col>
           <!-- del bank -->
           <v-col v-if="selected.length && selectedBank">
             <v-btn
@@ -286,6 +296,44 @@
     <v-dialog
       transition="dialog-top-transition"
       max-width="600"
+      v-model="dialogo"
+    >
+      <template>
+        <v-card>
+          <v-toolbar color="primary" dark
+            ><v-icon large color="darken-2">
+              mdi-alert-outline
+            </v-icon></v-toolbar
+          >
+          <v-card-text>
+            <div class="text-h4 pa-12">
+              Открепить оператора от выбранных клиентов?
+            </div>
+          </v-card-text>
+          <v-card-actions class="justify-end">
+            <v-btn
+              @click="
+              userid = 0;
+                changeUserOfClients();
+                dialogo = false;
+              "
+              >Да</v-btn
+            >
+            <v-spacer></v-spacer>
+            <v-btn
+              text
+              @click="
+                dialogo = false;
+              "
+              >Нет</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </template>
+    </v-dialog>
+    <v-dialog
+      transition="dialog-top-transition"
+      max-width="600"
       v-model="dialog"
     >
       <template>
@@ -377,6 +425,7 @@ export default {
     snackbar: false,
     hmrow: "",
     dialog: false,
+    dialogo: false,
     dialogset: false,
     dateReg: [],
     dateAdd: [],
@@ -444,7 +493,7 @@ export default {
       ];
     },
     selectRow() {
-      this.selected = this.clients.slice(0, this.hmrow);
+      this.selected = this.filterClients.slice(0, this.hmrow);
     },
     getUserClients(id) {
       let self = this;
@@ -474,6 +523,7 @@ export default {
     changeUserOfClients() {
       let self = this;
       let send = {};
+      if (self.selectedBank != 0 ) send.bank_id = self.selectedBank
       send.user_id = this.userid;
       if (this.selected.length) {
         send.clients = this.selected.map((i) => i.id);
