@@ -118,7 +118,7 @@ class ClientsController extends Controller
     {
         if($bank_id == 0 && $funnel == 0) {
             //  SELECT `client_id` FROM `logs` WHERE `user_id` = 1 AND DATE(`date_add`) = DATE(NOW())
-        $done_today = Log::select('client_id')->where('user_id', $id)->where('date_add','>',NOW())->get();
+        $done_today = Log::select('client_id')->where('user_id', $id)->whereDate('date_add',NOW())->get();
         return Client::where('user_id', $id)->whereNotIn('id',$done_today)->orderByDesc('date_added')->get();
         };
 if($bank_id == 0 && $funnel != null) return Client::where('user_id', $id)->where('banksfunnels','like','%:'.$funnel.'"%')->orderByDesc('date_added')->get();

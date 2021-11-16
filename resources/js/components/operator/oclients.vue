@@ -61,7 +61,7 @@
         <v-row id="filter">
           <!-- bank -->
           <v-col cols="3">
-                        <v-select
+            <v-select
               v-model="selectedBank"
               :items="banks"
               outlined
@@ -72,7 +72,7 @@
               item-value="id"
               label="Банк"
               hide-details="true"
-               @change="changeFilter"
+              @change="changeFilter"
             >
               <template v-slot:item="{ active, item, attrs, on }">
                 <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
@@ -95,7 +95,9 @@
               </template>
             </v-select>
           </v-col>
-          <v-col>Всего: <span class="text-h5">{{all}}</span></v-col>
+          <v-col
+            >Всего: <span class="text-h5">{{ all }}</span></v-col
+          >
         </v-row>
       </v-col>
     </v-row>
@@ -143,7 +145,7 @@
         </v-col>
       </v-row>
     </template>
-        <v-dialog
+    <v-dialog
       transition="dialog-top-transition"
       max-width="600"
       v-model="dialogf"
@@ -155,26 +157,21 @@
               mdi-alert-outline
             </v-icon></v-toolbar
           >
+
           <v-card-text>
             <div class="text-h4 pa-12">
-              Установить выбранный статус  {{ selected[0].fullName }}?
+              Установить выбранный статус "{{selectedFunnnelName()}}" для {{ selected !={}?selected.fullName : ""}}?
             </div>
           </v-card-text>
           <v-card-actions class="justify-end">
             <v-btn
-              @click="dialogf = false;setBankForClients;
+              @click="
+                dialogf = false;dialog=false;setBankForClients();selectedFunnel=0;
               "
               >Да</v-btn
             >
             <v-spacer></v-spacer>
-            <v-btn
-              text
-              @click="
-                dialogf = false;
-
-              "
-              >Нет</v-btn
-            >
+            <v-btn text @click="dialogf = false;selectedFunnel=0">Нет</v-btn>
           </v-card-actions>
         </v-card>
       </template>
@@ -187,9 +184,9 @@ import axios from "axios";
 
 export default {
   data: () => ({
-      dialogf:false,
-    all:'',
-    done:'',
+    dialogf: false,
+    all: "",
+    done: "",
     import_headers: [
       // { text: "", value: "id" },
       { text: "ИНН", value: "inn" },
@@ -202,7 +199,7 @@ export default {
     ],
     filterClients: [],
     clients: [],
-    selected: [],
+    selected: {},
     banks: [],
     selectedBank: 1,
     funnels: [],
@@ -217,47 +214,53 @@ export default {
     this.getUserClients();
   },
   watch: {},
+  computed:{
+
+  },
   methods: {
-      howmanybank() {
-        let self = this;
-        let a = {};
-        self.clients.map(function (i) {
-          let client = "";
-          let el = {};
-          client = i.banksfunnels.replace(/"/g, "");
-          if (/,/.test(client)) {
-            //many clients
-            client.split(",").map((i) => {
-              el = i.split(":");
-              if (a[el[0]] === undefined) a[el[0]] = 0;
-              a[el[0]] += 1;
-            });
-          } else {
-            //one client
-            el = client.split(":");
+          selectedFunnnelName:function(){
+          return this.funnels != []?this.funnels.find(i => i.id == this.selectedFunnel).name:''
+      }  ,
+    howmanybank() {
+      let self = this;
+      let a = {};
+      self.clients.map(function (i) {
+        let client = "";
+        let el = {};
+        client = i.banksfunnels.replace(/"/g, "");
+        if (/,/.test(client)) {
+          //many clients
+          client.split(",").map((i) => {
+            el = i.split(":");
             if (a[el[0]] === undefined) a[el[0]] = 0;
             a[el[0]] += 1;
-          }
-        });
-        self.banks = self.banks.map(function (i) {
-          if (i.id > 0) i.hm = a[i.id];
-          return i;
-        });
-      },
- getBanks() {
-        let self = this;
-        axios
-          .get("/api/banks")
-          .then((res) => {
-            self.banks = res.data.map(({ id, name, abbr, hm }) => ({
-              id,
-              name,
-              abbr,
-              hm,
-            }));
-          })
-          .catch((error) => console.log(error));
-      },
+          });
+        } else {
+          //one client
+          el = client.split(":");
+          if (a[el[0]] === undefined) a[el[0]] = 0;
+          a[el[0]] += 1;
+        }
+      });
+      self.banks = self.banks.map(function (i) {
+        if (i.id > 0) i.hm = a[i.id];
+        return i;
+      });
+    },
+    getBanks() {
+      let self = this;
+      axios
+        .get("/api/banks")
+        .then((res) => {
+          self.banks = res.data.map(({ id, name, abbr, hm }) => ({
+            id,
+            name,
+            abbr,
+            hm,
+          }));
+        })
+        .catch((error) => console.log(error));
+    },
     setBankForClients() {
       let self = this;
       let send = {};
@@ -270,7 +273,7 @@ export default {
         .post("/api/setBankForClients", send)
         .then((res) => {
           self.getUserClients();
-          self.selected = [];
+          self.selected = {};
           self.dialog = false;
           self.message =
             "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
@@ -305,13 +308,13 @@ export default {
       let funnel_id = 0;
       //   if (self.selectedBank) bank_id = self.selectedBank;
       axios
-        .get("/api/getUserClients/" + id + "/" + bank_id+'/'+funnel_id)
+        .get("/api/getUserClients/" + id + "/" + bank_id + "/" + funnel_id)
         .then((res) => {
           self.clients = Object.entries(res.data).map((e) => e[1]);
 
           self.changeFilter();
-          self. howmanybank()
-          self.all = self.clients.length
+          self.howmanybank();
+          self.all = self.clients.length;
         })
         .catch((error) => console.log(error));
     },
@@ -329,7 +332,6 @@ export default {
       this.selected = row.item;
       this.dialog = true;
     },
-
   },
   components: {},
 };
