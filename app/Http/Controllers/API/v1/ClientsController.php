@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\Log;
+use App\Models\Bank;
+use App\Models\Funnel;
 use DB;
 use Debugbar;
 
@@ -105,7 +107,7 @@ class ClientsController extends Controller
         if (isset($data['funnel']) && isset($data['user_id'])) {
             $a_log = [];
             foreach ($data['clients'] as $cl) {
-                $a_log = ['client_id' => $cl, 'user_id' => $data['user_id'],'bank_id' =>$data['bank_id'],  'funnel_id' => $data['funnel'], 'dateadd' => Now(), 'timeadd' => Now()];
+                $a_log = ['client_id' => $cl, 'user_id' => $data['user_id'], 'bank_id' => $data['bank_id'],  'funnel_id' => $data['funnel'], 'dateadd' => Now(), 'timeadd' => Now()];
             }
             Log::insert($a_log);
         }
@@ -114,27 +116,27 @@ class ClientsController extends Controller
         return response($bankfunnels);
     }
 
-    public function getUserClients($id,$bank_id = null,$funnel=null)
+    public function getUserClients($id, $bank_id = null, $funnel = null)
     {
-        if($bank_id == 0 && $funnel == 0) {
+        if ($bank_id == 0 && $funnel == 0) {
             //  SELECT `client_id` FROM `logs` WHERE `user_id` = 1 AND DATE(`date_add`) = DATE(NOW())
-        $done_today = Log::select('client_id')->where('user_id', $id)->where('dateadd',date('Y-m-d'))->whereNotNull('bank_id')->get();
-        return Client::where('user_id', $id)->whereNotIn('id',$done_today)->orderByDesc('date_added')->get();
+            $done_today = Log::select('client_id')->where('user_id', $id)->where('dateadd', date('Y-m-d'))->whereNotNull('bank_id')->get();
+            return Client::where('user_id', $id)->whereNotIn('id', $done_today)->orderByDesc('date_added')->get();
         };
-if($bank_id == 0 && $funnel != null) return Client::where('user_id', $id)->where('banksfunnels','like','%:'.$funnel.'"%')->orderByDesc('date_added')->get();
-if($bank_id != 0 && $funnel != null) return Client::where('user_id', $id)->where('banksfunnels','like','%:'.$funnel.'"%')->where('banksfunnels','like','%"'.$bank_id.':%')->orderByDesc('date_added')->get();
-if($bank_id == null && $funnel == null) return Client::where('user_id', $id)->orderByDesc('date_added')->get();
+        if ($bank_id == 0 && $funnel != null) return Client::where('user_id', $id)->where('banksfunnels', 'like', '%:' . $funnel . '"%')->orderByDesc('date_added')->get();
+        if ($bank_id != 0 && $funnel != null) return Client::where('user_id', $id)->where('banksfunnels', 'like', '%:' . $funnel . '"%')->where('banksfunnels', 'like', '%"' . $bank_id . ':%')->orderByDesc('date_added')->get();
+        if ($bank_id == null && $funnel == null) return Client::where('user_id', $id)->orderByDesc('date_added')->get();
     }
 
     public function changeUserOfClients(Request $request)
     {
         $data = $request->All();
-        $a_log = [];
-        foreach ($data['clients'] as $cl) {
-            $a_log[] = ['client_id' => $cl, 'user_id' => $data['user_id'], 'other' => '0', 'dateadd' => Now(), 'timeadd' => Now()];
-        }
-        Log::insert($a_log);
-        return Client::whereIn('id', $data['clients'])->update(['user_id' => $data['user_id']]);
+        // $a_log = [];
+        // foreach ($data['clients'] as $cl) {
+        //     $a_log[] = ['client_id' => $cl, 'user_id' => $data['user_id'], 'other' => '0', 'dateadd' => Now(), 'timeadd' => Now()];
+        // }
+        // Log::insert($a_log);
+        return Client::whereIn('id', $data['clients'])->update(['user_id' => $data['user_id'],'date_set'=>date('Y-m-d')]);
     }
 
     public function getClients(Request $request)
@@ -197,12 +199,25 @@ if($bank_id == null && $funnel == null) return Client::where('user_id', $id)->or
                     break;
                 default:
                     $sql .= " AND 1 != 1";
-                    }
+            }
         }
         $sql = $head_sql . $sql . " ORDER BY `date_added` DESC LIMIT 10000";
         // Debugbar::info($sql);
         return DB::select(DB::raw($sql));
     }
+
+public function getReportAll(Request $request){
+    $data = $request->All();
+    $bank_id = $data['bank_id'];
+    $period = $data['period'];
+    $a_banks = Bank::get();
+    $a_funnels = Funnel::orderBy('order','asc')->get();
+    $json = [];
+    $json['period'] = $period;
+    // SELECT funnel_id,COUNT(*) FROM `logs` WHERE bank_id = 3 AND dateadd = '2021-11-17' GROUP BY funnel_id
+
+    return response($json);
+}
 
 
     /**

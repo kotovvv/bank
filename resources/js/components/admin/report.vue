@@ -92,7 +92,7 @@
                 </v-btn>
               </v-date-picker>
             </v-dialog>
-          </v-col>        
+          </v-col>
                   <!-- btn -->
           <v-col cols="1">
             <v-btn
@@ -146,8 +146,21 @@ data: () => ({
     },
     getReportAll(){
       let self=this
-      
-    }
+      let send = {}
+      send.bank_id = self.selectedBank
+      if (self.period == '') {
+          self.message = 'Установите период'
+          self.snackbar = true
+          return
+          }
+      send.period = self.period
+axios
+        .post("/api/getReportAll",send)
+        .then((res) => {
+     console.log(res.data)
+          })
+        .catch((error) => console.log(error));
+    },
  },
 }
 </script>
