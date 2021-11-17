@@ -199,7 +199,7 @@
               outlined
               raised
               @click="getClients"
-              ><v-icon> mdi-table </v-icon></v-btn
+              ><v-icon> mdi-table-large </v-icon></v-btn
             >
           </v-col>
         </v-row>

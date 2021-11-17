@@ -54,6 +54,7 @@ const dictionary = () => import("./dictionary");
 const setBank = () => import("../administrator/setBank");
 const setOperator = () => import("../administrator/setOperator");
 const oclients = () => import("../operator/oclients");
+const report = () => import("./report");
 
 export default {
   props: ["user"],
@@ -66,6 +67,7 @@ export default {
       { text: "Основная база", name: "setBank", icon: "mdi-database" },
       { text: "Банки", name: "setOperator", icon: "mdi-playlist-plus" },
       { text: "Оператор", name: "oclients", icon: "mdi-phone-log-outline" },
+      { text: "Отчёты", name: "report", icon: "mdi-timetable" },
       {
         text: "Справочники",
         name: "dictionary",
@@ -81,6 +83,7 @@ export default {
       if (this.adminMenu == "setOperator") return setOperator;
       if (this.adminMenu == "setBank") return setBank;
       if (this.adminMenu == "oclients") return oclients;
+      if (this.adminMenu == "report") return report;
     },
   },
   mounted: function () {},

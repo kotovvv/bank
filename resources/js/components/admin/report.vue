@@ -1,9 +1,153 @@
 <template>
+  <div>
+    <v-snackbar v-model="snackbar" top right>
+      <v-card-text v-html="message"></v-card-text>
+      <template v-slot:action="{ attrs }">
+        <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
+          X
+        </v-btn>
+      </template>
+    </v-snackbar>
 
+    <v-row>
+      <v-col cols="12">
+        <v-row id="filter">
+          <!-- bank -->
+          <v-col cols="2">
+            <v-select
+              v-model="selectedBank"
+              :items="banks"
+              outlined
+              dense
+              chips
+              small-chips
+              item-text="name"
+              item-value="id"
+              label="Банк"
+              hide-details="true"
+            >
+              <template v-slot:item="{ active, item, attrs, on }">
+                <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      <v-row no-gutters align="center">
+                        <span>{{ item.name }}</span>
+                        <v-spacer></v-spacer>
+                        <v-chip
+                          text-color="white"
+                          class="indigo darken-4"
+                          small
+                          v-if="item.hm > 0"
+                          >{{ item.hm }}</v-chip
+                        >
+                      </v-row>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-select>
+          </v-col>
+          <!-- period -->
+          <v-col cols="2">
+            <v-dialog
+              ref="dialog"
+              v-model="modal"
+              :return-value.sync="period"
+              persistent
+              width="290px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model.lazy="period"
+                  label="Период"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  id="period"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model.lazy="period"
+                scrollable
+                range
+                locale="ru-ru"
+              >
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="modal = false">
+                  Отмена
+                </v-btn>
+                <v-btn
+                  text
+                  color="primary"
+                  @click="
+                    period = [];
+                    $refs.dialog.save(period);
+                    modal = false;
+                  "
+                >
+                  Очистить
+                </v-btn>
+                <v-btn text color="primary" @click="$refs.dialog.save(period)">
+                  Выбрать
+                </v-btn>
+              </v-date-picker>
+            </v-dialog>
+          </v-col>        
+                  <!-- btn -->
+          <v-col cols="1">
+            <v-btn
+              color="primary"
+              elevation="2"
+              outlined
+              raised
+              @click="getReportAll"
+              ><v-icon> mdi-table-large </v-icon></v-btn
+            >
+          </v-col>
+        </v-row>
+      </v-col>
+
+    </v-row>
+  </div>
 </template>
 
 <script>
-export default {
+import axios from "axios";
 
+export default {
+data: () => ({
+  period:[],
+    dialog: false,
+    modal: false,
+    snackbar: false,
+    banks:[],
+    selectedBank:0,
+  message:''
+
+}),
+  mounted() {
+    this.getBanks();
+
+  },
+ methods: {
+       getBanks() {
+      let self = this;
+      axios
+        .get("/api/banks")
+        .then((res) => {
+          self.banks = res.data.map(({ id, name, abbr }) => ({
+            id,
+            name,
+            abbr,
+          }));
+          self.banks.unshift({id:0,name:'Все'})
+        })
+        .catch((error) => console.log(error));
+    },
+    getReportAll(){
+      let self=this
+      
+    }
+ },
 }
 </script>
