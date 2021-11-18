@@ -136,7 +136,7 @@ class ClientsController extends Controller
         //     $a_log[] = ['client_id' => $cl, 'user_id' => $data['user_id'], 'other' => '0', 'dateadd' => Now(), 'timeadd' => Now()];
         // }
         // Log::insert($a_log);
-        return Client::whereIn('id', $data['clients'])->update(['user_id' => $data['user_id'],'date_set'=>date('Y-m-d')]);
+        return Client::whereIn('id', $data['clients'])->update(['user_id' => $data['user_id'], 'date_set' => date('Y-m-d')]);
     }
 
     public function getClients(Request $request)
@@ -152,7 +152,11 @@ class ClientsController extends Controller
                 case 'datereg':
                     if (strpos($filter_word, ',')) {
                         $a_date = explode(',', $filter_word);
-                        $sql .= " AND `registration` BETWEEN date('$a_date[0]') AND date('$a_date[1]')";
+                        if ($a_date[0] == $a_date[1]) {
+                            $sql .= " AND `registration` = date('$filter_word')";
+                        } else {
+                            $sql .= " AND `registration` BETWEEN date('$a_date[0]') AND date('$a_date[1]')";
+                        }
                     } else {
                         $sql .= " AND `registration` = date('$filter_word')";
                     }
@@ -206,18 +210,68 @@ class ClientsController extends Controller
         return DB::select(DB::raw($sql));
     }
 
-public function getReportAll(Request $request){
-    $data = $request->All();
-    $bank_id = $data['bank_id'];
-    $period = $data['period'];
-    $a_banks = Bank::get();
-    $a_funnels = Funnel::orderBy('order','asc')->get();
-    $json = [];
-    $json['period'] = $period;
-    // SELECT funnel_id,COUNT(*) FROM `logs` WHERE bank_id = 3 AND dateadd = '2021-11-17' GROUP BY funnel_id
+    public function getReportAll(Request $request)
+    {
+        $data = $request->All();
+        $bank_id = $data['bank_id'];
+        $period = $data['period'];
+        $where_period = '';
+        if (is_array($period)) {
+            if (count($period) == 1) {
+                $where_period .= " = date('$period[0]')";
+            } else {
+                if ($period[0] == $period[1]) {
+                    $where_period .= " = date('$period[0]')";
+                } else {
+                    $where_period .= " BETWEEN date('$period[0]') AND date('$period[1]')";
+                }
+            }
+        } else {
+            $where_period .= " = date('$period')";
+        }
 
-    return response($json);
-}
+        if($bank_id == 0){
+            $a_banks = Bank::get();
+            $sql = "SELECT COUNT(*) COUNT FROM `clients` WHERE 1 = 1  AND `date_set` " . $where_period ;
+            $all_count = DB::select(DB::raw($sql));
+            $sql = "SELECT COUNT(*) COUNT FROM `logs` WHERE 1 = 1 AND `dateadd` " . $where_period ;
+            $done_count = DB::select(DB::raw($sql));
+        }else{
+            $a_banks =  Bank::where('id',$bank_id)->get();
+            $sql = "SELECT COUNT(*) COUNT FROM `clients` WHERE `banksfunnels` LIKE '%\"".$bank_id.":%' AND `date_set` " . $where_period ;
+            $all_count = DB::select(DB::raw($sql));
+            $sql = "SELECT COUNT(*) COUNT FROM `logs` WHERE `bank_id` = '".$bank_id."' AND `dateadd` " . $where_period ;
+            $done_count = DB::select(DB::raw($sql));        }
+
+        $a_funnels = Funnel::orderBy('order', 'asc')->get()->toArray();
+        $json = [];
+        $td = [];
+        $json['header'] = array_merge([implode("  ", $period)], array_column($a_funnels, 'name'));
+
+        foreach ($a_banks as $bank) {
+            $a_row = [];
+            $a_row[] = $bank['name'];
+            $sql = "SELECT funnel_id,COUNT(*) count FROM `logs` WHERE bank_id = '" . $bank['id'] . "' AND `dateadd`" . $where_period . " GROUP BY funnel_id";
+            $funnels_count = DB::select(DB::raw($sql));
+            foreach ($a_funnels as $funnel) {
+                $count = '';
+                foreach ($funnels_count as $fc) {
+                    if ($fc->funnel_id == $funnel['id']) {
+                        $count = $fc->count;
+                    }
+                }
+                $a_row[] =  $count;
+            }
+            $td[] = $a_row;
+        }
+        $json['td'] = $td;
+        // назначено SELECT COUNT(*) COUNT FROM `clients` WHERE  `date_set` BETWEEN DATE('2021-11-17') AND DATE('2021-11-18')
+        // выполнено SELECT COUNT(*) COUNT FROM `logs` WHERE  `dateadd` BETWEEN DATE('2021-11-17') AND DATE('2021-11-18')
+$json['all'] = $all_count;
+$json['done'] = $done_count;
+
+        return response($json);
+    }
 
 
     /**

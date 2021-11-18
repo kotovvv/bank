@@ -93,7 +93,7 @@
               </v-date-picker>
             </v-dialog>
           </v-col>
-                  <!-- btn -->
+          <!-- btn -->
           <v-col cols="1">
             <v-btn
               color="primary"
@@ -106,7 +106,40 @@
           </v-col>
         </v-row>
       </v-col>
-
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-simple-table>
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="pa-1" v-for="(th, i) in td_head" :key="i">
+                  {{ th }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="py-1" v-for="(tr, i) in td_body" :key="i">
+                <td
+                  v-for="(td, itd) in tr"
+                  :key="itd"
+                  :class="{ 'font-weight-bold': itd == 0 }"
+                >
+                  {{ td }}
+                </td>
+              </tr>
+              <tr>
+                <td>Назначено: {{ all }}</td>
+                <td v-for="(th, i) in td_head.slice(1)" :key="i"></td>
+              </tr>
+              <tr>
+                <td>Обработано: {{ done }}</td>
+                <td v-for="(th, i) in td_head.slice(1)" :key="i"></td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+      </v-col>
     </v-row>
   </div>
 </template>
@@ -115,22 +148,24 @@
 import axios from "axios";
 
 export default {
-data: () => ({
-  period:[],
+  data: () => ({
+    period: [],
     dialog: false,
     modal: false,
     snackbar: false,
-    banks:[],
-    selectedBank:0,
-  message:''
-
-}),
+    banks: [],
+    selectedBank: 0,
+    message: "",
+    td_head: [],
+    td_body: [],
+    all: "",
+    done: "",
+  }),
   mounted() {
     this.getBanks();
-
   },
- methods: {
-       getBanks() {
+  methods: {
+    getBanks() {
       let self = this;
       axios
         .get("/api/banks")
@@ -140,27 +175,30 @@ data: () => ({
             name,
             abbr,
           }));
-          self.banks.unshift({id:0,name:'Все'})
+          self.banks.unshift({ id: 0, name: "Все" });
         })
         .catch((error) => console.log(error));
     },
-    getReportAll(){
-      let self=this
-      let send = {}
-      send.bank_id = self.selectedBank
-      if (self.period == '') {
-          self.message = 'Установите период'
-          self.snackbar = true
-          return
-          }
-      send.period = self.period
-axios
-        .post("/api/getReportAll",send)
+    getReportAll() {
+      let self = this;
+      let send = {};
+      send.bank_id = self.selectedBank;
+      if (self.period == "") {
+        self.message = "Установите период";
+        self.snackbar = true;
+        return;
+      }
+      send.period = self.period;
+      axios
+        .post("/api/getReportAll", send)
         .then((res) => {
-     console.log(res.data)
-          })
+          self.td_head = res.data.header;
+          self.td_body = res.data.td;
+          self.all = res.data.all[0].COUNT;
+          self.done = res.data.done[0].COUNT;
+        })
         .catch((error) => console.log(error));
     },
- },
-}
+  },
+};
 </script>
