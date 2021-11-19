@@ -230,18 +230,19 @@ class ClientsController extends Controller
             $where_period .= " = date('$period')";
         }
 
-        if($bank_id == 0){
+        if ($bank_id == 0) {
             $a_banks = Bank::get();
-            $sql = "SELECT COUNT(*) COUNT FROM `clients` WHERE 1 = 1  AND `date_set` " . $where_period ;
+            $sql = "SELECT COUNT(*) COUNT FROM `clients` WHERE `date_set` " . $where_period;
             $all_count = DB::select(DB::raw($sql));
-            $sql = "SELECT COUNT(*) COUNT FROM `logs` WHERE 1 = 1 AND `dateadd` " . $where_period ;
+            $sql = "SELECT COUNT(*) COUNT FROM `logs` WHERE `dateadd` " . $where_period;
             $done_count = DB::select(DB::raw($sql));
-        }else{
-            $a_banks =  Bank::where('id',$bank_id)->get();
-            $sql = "SELECT COUNT(*) COUNT FROM `clients` WHERE `banksfunnels` LIKE '%\"".$bank_id.":%' AND `date_set` " . $where_period ;
+        } else {
+            $a_banks =  Bank::where('id', $bank_id)->get();
+            $sql = "SELECT COUNT(*) COUNT FROM `clients` WHERE `banksfunnels` LIKE '%\"" . $bank_id . ":%' AND `date_set` " . $where_period;
             $all_count = DB::select(DB::raw($sql));
-            $sql = "SELECT COUNT(*) COUNT FROM `logs` WHERE `bank_id` = '".$bank_id."' AND `dateadd` " . $where_period ;
-            $done_count = DB::select(DB::raw($sql));        }
+            $sql = "SELECT COUNT(*) COUNT FROM `logs` WHERE `bank_id` = '" . $bank_id . "' AND `dateadd` " . $where_period;
+            $done_count = DB::select(DB::raw($sql));
+        }
 
         $a_funnels = Funnel::orderBy('order', 'asc')->get()->toArray();
         $json = [];
@@ -265,10 +266,9 @@ class ClientsController extends Controller
             $td[] = $a_row;
         }
         $json['td'] = $td;
-        // назначено SELECT COUNT(*) COUNT FROM `clients` WHERE  `date_set` BETWEEN DATE('2021-11-17') AND DATE('2021-11-18')
-        // выполнено SELECT COUNT(*) COUNT FROM `logs` WHERE  `dateadd` BETWEEN DATE('2021-11-17') AND DATE('2021-11-18')
-$json['all'] = $all_count;
-$json['done'] = $done_count;
+        $all = array_merge(array_fill(0, count($a_funnels), ''), ['Назначено: ' . $all_count[0]->COUNT]);
+        $done = array_merge(array_fill(0, count($a_funnels), ''), ['Обработано: ' . $done_count[0]->COUNT]);
+        $json['td'] = array_merge($json['td'], [$all], [$done]);
 
         return response($json);
     }

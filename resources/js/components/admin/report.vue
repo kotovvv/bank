@@ -104,6 +104,16 @@
               ><v-icon> mdi-table-large </v-icon></v-btn
             >
           </v-col>
+          <v-spacer></v-spacer>
+          <v-col v-if="td_body.length">
+            <download-csv
+              delimiter=";"
+              :data="[td_head].concat(td_body)"
+              :name="period.join()+'.csv'"
+            >
+              <v-btn depressed>Скачать отчёт CSV</v-btn>
+            </download-csv>
+          </v-col>
         </v-row>
       </v-col>
     </v-row>
@@ -128,14 +138,6 @@
                   {{ td }}
                 </td>
               </tr>
-              <tr>
-                <td>Назначено: {{ all }}</td>
-                <td v-for="(th, i) in td_head.slice(1)" :key="i"></td>
-              </tr>
-              <tr>
-                <td>Обработано: {{ done }}</td>
-                <td v-for="(th, i) in td_head.slice(1)" :key="i"></td>
-              </tr>
             </tbody>
           </template>
         </v-simple-table>
@@ -146,7 +148,7 @@
 
 <script>
 import axios from "axios";
-
+import JsonCSV from "vue-json-csv";
 export default {
   data: () => ({
     period: [],
@@ -158,8 +160,6 @@ export default {
     message: "",
     td_head: [],
     td_body: [],
-    all: "",
-    done: "",
   }),
   mounted() {
     this.getBanks();
@@ -194,11 +194,12 @@ export default {
         .then((res) => {
           self.td_head = res.data.header;
           self.td_body = res.data.td;
-          self.all = res.data.all[0].COUNT;
-          self.done = res.data.done[0].COUNT;
         })
         .catch((error) => console.log(error));
     },
+  },
+  components: {
+    "download-csv": JsonCSV,
   },
 };
 </script>
