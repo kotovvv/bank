@@ -59,26 +59,37 @@
 </template>
 
 <script>
-const setBank = () => import("./setBank.vue")
-const setOperator = () => import("./setOperator.vue");
+const importxls = () => import("../admin/importxls");
+const dictionary = () => import("../admin/dictionary");
+const setBank = () => import("./setBank");
+const setOperator = () => import("./setOperator");
+const report = () => import("../admin/report");
 
 export default {
   props: ["user"],
   data: () => ({
     drawer: null,
     selectedItem: 0,
-    administratorMenu: "setBank",
+
     items: [
+      { text: "Импорт", name: "importxls", icon: "mdi-swap-vertical" },
       { text: "Основная база", name: "setBank", icon: "mdi-database" },
       { text: "Банки", name: "setOperator", icon: "mdi-playlist-plus" },
+      { text: "Отчёты", name: "report", icon: "mdi-timetable" },
+
     ],
+    managerMenu: "setBank",
   }),
   computed: {
     managerComponent() {
-      if (this.administratorMenu == "setBank") return setBank;
-      if (this.administratorMenu == "setOperator") return setOperator;
+      if (this.managerMenu == "importxls") return importxls;
+      if (this.managerMenu == "dictionary") return dictionary;
+      if (this.managerMenu == "setOperator") return setOperator;
+      if (this.managerMenu == "setBank") return setBank;
+      if (this.managerMenu == "report") return report;
     },
   },
+  mounted: function () {},
   methods: {},
 };
 </script>

@@ -15,16 +15,17 @@
           <!-- bank -->
           <v-col cols="2">
             <v-select
-              v-model="selectedBank"
-              :items="banks"
+              v-model="selectedUser"
+              :items="users"
               outlined
               dense
               chips
               small-chips
               item-text="name"
               item-value="id"
-              label="Банк"
+              label="Операторы"
               hide-details="true"
+              @change="getUserClients"
             >
               <template v-slot:item="{ active, item, attrs, on }">
                 <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
@@ -37,8 +38,8 @@
                           text-color="white"
                           class="indigo darken-4"
                           small
-                          v-if="item.hm > 0"
-                          >{{ item.hm }}</v-chip
+                          v-if="item.hmlids > 0"
+                          >{{ item.hmlids }}</v-chip
                         >
                       </v-row>
                     </v-list-item-title>
@@ -48,7 +49,7 @@
             </v-select>
           </v-col>
           <!-- registration -->
-          <v-col cols="2">
+          <!-- <v-col cols="2">
             <v-dialog
               ref="dialog"
               v-model="modal"
@@ -92,32 +93,32 @@
                 </v-btn>
               </v-date-picker>
             </v-dialog>
-          </v-col>
+          </v-col> -->
           <!-- firm -->
-          <v-col cols="2">
+          <!-- <v-col cols="2">
             <v-text-field
               label="Наименование:"
               id="firm"
               v-model="firm"
             ></v-text-field>
-          </v-col>
+          </v-col> -->
           <!-- address -->
-          <v-col cols="1">
+          <!-- <v-col cols="1">
             <v-text-field
               label="Адрес"
               id="address"
               v-model="address"
             ></v-text-field>
-          </v-col>
+          </v-col> -->
 
           <!-- reg -->
-          <v-col cols="1">
+          <!-- <v-col cols="1">
             <v-text-field
               label="Регион"
               id="region"
               v-model="region"
             ></v-text-field>
-          </v-col>
+          </v-col> -->
           <!-- status -->
           <!-- <v-col cols="3">
             <v-autocomplete
@@ -134,7 +135,7 @@
           </v-col> -->
 
           <!-- btn -->
-          <v-col cols="1">
+          <!-- <v-col cols="1">
             <v-btn
               color="primary"
               elevation="2"
@@ -146,10 +147,10 @@
               "
               ><v-icon> mdi-table-large </v-icon></v-btn
             >
-          </v-col>
+          </v-col> -->
           <v-spacer></v-spacer>
 
-          <!-- <v-col v-if="selected.length && disableuser > 0">
+          <v-col v-if="selected.length && selectedUser > 0">
             <v-btn
               color="primary"
               elevation="2"
@@ -158,9 +159,9 @@
               @click="dialogo = true"
               >Открепить оператора</v-btn
             >
-          </v-col> -->
+          </v-col>
           <!-- del bank -->
-          <v-col v-if="selected.length && selectedBank">
+          <!-- <v-col v-if="selected.length && selectedBank">
             <v-btn
               color="primary"
               elevation="2"
@@ -169,14 +170,14 @@
               @click="dialog = true"
               >Открепить банк</v-btn
             >
-          </v-col>
+          </v-col> -->
         </v-row>
       </v-col>
     </v-row>
     <template>
       <v-row>
         <v-spacer></v-spacer>
-        <v-col cols="9" v-if="clients.length">
+        <v-col cols="12" v-if="clients.length">
           <v-card>
             <!-- :search="search" -->
             <v-data-table
@@ -193,16 +194,33 @@
                 'items-per-page-text': 'Показать',
               }"
             >
-              <template v-slot:top="{}">
+              <template
+              v-slot:top="{  }"
+              >
                 <v-row>
+                  <v-col cols="6">
+                    <v-row class="justify-start align-end mb-5">
+                      <span class="ml-10">Отобрать</span>
+                      <span class="mx-4 hmrows">
+                        <v-text-field
+                          label="Сколько?"
+                          @input="selectRow"
+                          :max="filterClients.length"
+                          v-model.number.lazy="hmrow"
+                          hide-details="auto"
+                        ></v-text-field>
+                      </span>
+                      <span> записей из {{ filterClients.length }}</span>
+                      <v-spacer></v-spacer>
+                    </v-row>
+                  </v-col>
                   <v-spacer></v-spacer>
-                  <v-col cols="6"> </v-col>
                 </v-row>
               </template>
             </v-data-table>
           </v-card>
         </v-col>
-        <v-col cols="3">
+        <!-- <v-col cols="3">
           <div class="row">
             <v-card class="pa-5 w-100">
               <template v-if="clients.length">
@@ -235,22 +253,22 @@
                       >
                       </v-radio>
 
-                      <!-- :color="usercolor(user)" -->
-                      <!-- <v-btn
+
+                      <v-btn
                         class="ml-3"
                         small
                         @click="getUserClients(user.id)"
                         :value="user.hmlids"
                         :disabled="disableuser == user.id"
                         >{{ user.hmlids }}</v-btn
-                      > -->
+                      >
                     </v-row>
                   </v-radio-group>
                 </v-list>
               </v-card-text>
             </v-card>
           </div>
-        </v-col>
+        </v-col> -->
       </v-row>
     </template>
     <v-dialog
@@ -313,20 +331,14 @@
           <v-card-actions class="justify-end">
             <v-btn
               @click="
-              userid = 0;
+                userid = 0;
                 changeUserOfClients();
                 dialogo = false;
               "
               >Да</v-btn
             >
             <v-spacer></v-spacer>
-            <v-btn
-              text
-              @click="
-                dialogo = false;
-              "
-              >Нет</v-btn
-            >
+            <v-btn text @click="dialogo = false">Нет</v-btn>
           </v-card-actions>
         </v-card>
       </template>
@@ -421,6 +433,7 @@ export default {
     funnels: [],
     selectedFunnel: 0,
     selectedBank: 0,
+    selectedUser: 0,
     message: "",
     snackbar: false,
     hmrow: "",
@@ -435,10 +448,10 @@ export default {
     firstRequest: true,
   }),
   mounted() {
-    this.getBanks();
-    this.getFunnels();
+    // this.getBanks();
+    // this.getFunnels();
     this.getUsers();
-    this.getClients(this.firstRequest);
+
   },
   watch: {},
   computed: {
@@ -495,9 +508,9 @@ export default {
     selectRow() {
       this.selected = this.filterClients.slice(0, this.hmrow);
     },
-    getUserClients(id) {
+    getUserClients() {
       let self = this;
-      self.disableuser = id;
+      let id = this.selectedUser;
       axios
         .get("/api/getUserClients/" + id)
         .then((res) => {
@@ -505,8 +518,6 @@ export default {
           self.clients.map(function (e) {
             e.operator = self.users.find((u) => u.id == e.user_id).fio;
           });
-          self.howmanybank();
-          self.selectedBanks = 0;
         })
         .catch((error) => console.log(error));
     },
@@ -523,21 +534,18 @@ export default {
     changeUserOfClients() {
       let self = this;
       let send = {};
-      if (self.selectedBank != 0 ) send.bank_id = self.selectedBank
-      send.user_id = this.userid;
-      if (this.selected.length) {
-        send.clients = this.selected.map((i) => i.id);
-      } else {
-        send.clients = this.filterClients.map((i) => i.id);
-      }
+      if (this.selected.length == 0) return;
+      send.user_id = self.userid == 0? 0 :this.selectedUser;
+      send.clients = this.selected.map((i) => i.id);
+
       axios
         .post("/api/changeUserOfClients", send)
         .then((res) => {
           self.getUsers();
-          self.getClients(self.firstRequest);
+          self.getClients(self.selectedUser);
           self.userid = null;
-          self.disableuser=0
-          self.selected=[]
+          self.disableuser = 0;
+          self.selected = [];
         })
         .catch((error) => console.log(error));
     },
@@ -561,6 +569,7 @@ export default {
         .get("/api/users")
         .then((res) => {
           self.users = res.data;
+          // .filter(i=>i.role_id==3);
           self.hmrow = "";
         })
         .catch((error) => console.log(error));
@@ -606,7 +615,7 @@ export default {
         if (this.selectedBank) send.bank_id = this.selectedBank;
         if (this.selectedFunnel) send.funnel_id = this.selectedFunnel;
       }
-      send.user_id = 0;
+      send.user_id = self.selectedUser;
       axios
         .post("/api/getClients", send)
         .then((res) => {
@@ -646,5 +655,8 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.hmrows {
+  width: 100px;
+}
 </style>

@@ -32,7 +32,7 @@
             <v-list-item
               v-for="(item, i) in items"
               :key="i"
-              @click="managerMenu = item.name"
+              @click="operatorMenu = item.name"
             >
               <v-list-item-icon>
                 <v-icon v-text="item.icon"></v-icon>
@@ -50,7 +50,7 @@
       <v-container fluid>
         <!-- <v-row> -->
         <!-- table -->
-        <component :user="$props.user" :is="managerComponent" />
+        <component :user="$props.user" :is="operatorComponent" />
         <!-- <tablenewlid></tablenewlid> -->
         <!-- </v-row> -->
       </v-container>
@@ -60,21 +60,23 @@
 
 <script>
 const oClients = () => import("./oclients")
-
+const oreport = () => import("./oreport");
 
 export default {
   props: ["user"],
   data: () => ({
     drawer: null,
     selectedItem: 0,
-    administratorMenu: "oClients",
+    operatorMenu: "oClients",
     items: [
-      { text: "Основная база", name: "oClients", icon: "mdi-phone-log-outline" },
+      { text: "Клиенты", name: "oClients", icon: "mdi-phone-log-outline" },
+      { text: "Отчёты", name: "oreport", icon: "mdi-timetable" },
     ],
   }),
   computed: {
-    managerComponent() {
-      if (this.administratorMenu == "oClients") return oClients;
+    operatorComponent() {
+      if (this.operatorMenu == "oClients") return oClients;
+      if (this.operatorMenu == "oreport") return oreport;
     },
   },
   methods: {},
