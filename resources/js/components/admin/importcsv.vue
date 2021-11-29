@@ -128,10 +128,10 @@ export default {
         i,
         f;
       for (i = 0, f = files[i]; i != files.length; ++i) {
-             if (f == null) return   
+             if (f == null) return
      if (ftype.indexOf(f.type) >= 0) {
         this.createInput(f);
-      } 
+      }
       }
     },
     csvJSON(csv) {
@@ -156,8 +156,8 @@ export default {
         });
         result.push(obj);
       });
-console.log(result)
-      //result.pop(); // remove the last item because undefined values
+
+      result.pop(); // remove the last item because undefined values
 
       return result; // JavaScript object
     },

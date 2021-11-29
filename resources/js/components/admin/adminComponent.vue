@@ -74,7 +74,7 @@ export default {
         icon: "mdi-format-list-checks",
       },
     ],
-    adminMenu: "report",
+    adminMenu: "importcsv",
   }),
   computed: {
     adminComponent() {

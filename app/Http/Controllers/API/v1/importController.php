@@ -55,7 +55,7 @@ class ImportController extends Controller
                 $duplicate++;
                 continue;
             }
-            //Debugbar::info($client_val);
+
             $client_val['phoneNumber'] = str_replace(['+', '(', ')', '#', ' ', '-', '_'], '', $client_val['phoneNumber']);
             if (strlen($client_val['phoneNumber']) == 10 && !in_array(substr($client_val['phoneNumber'], 0, 1), ['7', '8'])) $client_val['phoneNumber'] .= '7';
             if (strlen($client_val['phoneNumber']) != 11) continue;
