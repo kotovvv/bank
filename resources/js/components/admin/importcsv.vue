@@ -50,7 +50,7 @@
 
 
 <script>
-import XLSX from "xlsx";
+
 import axios from "axios";
 import JsonCSV from "vue-json-csv";
 export default {
@@ -112,73 +112,81 @@ export default {
       e.stopPropagation();
       e.preventDefault();
       let self = this;
-      //   console.log("DROPPED");
+
+      const ftype = [
+        "text/comma-separated-values",
+        "text/csv",
+        "application/csv",
+        "application/excel",
+        "application/vnd.ms-excel",
+        "application/vnd.msexcel",
+        "text/anytext",
+        "text/plain",
+      ];
+        //  console.log("DROPPED");
       var files = e.target.files || e.dataTransfer.files,
         i,
         f;
       for (i = 0, f = files[i]; i != files.length; ++i) {
-        var reader = new FileReader(),
-          name = f.name;
-        reader.onload = function (e) {
-          var results,
-            data = e.target.result,
-            fixedData = self.fixdata(data),
-            workbook = XLSX.read(btoa(fixedData), { type: "base64" }),
-            firstSheetName = workbook.SheetNames[0],
-            worksheet = workbook.Sheets[firstSheetName];
-          self.headers = self.get_header_row(worksheet);
-          results = XLSX.utils.sheet_to_json(worksheet, {
-            raw: false,
-            dateNF: "YYYY-M-D",
-          });
-          self.clients = results;
-          if (self.clients.length > 0) {
-            self.importfile();
-          }
-        };
-        reader.readAsArrayBuffer(f);
+             if (f == null) return   
+     if (ftype.indexOf(f.type) >= 0) {
+        this.createInput(f);
+      } 
       }
     },
-    workbook_to_json(workbook) {
-      var result = {};
-      workbook.SheetNames.forEach(function (sheetName) {
-        var roa = XLSX.utils.sheet_to_row_object_array(
-          workbook.Sheets[sheetName]
-        );
-        if (roa.length > 0) {
-          result[sheetName] = roa;
-        }
+    csvJSON(csv) {
+      var vm = this;
+      var lines = csv.split("\n");
+      var result = [];
+      var headers = lines[0].split(";");
+      headers = [ "inn", "fullName", "phoneNumber", "organizationName", "address", "region", "registration"];
+      // vm.parse_header = lines[0].split(",");
+      // lines[0].split(",").forEach(function (key) {
+      //   vm.sortOrders[key] = 1;
+      // });
+
+      lines.map(function (line, indexLine) {
+        if (indexLine < 1) return; // Jump header line
+
+        var obj = {};
+        line = line.trim();
+        var currentline = line.split(";");
+        headers.map(function (header, indexHeader) {
+          obj[header] = currentline[indexHeader];
+        });
+        result.push(obj);
       });
-      return result;
+console.log(result)
+      //result.pop(); // remove the last item because undefined values
+
+      return result; // JavaScript object
     },
-    fixdata(data) {
-      var o = "",
-        l = 0,
-        w = 10240;
-      for (; l < data.byteLength / w; ++l)
-        o += String.fromCharCode.apply(
-          null,
-          new Uint8Array(data.slice(l * w, l * w + w))
-        );
-      o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w)));
-      return o;
-    },
-    get_header_row(sheet) {
-      var headers = [],
-        range = XLSX.utils.decode_range(sheet["!ref"]);
-      var C,
-        R = range.s.r; /* start in the first row */
-      for (C = range.s.c; C <= range.e.c; ++C) {
-        /* walk every column in the range */
-        var cell =
-          sheet[
-            XLSX.utils.encode_cell({ c: C, r: R })
-          ]; /* find the cell in the first row */
-        var hdr = "UNKNOWN " + C; // <-- replace with your desired default
-        if (cell && cell.t) hdr = XLSX.utils.format_cell(cell);
-        headers.push(hdr);
-      }
-      return headers;
+    createInput(file) {
+      let promise = new Promise((resolve, reject) => {
+        var reader = new FileReader();
+        var vm = this;
+        reader.onload = (e) => {
+          resolve((vm.fileinput = reader.result));
+        };
+        reader.readAsText(file);
+      });
+
+      promise.then(
+        (result) => {
+          let vm = this;
+          /* handle a successful result */
+          // console.log(vm.csvJSON(this.fileinput));
+          // reader.onload = function(event) {
+          // arr.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i)
+          vm.clients = vm.csvJSON(this.fileinput)
+          vm.importfile()
+          // };
+        },
+        (error) => {
+          /* handle an error */
+          console.log(error);
+        }
+      );
     },
   },
   components: {

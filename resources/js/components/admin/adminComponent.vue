@@ -49,7 +49,7 @@
 </template>
 
 <script>
-const importxls = () => import("./importxls");
+const importcsv = () => import("./importcsv");
 const dictionary = () => import("./dictionary");
 const setBank = () => import("../administrator/setBank");
 const setOperator = () => import("../administrator/setOperator");
@@ -63,7 +63,7 @@ export default {
     selectedItem: 0,
 
     items: [
-      { text: "Импорт", name: "importxls", icon: "mdi-swap-vertical" },
+      { text: "Импорт", name: "importcsv", icon: "mdi-swap-vertical" },
       { text: "Основная база", name: "setBank", icon: "mdi-database" },
       { text: "Банки", name: "setOperator", icon: "mdi-playlist-plus" },
       { text: "Операторы", name: "operators", icon: "mdi-phone-log-outline" },
@@ -78,7 +78,7 @@ export default {
   }),
   computed: {
     adminComponent() {
-      if (this.adminMenu == "importxls") return importxls;
+      if (this.adminMenu == "importcsv") return importcsv;
       if (this.adminMenu == "dictionary") return dictionary;
       if (this.adminMenu == "setOperator") return setOperator;
       if (this.adminMenu == "setBank") return setBank;
