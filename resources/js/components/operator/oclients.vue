@@ -223,21 +223,21 @@ export default {
       let self = this;
       let a = {};
       self.clients.map(function (i) {
-        let client = "";
+        let bankfun = "";
         let el = {};
-        client = i.banksfunnels.replace(/"/g, "");
-        if (/,/.test(client)) {
-          //many clients
-          client.split(",").map((i) => {
+        bankfun = i.banksfunnels.replace(/"/g, "");
+        if (/,/.test(bankfun)) {
+          //many banks
+          bankfun.split(",").map((i) => {
             el = i.split(":");
             if (a[el[0]] === undefined) a[el[0]] = 0;
-            a[el[0]] += 1;
+            if (el[1] == 0) a[el[0]] += 1;
           });
         } else {
-          //one client
-          el = client.split(":");
+          //one bank
+          el = bankfun.split(":");
           if (a[el[0]] === undefined) a[el[0]] = 0;
-          a[el[0]] += 1;
+          if (el[1] == 0) a[el[0]] += 1;
         }
       });
       self.banks = self.banks.map(function (i) {
