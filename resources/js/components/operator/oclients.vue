@@ -160,7 +160,7 @@
 
           <v-card-text>
             <div class="text-h4 pa-12">
-              Установить выбранный статус "{{selectedFunnnelName()}}" для {{ selected !={}?selected.fullName : ""}}?
+              Установить выбранный статус  для {{ selected !={}?selected.fullName : ""}}?
             </div>
           </v-card-text>
           <v-card-actions class="justify-end">
@@ -218,10 +218,7 @@ export default {
 
   },
   methods: {
-          selectedFunnnelName:function(){
-              return 'aaa'
-        //   return this.funnels != []?this.funnels.find(i => i.id == this.selectedFunnel).name:''
-      }  ,
+
     howmanybank() {
       let self = this;
       let a = {};

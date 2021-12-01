@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Role;
-use App\Models\Lid;
 use App\Models\Log;
-use App\Models\Import;
+// use App\Models\Import;
+use App\Models\Client;
 use DB;
 use Debugbar;
 use Hash;
@@ -89,7 +89,7 @@ class UsersController extends Controller
 
     $data = $request->all();
     // Debugbar::info($data);
-    if (isset($data['password'])) $data['password'] = Hash::make($data['password']);
+    if (isset($data['password'])) $password = Hash::make($data['password']);
     if (isset($data['id'])) {
       //  Debugbar::info('update');
       $arr = [];
@@ -101,7 +101,7 @@ class UsersController extends Controller
       if (User::where('id', $data['id'])->update($arr)) {
         if (isset($data['password'])) {
           $user = User::find($data['id']);
-        //   $user->password = $password;
+           $user->password = $password;
           $user->save();
         }
         return response('User updated', 200);
@@ -134,7 +134,7 @@ class UsersController extends Controller
     $fio = DB::select(DB::raw($sql));
 
     foreach ($a_users as $user_id) {
-      $sql = "SELECT COUNT(*) n FROM `lids` WHERE `user_id` =  " . $user_id ;
+      $sql = "SELECT COUNT(*) n FROM `clients` WHERE `user_id` =  " . $user_id ;
     }
     $all = DB::select(DB::raw($sql));
 
@@ -149,7 +149,7 @@ class UsersController extends Controller
     $count_status = 0;
     while (strtotime($current_date) <= strtotime($dateto)) {
       $row_dates['col'][] = $current_date;
-      $sql = "SELECT COUNT(*) n FROM `lids` WHERE `user_id` = " . $a_users[0] . " AND CAST(created_at AS DATE) = '" . $current_date . "'";
+      $sql = "SELECT COUNT(*) n FROM `clients` WHERE `user_id` = " . $a_users[0] . " AND CAST(created_at AS DATE) = '" . $current_date . "'";
       $new = DB::select(DB::raw($sql));
       $row_added['col'][] = $new[0]->n;
 
@@ -203,7 +203,7 @@ class UsersController extends Controller
   public function getusers()
   {
 
-    return User::select(['users.*', DB::raw('(SELECT COUNT(user_id) FROM lids WHERE lids.user_id = users.id) as hmlids ')])
+    return User::select(['users.*', DB::raw('(SELECT COUNT(user_id) FROM users WHERE users.user_id = users.id) as hmlids ')])
 
       ->where('users.role_id', '>', 1)
       ->where('users.active', 1)
@@ -217,7 +217,7 @@ class UsersController extends Controller
     $related_users = $request->All();
     if (count($related_users) == 0) return false;
 
-    return User::select(['users.*', DB::raw('(SELECT COUNT(user_id) FROM lids WHERE lids.user_id = users.id) as hmlids ')])
+    return User::select(['users.*', DB::raw('(SELECT COUNT(user_id) FROM clients WHERE clients.user_id = users.id) as hmlids ')])
 
       ->where('users.role_id', '>', 1)
       ->where('users.active', 1)
@@ -235,9 +235,9 @@ class UsersController extends Controller
 
   public function deleteuser($id)
   {
-    Lid::where('user_id', '=', $id)->delete();
+    Client::where('user_id', '=', $id)->delete();
     Log::where('user_id', '=', $id)->delete();
-    Import::where('user_id', '=', $id)->delete();
+    // Import::where('user_id', '=', $id)->delete();
     $user = User::find($id);
     $user->delete();
   }

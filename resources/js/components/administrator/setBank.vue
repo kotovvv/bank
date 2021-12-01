@@ -226,7 +226,7 @@
           item-text="name"
           item-value="id"
           :menu-props="{ maxHeight: '400' }"
-          label="Спрятать назначенные"
+          label="Спрятать банки"
           multiple
           hide-details=true
         ></v-select>
