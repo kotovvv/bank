@@ -220,16 +220,20 @@
           hide-details=true
         ></v-autocomplete>
         <!-- multiple -->
-        <v-select
+         <v-autocomplete
+ outlined
+          dense
+          chips
+          small-chips
           v-model="hidedBank"
           :items="banks"
           item-text="name"
           item-value="id"
           :menu-props="{ maxHeight: '400' }"
-          label="Спрятать банки"
+          label="Спрятать банк"
           multiple
           hide-details=true
-        ></v-select>
+        ></v-autocomplete>
 
       </v-col>
     </v-row>

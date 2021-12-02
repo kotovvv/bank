@@ -253,7 +253,8 @@ class ClientsController extends Controller
         $json = [];
         $td = [];
         $sum = [];
-        $json['header'] = array_merge([implode("  ", $period)], array_column($a_funnels, 'name'));
+        Debugbar::info($a_funnels);
+        $json['header'] = array_merge([implode("  ", $period)], array_column($a_funnels, 'name','id'));
 
         foreach ($a_banks as $bank) {
             $a_row = [];
@@ -282,7 +283,10 @@ class ClientsController extends Controller
         return response($json);
     }
 
-
+    //report for users
+    //SELECT `user_id`,`bank_id`,`funnel_id`,COUNT(funnel_id) hm FROM `logs`  GROUP BY `funnel_id`,user_id ORDER BY user_id ASC
+    
+    
     /**
      * Remove the specified resource from storage.
      *

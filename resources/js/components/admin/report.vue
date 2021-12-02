@@ -129,15 +129,21 @@
               </tr>
             </thead>
             <tbody>
-              <tr class="py-1" v-for="(tr, i) in td_body" :key="i">
-                <td
-                  v-for="(td, itd) in tr"
-                  :key="itd"
+              <template  v-for="(tr, i) in td_body">
+              <tr class="py-1" :key="'trb'+i">
+                <td v-for="(td,inx) in tr" 
+                :key="'1tr-'+inx"
                   :class="{ 'font-weight-bold': itd == 0 }"
                 >
                   {{ td }}
                 </td>
+                
               </tr>
+              <tr :key="'tru'+i">
+                <td class="hidden"
+                                >1111111111</td>
+                                </tr>
+              </template>
             </tbody>
           </template>
         </v-simple-table>
