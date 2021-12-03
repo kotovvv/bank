@@ -118,7 +118,8 @@ class ClientsController extends Controller
 
     public function getUserClients($id, $bank_id = null, $funnel = null)
     {
-        if ($bank_id == 0 && $funnel == 0) {
+        if ($bank_id === 0 && $funnel === 0) {
+            Debugbar::info('0000000000000000');
             //  SELECT `client_id` FROM `logs` WHERE `user_id` = 1 AND DATE(`date_add`) = DATE(NOW())
             // get and with funnels = 0
             return Client::where('user_id', $id)->where('banksfunnels', 'like', '%:0"%')->orderByDesc('date_added')->get();
@@ -128,7 +129,9 @@ class ClientsController extends Controller
         };
         if ($bank_id == 0 && $funnel != null) return Client::where('user_id', $id)->where('banksfunnels', 'like', '%:' . $funnel . '"%')->orderByDesc('date_added')->get();
         if ($bank_id != 0 && $funnel != null) return Client::where('user_id', $id)->where('banksfunnels', 'like', '%:' . $funnel . '"%')->where('banksfunnels', 'like', '%"' . $bank_id . ':%')->orderByDesc('date_added')->get();
-        if ($bank_id == null && $funnel == null) return Client::where('user_id', $id)->orderByDesc('date_added')->get();
+        if ($bank_id === null && $funnel === null) {
+            Debugbar::info('null');
+            return Client::where('user_id', $id)->orderByDesc('date_added')->get();}
     }
 
     public function changeUserOfClients(Request $request)
