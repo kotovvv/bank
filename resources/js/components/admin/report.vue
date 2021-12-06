@@ -109,7 +109,7 @@
             <download-csv
               delimiter=";"
               :data="[td_head].concat(td_body)"
-              :name="period.join()+'.csv'"
+              :name="period.join() + '.csv'"
             >
               <v-btn depressed>Скачать отчёт CSV</v-btn>
             </download-csv>
@@ -129,20 +129,40 @@
               </tr>
             </thead>
             <tbody>
-              <template  v-for="(tr, i) in td_body">
-              <tr class="py-1" :key="'trb'+i">
-                <td v-for="(td,inx) in tr" 
-                :key="'1tr-'+inx"
-                  :class="{ 'font-weight-bold': itd == 0 }"
+              <template v-for="b in banks">
+                <tr
+                  class="bank blue lighten-4"
+                  @click="toggleUser(b.id)"
                 >
-                  {{ td }}
-                </td>
-                
-              </tr>
-              <tr :key="'tru'+i">
-                <td class="hidden"
-                                >1111111111</td>
-                                </tr>
+                  <td>{{ b.name }}</td>
+                  <td v-for="(f, fi) in funnels" :key="fi">
+                    {{ countb(b.id, f.id) }}
+                  </td>
+                </tr>
+                <template v-for="u in users">
+                  <tr
+                    :key="u.id + b.id"
+                    class="user "
+                    :class="'bank' + b.id"
+                    v-if="userInBank(u.id, b.id)"
+                  >
+                    <td class="text-right">{{ u.fio }}</td>
+                    <td v-for="(f, fi) in funnels" :key="fi">
+                      {{ countf(u.id, b.id, f.id) }}
+                    </td>
+                  </tr>
+                </template>
+              </template>
+              <template v-for="(tr, i) in td_body">
+                <tr class="py-1" :key="'trb' + i">
+                  <td
+                    v-for="(td, inx) in tr"
+                    :key="'1tr-' + inx"
+                    :class="{ 'font-weight-bold': itd == 0 }"
+                  >
+                    {{ td }}
+                  </td>
+                </tr>
               </template>
             </tbody>
           </template>
@@ -155,6 +175,7 @@
 <script>
 import axios from "axios";
 import JsonCSV from "vue-json-csv";
+import lodash from "lodash";
 export default {
   data: () => ({
     period: [],
@@ -166,11 +187,44 @@ export default {
     message: "",
     td_head: [],
     td_body: [],
+    users: [],
+    banks: [],
+    funnels: [],
+    ubf: [],
   }),
   mounted() {
     this.getBanks();
   },
   methods: {
+    toggleUser(bank_id){
+const bid = document.querySelectorAll('.bank'+bank_id)
+for(let i = 0;i <= bid.length;i++){
+  bid[i].classList.toggle('show')
+}
+    },
+    userInBank(user_id, bank_id) {
+      return lodash.filter(
+        this.ubf,
+        (i) => i.user_id == user_id && i.bank_id == bank_id
+      ).length;
+    },
+    countb(bank_id, funnel_id) {
+      let hm = lodash.filter(
+        this.ubf,
+        (i) => i.funnel_id == funnel_id && i.bank_id == bank_id
+      ).length;
+      return hm > 0 ? hm : "";
+    },
+    countf(user_id, bank_id, funnel_id) {
+      let hm = lodash.filter(
+        this.ubf,
+        (i) =>
+          i.user_id == user_id &&
+          i.funnel_id == funnel_id &&
+          i.bank_id == bank_id
+      ).length;
+      return hm > 0 ? hm : "";
+    },
     getBanks() {
       let self = this;
       axios
@@ -199,7 +253,11 @@ export default {
         .post("/api/getReportAll", send)
         .then((res) => {
           self.td_head = res.data.header;
-          self.td_body = res.data.td;
+          // self.td_body = res.data.td;
+          self.users = res.data.users;
+          self.funnels = res.data.funnels;
+          self.banks = res.data.banks;
+          self.ubf = res.data.ubf;
         })
         .catch((error) => console.log(error));
     },
@@ -209,3 +267,8 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.user{display: none;}
+.user.show{display: revert;}
+</style>

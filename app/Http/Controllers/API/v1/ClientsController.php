@@ -229,35 +229,41 @@ class ClientsController extends Controller
         }
 
         if ($bank_id == 0) {
-            $a_banks = Bank::get();
             $sql = "SELECT COUNT(*) COUNT FROM `clients` WHERE `date_set` " . $where_period;
             $all_count = DB::select(DB::raw($sql));
-            $sql = "SELECT l.`user_id`,l.`funnel_id`,l.`bank_id` FROM `logs` l LEFT JOIN `funnels` f ON (f.`id` = l.`funnel_id`) WHERE `dateadd` " . $where_period . "ORDER BY f.order ASC";
+            $sql = "SELECT `user_id`,`funnel_id`,`bank_id` FROM `logs` WHERE `dateadd` " . $where_period ;
             $usr_bnk_fnl = DB::select(DB::raw($sql));
+            $a_banks_o = array_unique(array_column($usr_bnk_fnl, 'bank_id'));
+            $a_banks = Bank::whereIn('id',$a_banks_o)->get();
         } else {
             $a_banks =  Bank::where('id', $bank_id)->get();
             $sql = "SELECT COUNT(*) COUNT FROM `clients` WHERE `banksfunnels` LIKE '%\"" . $bank_id . ":%' AND `date_set` " . $where_period;
             $all_count = DB::select(DB::raw($sql));
-            $sql = "SELECT l.`user_id`,l.`funnel_id`,l.`bank_id` FROM `logs` l LEFT JOIN `funnels` f ON (f.`id` = l.`funnel_id`) WHERE `bank_id` = '" . $bank_id . "' AND `dateadd` " . $where_period . " ORDER BY f.order ASC";
+            $sql = "SELECT `user_id`,`funnel_id`,`bank_id` FROM `logs`  WHERE `bank_id` = '" . $bank_id . "' AND `dateadd` " . $where_period;
             $usr_bnk_fnl = DB::select(DB::raw($sql));
         }
-        $a_funnels = Funnel::orderBy('order', 'asc')->get()->toArray();
-
-        $a_banks_o = array_unique(array_column($usr_bnk_fnl, 'bank_id'));
-        $a_funnels_o = array_unique(array_column($usr_bnk_fnl, 'funnel_id'));
+        
         $a_users_o = array_unique(array_column($usr_bnk_fnl, 'user_id'));
-        $a_users = User::whereIn('id', $a_users_o)->get();
+        $a_users = User::select('id','fio')->whereIn('id', $a_users_o)->get()->toArray();
+        $a_funnels_o = array_unique(array_column($usr_bnk_fnl, 'funnel_id'));
+        $a_funnels = Funnel::orderBy('order', 'asc')->whereIn('id',$a_funnels_o)->get()->toArray();
 
         $json = [];
         $td = [];
         $sum = [];
+        
         $json['header'] = array_merge([implode("  ", $period)], array_column($a_funnels, 'name', 'id'));
-
-        foreach ($a_banks_o as $bank) {
-            foreach ($a_users_o as $user) {
-                foreach($a_funnels_o as $funnel ){
-
+$json['funnels'] = $a_funnels;
+$json['users'] = $a_users;
+$json['banks'] = $a_banks;
+$json['ubf'] = $usr_bnk_fnl;
+        foreach ($a_banks as $bank) {
+            foreach ($a_users as $user) {
+                 $utd = []; 
+                 foreach($a_funnels as $funnel ){
+                    $utd[] = $user['fio'];
                 }
+                Debugbar::info();
             }
         }
 
@@ -284,7 +290,7 @@ class ClientsController extends Controller
         $all = array_merge(array_fill(0, count($a_funnels), ''), ['Назначено: ' . $all_count[0]->COUNT]);
         $done = array_merge(array_fill(0, count($a_funnels), ''), ['Обработано: ' . $done_count]);
         $json['td'] = array_merge($json['td'], [$sum], [$all], [$done]);
-
+$json['ubf'] = $usr_bnk_fnl;
         return response($json);
     }
 
