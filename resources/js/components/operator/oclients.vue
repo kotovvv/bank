@@ -37,6 +37,12 @@
                 </ul>
               </v-col>
               <v-col cols="4">
+                         <v-progress-linear
+            color="deep-purple accent-4"
+            indeterminate
+            rounded
+            height="6"
+          ></v-progress-linear>
                 <v-btn depressed color="primary">Запрос на звонок</v-btn>
                 <div id="ansver_bank"></div>
                 <div v-if="status_call">
