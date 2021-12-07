@@ -16,7 +16,7 @@
           <v-col cols="2">
             <v-select
               v-model="selectedBank"
-              :items="banks"
+              :items="selectbanks"
               outlined
               dense
               chips
@@ -105,15 +105,15 @@
             >
           </v-col>
           <v-spacer></v-spacer>
-          <v-btn depressed
-          @click="download_table_as_csv('reportall')"
-          >Скачать отчёт CSV</v-btn>
+          <v-btn depressed @click="download_table_as_csv('reportall')"
+            >Скачать отчёт CSV</v-btn
+          >
         </v-row>
       </v-col>
     </v-row>
     <v-row>
       <v-col>
-        <v-simple-table id="reportall">
+        <v-simple-table id="reportall" v-if="td_head">
           <template v-slot:default>
             <thead>
               <tr>
@@ -124,10 +124,7 @@
             </thead>
             <tbody>
               <template v-for="b in banks">
-                <tr
-                  class="bank blue lighten-4"
-                  @click="toggleUser(b.id)"
-                >
+                <tr class="bank blue lighten-4" @click="toggleUser(b.id)">
                   <td>{{ b.name }}</td>
                   <td v-for="(f, fi) in funnels" :key="fi">
                     {{ countb(b.id, f.id) }}
@@ -136,7 +133,7 @@
                 <template v-for="u in users">
                   <tr
                     :key="u.id + b.id"
-                    class="user "
+                    class="user"
                     :class="'bank' + b.id"
                     v-if="userInBank(u.id, b.id)"
                   >
@@ -147,17 +144,25 @@
                   </tr>
                 </template>
               </template>
-              <template v-for="(tr, i) in td_body">
-                <tr class="py-1" :key="'trb' + i">
-                  <td
-                    v-for="(td, inx) in tr"
-                    :key="'1tr-' + inx"
-                    :class="{ 'font-weight-bold': itd == 0 }"
-                  >
-                    {{ td }}
+              <tr class="orange lighten-3">
+                <td>ИТОГО:</td>
+                <template v-for="(f, fi) in funnels">
+                  <td :key="fi">
+                    {{ countall(f.id) }}
                   </td>
-                </tr>
-              </template>
+                </template>
+              </tr>
+              <tr>
+                <td v-for="(f, fi) in funnels.length - 1" :key="fi"></td>
+                <td>Назначено:</td>
+                <td>{{ all }}</td>
+              </tr>
+              <tr>
+                <td v-for="(f, fi) in funnels.length - 1" :key="fi"></td>
+                <td>Обработано:</td>
+                <td>{{ ubf.length }}</td>
+              </tr>
+
             </tbody>
           </template>
         </v-simple-table>
@@ -168,7 +173,6 @@
 
 <script>
 import axios from "axios";
-import JsonCSV from "vue-json-csv";
 import lodash from "lodash";
 export default {
   data: () => ({
@@ -176,25 +180,28 @@ export default {
     dialog: false,
     modal: false,
     snackbar: false,
-    banks: [],
+    selectbanks: [],
     selectedBank: 0,
     message: "",
     td_head: [],
-    td_body: [],
     users: [],
     banks: [],
     funnels: [],
     ubf: [],
+    all: "",
   }),
   mounted() {
     this.getBanks();
   },
   methods: {
-    toggleUser(bank_id){
-const bid = document.querySelectorAll('.bank'+bank_id)
-for(let i = 0;i <= bid.length;i++){
-  bid[i].classList.toggle('show')
-}
+    countall(funnel_id) {
+      return lodash.filter(this.ubf, (i) => i.funnel_id == funnel_id).length;
+    },
+    toggleUser(bank_id) {
+      const bid = document.querySelectorAll(".bank" + bank_id);
+      for (let i = 0; i <= bid.length; i++) {
+        bid[i].classList.toggle("show");
+      }
     },
     userInBank(user_id, bank_id) {
       return lodash.filter(
@@ -224,18 +231,24 @@ for(let i = 0;i <= bid.length;i++){
       axios
         .get("/api/banks")
         .then((res) => {
-          self.banks = res.data.map(({ id, name, abbr }) => ({
+          self.selectbanks = res.data.map(({ id, name, abbr }) => ({
             id,
             name,
             abbr,
           }));
-          self.banks.unshift({ id: 0, name: "Все" });
+          self.selectbanks.unshift({ id: 0, name: "Все" });
         })
         .catch((error) => console.log(error));
     },
     getReportAll() {
       let self = this;
       let send = {};
+    this.td_head = []
+    this.users = []
+    this.banks = []
+    this.funnels = []
+    this.ubf = []
+    this.all = ""
       send.bank_id = self.selectedBank;
       if (self.period == "") {
         self.message = "Установите период";
@@ -252,47 +265,57 @@ for(let i = 0;i <= bid.length;i++){
           self.funnels = res.data.funnels;
           self.banks = res.data.banks;
           self.ubf = res.data.ubf;
+          self.all = res.data.all;
         })
         .catch((error) => console.log(error));
     },
     // Quick and simple export target #table_id into a csv
-download_table_as_csv(table_id, separator = ';') {
-    // Select rows from table_id
-    var rows = document.querySelectorAll('#' + table_id + ' table tr');
-    // Construct csv
-    var csv = [];
-    for (var i = 0; i < rows.length; i++) {
-        var row = [], cols = rows[i].querySelectorAll('td, th');
+    download_table_as_csv(table_id, separator = ";") {
+      // Select rows from table_id
+      var rows = document.querySelectorAll("#" + table_id + " table tr");
+      // Construct csv
+      var csv = [];
+      for (var i = 0; i < rows.length; i++) {
+        var row = [],
+          cols = rows[i].querySelectorAll("td, th");
         for (var j = 0; j < cols.length; j++) {
-            // Clean innertext to remove multiple spaces and jumpline (break csv)
-            var data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ')
-            // Escape double-quote with double-double-quote (see https://stackoverflow.com/questions/17808511/properly-escape-a-double-quote-in-csv)
-            data = data.replace(/"/g, '""');
-            // Push escaped string
-            row.push('"' + data + '"');
+          // Clean innertext to remove multiple spaces and jumpline (break csv)
+          var data = cols[j].innerText
+            .replace(/(\r\n|\n|\r)/gm, "")
+            .replace(/(\s\s)/gm, " ");
+          // Escape double-quote with double-double-quote (see https://stackoverflow.com/questions/17808511/properly-escape-a-double-quote-in-csv)
+          data = data.replace(/"/g, '""');
+          // Push escaped string
+          row.push('"' + data + '"');
         }
         csv.push(row.join(separator));
-    }
-    var csv_string = csv.join('\n');
-    // Download it
-    var filename = 'export_' + table_id + '_' + new Date().toLocaleDateString() + '.csv';
-    var link = document.createElement('a');
-    link.style.display = 'none';
-    link.setAttribute('target', '_blank');
-    link.setAttribute('href', 'data:text/csv;charset=utf8,' + encodeURIComponent(csv_string));
-    link.setAttribute('download', filename);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-},
+      }
+      var csv_string = csv.join("\n");
+      // Download it
+      var filename =
+        "export_" + table_id + "_" + new Date().toLocaleDateString() + ".csv";
+      var link = document.createElement("a");
+      link.style.display = "none";
+      link.setAttribute("target", "_blank");
+      link.setAttribute(
+        "href",
+        "data:text/csv;charset=utf-8,\uFEFF" + csv_string
+      );
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
   },
-  components: {
-    "download-csv": JsonCSV,
-  },
+  components: {},
 };
 </script>
 
 <style scoped>
-.user{display: none;}
-.user.show{display: revert;}
+.user {
+  display: none;
+}
+.user.show {
+  display: revert;
+}
 </style>
