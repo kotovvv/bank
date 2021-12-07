@@ -105,21 +105,15 @@
             >
           </v-col>
           <v-spacer></v-spacer>
-          <v-col v-if="td_body.length">
-            <download-csv
-              delimiter=";"
-              :data="[td_head].concat(td_body)"
-              :name="period.join() + '.csv'"
-            >
-              <v-btn depressed>Скачать отчёт CSV</v-btn>
-            </download-csv>
-          </v-col>
+          <v-btn depressed
+          @click="download_table_as_csv('reportall')"
+          >Скачать отчёт CSV</v-btn>
         </v-row>
       </v-col>
     </v-row>
     <v-row>
       <v-col>
-        <v-simple-table>
+        <v-simple-table id="reportall">
           <template v-slot:default>
             <thead>
               <tr>
@@ -261,6 +255,36 @@ for(let i = 0;i <= bid.length;i++){
         })
         .catch((error) => console.log(error));
     },
+    // Quick and simple export target #table_id into a csv
+download_table_as_csv(table_id, separator = ';') {
+    // Select rows from table_id
+    var rows = document.querySelectorAll('#' + table_id + ' table tr');
+    // Construct csv
+    var csv = [];
+    for (var i = 0; i < rows.length; i++) {
+        var row = [], cols = rows[i].querySelectorAll('td, th');
+        for (var j = 0; j < cols.length; j++) {
+            // Clean innertext to remove multiple spaces and jumpline (break csv)
+            var data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ')
+            // Escape double-quote with double-double-quote (see https://stackoverflow.com/questions/17808511/properly-escape-a-double-quote-in-csv)
+            data = data.replace(/"/g, '""');
+            // Push escaped string
+            row.push('"' + data + '"');
+        }
+        csv.push(row.join(separator));
+    }
+    var csv_string = csv.join('\n');
+    // Download it
+    var filename = 'export_' + table_id + '_' + new Date().toLocaleDateString() + '.csv';
+    var link = document.createElement('a');
+    link.style.display = 'none';
+    link.setAttribute('target', '_blank');
+    link.setAttribute('href', 'data:text/csv;charset=utf8,' + encodeURIComponent(csv_string));
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+},
   },
   components: {
     "download-csv": JsonCSV,
