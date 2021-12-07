@@ -37,19 +37,23 @@
                 </ul>
               </v-col>
               <v-col cols="4">
-                Выбор статуса
-                <v-container class="px-0" fluid>
-                  <v-radio-group v-model="selectedFunnel">
-                    <v-radio
-                      v-for="funnel in funnels"
-                      :key="funnel.id"
-                      color="funnel.color"
-                      :label="`${funnel.name}`"
-                      :value="funnel.id"
-                      @click="dialogf = true"
-                    ></v-radio>
-                  </v-radio-group>
-                </v-container>
+                <v-btn depressed color="primary">Запрос на звонок</v-btn>
+                <div id="ansver_bank"></div>
+                <div v-if="status_call">
+                  Выбор статуса
+                  <v-container class="px-0" fluid>
+                    <v-radio-group v-model="selectedFunnel">
+                      <v-radio
+                        v-for="funnel in funnels"
+                        :key="funnel.id"
+                        color="funnel.color"
+                        :label="`${funnel.name}`"
+                        :value="funnel.id"
+                        @click="dialogf = true"
+                      ></v-radio>
+                    </v-radio-group>
+                  </v-container>
+                </div>
               </v-col>
             </v-row>
           </v-card-text>
@@ -160,18 +164,29 @@
 
           <v-card-text>
             <div class="text-h4 pa-12">
-              Установить выбранный статус  для {{ selected !={}?selected.fullName : ""}}?
+              Установить выбранный статус для
+              {{ selected != {} ? selected.fullName : "" }}?
             </div>
           </v-card-text>
           <v-card-actions class="justify-end">
             <v-btn
               @click="
-                dialogf = false;dialog=false;setBankForClients();selectedFunnel=0;
+                dialogf = false;
+                dialog = false;
+                setBankForClients();
+                selectedFunnel = 0;
               "
               >Да</v-btn
             >
             <v-spacer></v-spacer>
-            <v-btn text @click="dialogf = false;selectedFunnel=0">Нет</v-btn>
+            <v-btn
+              text
+              @click="
+                dialogf = false;
+                selectedFunnel = 0;
+              "
+              >Нет</v-btn
+            >
           </v-card-actions>
         </v-card>
       </template>
@@ -207,6 +222,7 @@ export default {
     message: "",
     snackbar: false,
     dialog: false,
+    status_call: false,
   }),
   mounted() {
     this.getBanks();
@@ -214,11 +230,8 @@ export default {
     this.getUserClients();
   },
   watch: {},
-  computed:{
-
-  },
+  computed: {},
   methods: {
-
     howmanybank() {
       let self = this;
       let a = {};
