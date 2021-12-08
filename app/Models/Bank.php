@@ -10,7 +10,7 @@ class Bank extends Model
     public $timestamps = false;
     use HasFactory;
     protected $fillable = [
-        'name', 'abr'
+        'name', 'abr','url','token'
     ];
 
 }

@@ -37,6 +37,19 @@
                         label="Наименование"
                       ></v-text-field>
                     </v-col>
+                     <v-col cols="12">
+                      <v-text-field
+                        v-model="editedItem.url"
+                        label="Ссылка"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="editedItem.token"
+                        label="Key"
+                      ></v-text-field>
+                    </v-col>
+                   
                     <v-col cols="4">
                       <v-text-field
                         v-model="editedItem.abbr"
@@ -98,7 +111,6 @@ export default {
     Banks: [],
     headers: [
       { text: "Наименование", value: "name" },
-      { text: "Аббревиатура", value: "abbr" },
 
       { text: "Действия", value: "actions", sortable: false },
     ],

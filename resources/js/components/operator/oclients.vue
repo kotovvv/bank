@@ -10,7 +10,7 @@
     </v-snackbar>
     <v-dialog
       transition="dialog-top-transition"
-      max-width="600"
+      max-width="800"
       v-model="dialog"
       persistent
     >
@@ -37,15 +37,16 @@
                 </ul>
               </v-col>
               <v-col cols="4">
-                         <v-progress-linear
-            color="deep-purple accent-4"
-            indeterminate
-            rounded
-            height="6"
-          ></v-progress-linear>
-                <v-btn depressed color="primary">Запрос на звонок</v-btn>
-                <div id="ansver_bank"></div>
-                <div v-if="status_call">
+                <v-progress-linear
+                  color="deep-purple accent-4"
+                  indeterminate
+                  rounded
+                  height="6"
+                  v-if="wait"
+                ></v-progress-linear>
+                <v-btn depressed color="primary" @click="requestBank" v-if="reqBtn">Запрос на звонок</v-btn>
+                <div id="answer_bank" v-if="answer_bank">{{answer_bank}}</div>
+                <div v-if="can_call">
                   Выбор статуса
                   <v-container class="px-0" fluid>
                     <v-radio-group v-model="selectedFunnel">
@@ -228,7 +229,16 @@ export default {
     message: "",
     snackbar: false,
     dialog: false,
-    status_call: false,
+    can_call: false,
+statuses_ansver:{
+  allowed:'Звонок разрешен',
+  blocked:'Заблокирован',
+  forbidden:'Не звонить',
+},
+responseBank:{},
+wait:false,
+reqBtn:true,
+answer_bank:'',
   }),
   mounted() {
     this.getBanks();
@@ -269,12 +279,7 @@ export default {
       axios
         .get("/api/banks")
         .then((res) => {
-          self.banks = res.data.map(({ id, name, abbr, hm }) => ({
-            id,
-            name,
-            abbr,
-            hm,
-          }));
+          self.banks = res.data;
         })
         .catch((error) => console.log(error));
     },
@@ -348,6 +353,41 @@ export default {
       row.select(true);
       this.selected = row.item;
       this.dialog = true;
+    },
+    requestBank() {
+      this.reqBtn = false
+      this.wait = true
+      const self = this
+      const item = this.selected;
+      let send = {};
+      send = { data: { phone: "+" + item.phoneNumber, inn: item.inn } };
+      const bank = this.banks[this.selectedBank-1];
+
+      axios({
+        method: "post",
+        data: send,
+        url:
+          bank.url + "/api/v1/call_easy/call_requests",
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': '*',
+          'Content-Type': 'application/json',
+          'Authorization': "Token token="+bank.token,
+        },
+      })
+        .then((response) => {
+          self.wait = false
+          self.responseBank = response.data.status;
+          this.wait = false
+          console.log(self.responseBank);
+        })
+        .catch((error) => {
+          this.wait = false
+          console.error(error.message);
+        });
+    },
+    updateStatus(){
+// PATCH api/v1/call_easy/call_requests/:id
     },
   },
   components: {},
