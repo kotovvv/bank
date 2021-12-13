@@ -364,8 +364,6 @@ answer_bank:'',
       const bank = this.banks.find((i) => i.id ==this.selectedBank);
       if (bank.url == '') return
 
-console.log(bank)
-
       axios({
         method: "post",
         data: send,
