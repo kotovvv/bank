@@ -361,13 +361,15 @@ answer_bank:'',
       const item = this.selected;
       let send = {};
       send = { data: { phone: "+" + item.phoneNumber, inn: item.inn } };
-      const bank = this.banks[this.selectedBank-1];
+      const bank = this.banks.find((i) => i.id ==this.selectedBank);
+      if (bank.url == '') return
+
+console.log(bank)
 
       axios({
         method: "post",
         data: send,
-        url:
-          bank.url + "/api/v1/call_easy/call_requests",
+        url: bank.url + "/api/v1/call_easy/call_requests",
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': '*',
@@ -377,12 +379,14 @@ answer_bank:'',
       })
         .then((response) => {
           self.wait = false
+          self.reqBtn = true
           self.responseBank = response.data.status;
-          this.wait = false
-          console.log(self.responseBank);
+
+          console.log(self.response);
         })
         .catch((error) => {
-          this.wait = false
+          self.wait = false
+          self.reqBtn = true
           console.error(error.message);
         });
     },
