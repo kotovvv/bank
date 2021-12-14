@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\v1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Bank;
+use Illuminate\Support\Facades\Http;
 use DB;
 use Debugbar;
 
@@ -81,6 +82,18 @@ class BanksController extends Controller
      */
     public function update(Request $request)
     {
+    }
+
+
+    public function canTel(Request $request)
+    {
+        // $response = Http::get('http://example.com');
+        DebugBar::info($request);
+        $data = $request->All();
+        // 'Content-Type': 'application/json',
+        //   'Authorization': "Token token="+bank.token,
+
+        return response($data);
     }
 
 
