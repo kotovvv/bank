@@ -40,5 +40,6 @@ Route::post('setBankForClients', [ClientsController::class,'setBankForClients'])
 Route::get('getClientsWithoutBanks', [ClientsController::class,'getClientsWithoutBanks']);
 Route::post('delBankFromClients', [ClientsController::class,'delBankFromClients']);
 Route::post('getReportAll', [ClientsController::class,'getReportAll']);
+Route::post('canTel', [BanksController::class,'canTel']);
 
 

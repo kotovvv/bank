@@ -361,28 +361,18 @@ answer_bank:'',
       const item = this.selected;
       let send = {};
       send = { data: { phone: "+" + item.phoneNumber, inn: item.inn } };
-      const bank = this.banks.find((i) => i.id ==this.selectedBank);
-      if (bank.url == '') return
+      send.bank_id = this.selectedBank
+      send.param = "/api/v1/call_easy/call_requests"
+      if (bank_id > 0) return
 
-console.log(bank)
-
-      axios({
-        method: "post",
-        data: send,
-        url: bank.url + "/api/v1/call_easy/call_requests",
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': '*',
-          'Content-Type': 'application/json',
-          'Authorization': "Token token="+bank.token,
-        },
-      })
-        .then((response) => {
+      axios
+        .post("/api/canTel", send)
+        .then((res) => {
           self.wait = false
           self.reqBtn = true
-          self.responseBank = response.data.status;
+        //   self.responseBank = res.data.status;
 
-          console.log(self.response);
+          console.log(res);
         })
         .catch((error) => {
           self.wait = false
