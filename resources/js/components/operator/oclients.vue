@@ -45,7 +45,14 @@
                   v-if="wait"
                 ></v-progress-linear>
                 <v-btn depressed color="primary" @click="requestBank" v-if="reqBtn">Запрос на звонок</v-btn>
-                <div id="answer_bank" v-if="answer_bank">{{answer_bank}}</div>
+
+                <div id="answer_bank"
+                v-if="answer_bank"
+                class="pa-1"
+                :class="{'green white--text':responseBank.status == 'allowed','pink white--text':responseBank.status != 'allowed'}"
+                >
+                {{answer_bank}}
+                </div>
                 <div v-if="can_call">
                   Выбор статуса
                   <v-container class="px-0" fluid>
