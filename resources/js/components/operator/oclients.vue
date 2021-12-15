@@ -360,23 +360,27 @@ answer_bank:'',
       const self = this
       const item = this.selected;
       let send = {};
-      send = { data: { phone: "+" + item.phoneNumber, inn: item.inn } };
+      send.data =  { phone: "+" + item.phoneNumber, inn: item.inn } ;
       send.bank_id = this.selectedBank
-      send.param = "/api/v1/call_easy/call_requests"
-      if (bank_id > 0) return
+      send.action = "call_requests"
 
-      axios
+axios
         .post("/api/canTel", send)
         .then((res) => {
           self.wait = false
           self.reqBtn = true
-        //   self.responseBank = res.data.status;
 
+if(res.status == 200 && res.data.status == "allowed") {
+    self.reqBtn = false
+    self.answer_bank =   res.data.status_translate
+    self.responseBank = res.data
+}
           console.log(res);
         })
         .catch((error) => {
           self.wait = false
           self.reqBtn = true
+          self.answer_bank = ''
           console.error(error.message);
         });
     },

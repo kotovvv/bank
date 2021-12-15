@@ -12,6 +12,8 @@ use Debugbar;
 
 class BanksController extends Controller
 {
+
+
     /**
      * Display a listing of the resource.
      *
@@ -87,13 +89,27 @@ class BanksController extends Controller
 
     public function canTel(Request $request)
     {
-        // $response = Http::get('http://example.com');
-        DebugBar::info($request);
-        $data = $request->All();
-        // 'Content-Type': 'application/json',
-        //   'Authorization': "Token token="+bank.token,
+        $a_bank_actions = [
+            'call_requests' => '/api/v1/call_easy/call_requests',
 
-        return response($data);
+        ];
+        $a_bank_statuses = [];
+
+        $data = $request->All();
+        $send = ['data'=>$data['data']];
+        if (isset($data['bank_id'])) {
+            $bank = Bank::where('id', $data['bank_id'])->first();
+            $action = $a_bank_actions[$data['action']];
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Token token=' . $bank['token'],
+                'Content-Type' => 'application/json'
+            ])->post($bank['url'] . $action,
+                $send
+            );
+        }
+
+        return response($response);
     }
 
 
