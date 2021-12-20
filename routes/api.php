@@ -42,5 +42,6 @@ Route::post('delBankFromClients', [ClientsController::class,'delBankFromClients'
 Route::post('getReportAll', [ClientsController::class,'getReportAll']);
 Route::post('canTel', [BanksController::class,'canTel']);
 Route::post('updateStatus', [BanksController::class,'updateStatus']);
+Route::get('getRegions', [BanksController::class,'getRegions']);
 
 
