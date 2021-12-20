@@ -91,9 +91,7 @@ class BanksController extends Controller
     {
         $a_bank_actions = [
             'call_requests' => '/api/v1/call_easy/call_requests',
-
         ];
-        $a_bank_statuses = [];
 
         $data = $request->All();
         $send = ['data'=>$data['data']];
@@ -105,6 +103,29 @@ class BanksController extends Controller
                 'Authorization' => 'Token token=' . $bank['token'],
                 'Content-Type' => 'application/json'
             ])->post($bank['url'] . $action,
+                $send
+            );
+        }
+
+        return response($response);
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $data = $request->All();
+        $a_bank_actions = [
+            'updateStatus' => '/api/v1/call_easy/call_requests/'.$data['client_id'],
+        ];
+
+        $send = ['data'=>$data['data']];
+        if (isset($data['bank_id'])) {
+            $bank = Bank::where('id', $data['bank_id'])->first();
+            $action = $a_bank_actions[$data['action']];
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Token token=' . $bank['token'],
+                'Content-Type' => 'application/json'
+            ])->patch($bank['url'] . $action,
                 $send
             );
         }

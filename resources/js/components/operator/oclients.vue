@@ -10,10 +10,12 @@
     </v-snackbar>
     <v-dialog
       transition="dialog-top-transition"
-      max-width="800"
       v-model="dialog"
       persistent
+      fullscreen
+      hide-overlay
     >
+      <!-- max-width="800" -->
       <template>
         <v-card>
           <v-toolbar color="primary" dark
@@ -25,8 +27,8 @@
           </v-toolbar>
           <v-card-text>
             <v-row class="pt-3">
-              <v-col cols="8">
-                <ul>
+              <v-col cols="4">
+                <ul style="color: #000">
                   <li><b>ФИО: </b>{{ selected.fullName }}</li>
                   <li><b>Тел: </b>{{ selected.phoneNumber }}</li>
                   <li><b>Наименование: </b>{{ selected.organizationName }}</li>
@@ -36,7 +38,7 @@
                   <li><b>Регистрация: </b>{{ selected.registration }}</li>
                 </ul>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="8">
                 <v-progress-linear
                   color="deep-purple accent-4"
                   indeterminate
@@ -44,21 +46,74 @@
                   height="6"
                   v-if="wait"
                 ></v-progress-linear>
-                <v-btn depressed color="primary" @click="requestBank" v-if="reqBtn">Запрос на звонок</v-btn>
-
-                <div id="answer_bank"
-                v-if="answer_bank"
-                class="pa-1"
-                :class="{'green white--text':responseBank.status == 'allowed','pink white--text':responseBank.status != 'allowed'}"
+                <v-btn
+                  depressed
+                  color="primary"
+                  @click="requestBank"
+                  v-if="reqBtn"
+                  >Запрос на звонок</v-btn
                 >
-                {{answer_bank}}
+
+                <div
+                  id="answer_bank"
+                  v-if="answer_bank"
+                  class="pa-1"
+                  :class="{
+                    'green white--text': responseBank.status == 'allowed',
+                    'pink white--text': responseBank.status != 'allowed',
+                  }"
+                >
+                  {{ answer_bank }}
                 </div>
-                <div v-if="can_call">
-                  Выбор статуса
+
+                <!-- answer client -->
+                <div class="mt-5" v-show="step == 2">
+                  <h2>Ответ банку</h2>
+                  <div class="my-5">
+                    <v-btn
+                      depressed
+                      color="green"
+                      @click="
+                        step = 3;
+                        updateStatus('agree');
+                      "
+                      >Клиент согласен на продукт</v-btn
+                    >
+                  </div>
+                  <div class="my-5">
+                    <v-btn
+                      depressed
+                      color="pink accent-1"
+                      @click="
+                        group_status = 4;
+                        step = 3;
+                        updateStatus('disagree');
+                      "
+                      >Клиент не согласен на продукт</v-btn
+                    >
+                  </div>
+                  <div class="my-5">
+                    <v-btn
+                      depressed
+                      color="orange darken-4"
+                      @click="
+                        step = 3;
+                        updateStatus('call_back');
+                      "
+                      >Клиент просил перезвонить</v-btn
+                    >
+                  </div>
+                </div>
+                <div
+                  class="mt-5"
+                  v-show="group_status != 0"
+                  :key="group_status"
+                >
+                  <h2>Выбор статуса</h2>
                   <v-container class="px-0" fluid>
                     <v-radio-group v-model="selectedFunnel">
                       <v-radio
-                        v-for="funnel in funnels"
+                        v-for="funnel in group_status_filter()"
                         :key="funnel.id"
                         color="funnel.color"
                         :label="`${funnel.name}`"
@@ -210,7 +265,7 @@
 
 <script>
 import axios from "axios";
-
+import _ from "lodash";
 export default {
   data: () => ({
     dialogf: false,
@@ -236,16 +291,13 @@ export default {
     message: "",
     snackbar: false,
     dialog: false,
-    can_call: false,
-statuses_ansver:{
-  allowed:'Звонок разрешен',
-  blocked:'Заблокирован',
-  forbidden:'Не звонить',
-},
-responseBank:{},
-wait:false,
-reqBtn:true,
-answer_bank:'',
+    set_status: false,
+    group_status: 0,
+    step: 1,
+    responseBank: {},
+    wait: false,
+    reqBtn: true,
+    answer_bank: "",
   }),
   mounted() {
     this.getBanks();
@@ -255,6 +307,9 @@ answer_bank:'',
   watch: {},
   computed: {},
   methods: {
+    group_status_filter() {
+      return _.filter(this.funnels, { group: this.group_status });
+    },
     howmanybank() {
       let self = this;
       let a = {};
@@ -307,6 +362,9 @@ answer_bank:'',
           self.message =
             "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
           self.snackbar = true;
+          self.reqBtn = true
+          self.step = 1
+          self.group_status = 0
         })
         .catch((error) => console.log(error));
     },
@@ -329,7 +387,6 @@ answer_bank:'',
           : [2, 0, 1, 1, 1, 2][number % 10 < 5 ? Math.abs(number) % 10 : 5]
       ];
     },
-
     getUserClients() {
       const self = this;
       const id = self.$attrs.user.id;
@@ -362,37 +419,57 @@ answer_bank:'',
       this.dialog = true;
     },
     requestBank() {
-      this.reqBtn = false
-      this.wait = true
-      const self = this
+      this.reqBtn = false;
+      this.wait = true;
+      const self = this;
       const item = this.selected;
       let send = {};
-      send.data =  { phone: "+" + item.phoneNumber, inn: item.inn } ;
-      send.bank_id = this.selectedBank
-      send.action = "call_requests"
+      send.data = { phone: "+" + item.phoneNumber, inn: item.inn };
+      send.bank_id = this.selectedBank;
+      send.action = "call_requests";
 
-axios
+      axios
         .post("/api/canTel", send)
         .then((res) => {
-          self.wait = false
-          self.reqBtn = true
-
-if(res.status == 200 && res.data.status == "allowed") {
-    self.reqBtn = false
-    self.answer_bank =   res.data.status_translate
-    self.responseBank = res.data
-}
+          self.wait = false;
+          self.reqBtn = true;
+          self.group_status = 0;
+          if (res.data.status == "forbidden") self.group_status = 1;
+          if (res.data.status == "blocked") self.group_status = 2;
+          if (res.status == 200 && res.data.status == "allowed") {
+            self.reqBtn = false;
+            self.answer_bank = res.data.status_translate;
+            self.responseBank = res.data;
+            self.step = 2;
+          }
           console.log(res);
         })
         .catch((error) => {
-          self.wait = false
-          self.reqBtn = true
-          self.answer_bank = ''
+          self.wait = false;
+          self.reqBtn = true;
+          self.answer_bank = "";
           console.error(error.message);
         });
     },
-    updateStatus(){
-// PATCH api/v1/call_easy/call_requests/:id
+    updateStatus(status) {
+      const self = this;
+      this.wait = true;
+      let send = {};
+      send.data = { call_status: status };
+      send.bank_id = this.selectedBank;
+      send.client_id = self.responseBank.id;
+      send.action = "updateStatus";
+      axios
+        .post("/api/updateStatus", send)
+        .then((res) => {
+          self.wait = false;
+          console.log(res);
+        })
+        .catch((error) => {
+          self.wait = false;
+          self.answer_bank = "";
+          console.error(error.message);
+        });
     },
   },
   components: {},

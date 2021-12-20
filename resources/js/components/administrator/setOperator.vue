@@ -118,20 +118,6 @@
               v-model="region"
             ></v-text-field>
           </v-col>
-          <!-- status -->
-          <!-- <v-col cols="3">
-            <v-autocomplete
-              v-model="selectedFunnel"
-              :items="funnels"
-              outlined
-              dense
-              chips
-              small-chips
-              item-text="name"
-              item-value="id"
-              label="Статус"
-            ></v-autocomplete>
-          </v-col> -->
 
           <!-- btn -->
           <v-col cols="1">
@@ -149,17 +135,6 @@
           </v-col>
           <v-spacer></v-spacer>
 
-          <!-- <v-col v-if="selected.length && disableuser > 0">
-            <v-btn
-              color="primary"
-              elevation="2"
-              outlined
-              raised
-              @click="dialogo = true"
-              >Открепить оператора</v-btn
-            >
-          </v-col> -->
-          <!-- del bank -->
           <v-col v-if="selected.length && selectedBank">
             <v-btn
               color="primary"
