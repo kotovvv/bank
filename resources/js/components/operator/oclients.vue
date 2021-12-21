@@ -124,52 +124,102 @@
                   </v-container>
                 </div>
                 <!-- form step 3 -->
-<v-container>
-  <h2>Форма</h2>
-  <v-row>
-    <v-col cols="6">
-      <v-autocomplete
-      v-model="model_region"
-      :items="show_regions"
-      :loading="isLoading"
-      :search-input.sync="search_region"
-      chips
-      clearable
-      hide-details
-      hide-selected
-      item-text="name"
-      item-value="id"
-      label="Регион"
-    >
-      <!-- solo -->
-      <template v-slot:no-data>
-        <v-list-item>
-          <v-list-item-title>
-           Введите первые символы
-            <strong>региона</strong>
-          </v-list-item-title>
-        </v-list-item>
-      </template>
-      <template v-slot:selection="{ attr, on, item, selected_region }">
-        <v-chip
-          v-bind="attr"
-          :input-value="selected_region"
-          color="blue-grey"
-          class="white--text"
-          v-on="on"
-        >
-          <span v-text="item.name"></span>
-        </v-chip>
-      </template>
-      <template v-slot:item="{ item }">
-        <v-list-item-content>
-          <v-list-item-title v-text="item.name"></v-list-item-title>
-        </v-list-item-content>
-      </template>
-    </v-autocomplete>
-    </v-col>
-  </v-row>
-</v-container>
+                <v-container>
+                  <h2>Форма</h2>
+                  <v-row>
+                    <v-col cols="6">
+                      <v-autocomplete
+                        v-model="model_region"
+                        :items="show_regions"
+                        :loading="isLoading"
+                        :search-input.sync="search_region"
+                        chips
+                        clearable
+                        hide-details
+                        hide-selected
+                        item-text="name"
+                        item-value="id"
+                        label="Регион"
+                      >
+                        <!-- solo -->
+                        <template v-slot:no-data>
+                          <v-list-item>
+                            <v-list-item-title>
+                              Введите первые символы
+                              <strong>региона</strong>
+                            </v-list-item-title>
+                          </v-list-item>
+                        </template>
+                        <template
+                          v-slot:selection="{ attr, on, item, selected_region }"
+                        >
+                          <v-chip
+                            v-bind="attr"
+                            :input-value="selected_region"
+                            color="blue-grey"
+                            class="white--text"
+                            v-on="on"
+                          >
+                            <span v-text="item.name"></span>
+                          </v-chip>
+                        </template>
+                        <template v-slot:item="{ item }">
+                          <v-list-item-content>
+                            <v-list-item-title
+                              v-text="item.name"
+                            ></v-list-item-title>
+                          </v-list-item-content>
+                        </template>
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- city -->
+                    <v-col cols="6">
+                      <v-autocomplete
+                        v-model="model_city"
+                        :items="show_cities"
+                        :loading="isLoading"
+                        :search-input.sync="search_city"
+                        chips
+                        clearable
+                        hide-details
+                        hide-selected
+                        item-text="name"
+                        item-value="id"
+                        label="Город"
+                      >
+                        <!-- solo -->
+                        <template v-slot:no-data>
+                          <v-list-item>
+                            <v-list-item-title>
+                              Введите первые символы
+                              <strong>города</strong>
+                            </v-list-item-title>
+                          </v-list-item>
+                        </template>
+                        <template
+                          v-slot:selection="{ attr, on, item, selected_city }"
+                        >
+                          <v-chip
+                            v-bind="attr"
+                            :input-value="selected_city"
+                            color="blue-grey"
+                            class="white--text"
+                            v-on="on"
+                          >
+                            <span v-text="item.name"></span>
+                          </v-chip>
+                        </template>
+                        <template v-slot:item="{ item }">
+                          <v-list-item-content>
+                            <v-list-item-title
+                              v-text="item.name"
+                            ></v-list-item-title>
+                          </v-list-item-content>
+                        </template>
+                      </v-autocomplete>
+                    </v-col>
+                  </v-row>
+                </v-container>
               </v-col>
             </v-row>
           </v-card-text>
@@ -346,10 +396,14 @@ export default {
     reqBtn: true,
     answer_bank: "",
     isLoading: false,
-      regions: [],
-      model_region: null,
-      search_region: null,
-      show_regions: [],
+    regions: [],
+    model_region: null,
+    search_region: null,
+    show_regions: [],
+    cities: [],
+    model_city: null,
+    search_city: null,
+    show_cities: [],
   }),
   mounted() {
     this.getBanks();
@@ -357,33 +411,63 @@ export default {
     this.getUserClients();
   },
   watch: {
-    search_region (val) {
+    search_region(val) {
       if (this.regions.length == 0) {
-        if (this.isLoading) return
+        if (this.isLoading) return;
 
-        this.isLoading = true
+        this.isLoading = true;
 
         // Lazily load input items
-        fetch(window.location.href+'api/getRegions')
-          .then(res => res.json())
-          .then(res => {
-            this.regions = res
+        fetch(window.location.href + "api/getRegions")
+          .then((res) => res.json())
+          .then((res) => {
+            this.regions = res;
           })
-          .catch(err => {
-            console.log(err)
+          .catch((err) => {
+            console.log(err);
           })
-          .finally(() => (this.isLoading = false))
-      }else{
-        val && this.queryRegion(val)
+          .finally(() => (this.isLoading = false));
+      } else {
+        val && this.queryRegion(val);
       }
-      },
+    },
+    search_city(val) {
+    let query = ''
+      if (this.cities.length == 0) {
+        if (this.isLoading) return;
+
+        this.isLoading = true;
+if(val != '') query = '/'+decodeURI(val)
+        // Lazily load input items
+        fetch(window.location.href + "api/getCities/"+ this.selectedBank+'/'+this.model_region + query)
+          .then((res) => res.json())
+          .then((res) => {
+            this.cities = res;
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+          .finally(() => (this.isLoading = false));
+      } else {
+        val && this.queryCity(val);
+      }
+    },
   },
   computed: {},
   methods: {
-    queryRegion(search){
-        this.show_regions = this.regions.filter(e => {
-            return e.name.toLowerCase().indexOf(search.toLowerCase()) > -1?e:false
-          })
+    queryRegion(search) {
+      this.show_regions = this.regions.filter((e) => {
+        return e.name.toLowerCase().indexOf(search.toLowerCase()) > -1
+          ? e
+          : false;
+      });
+    },
+    queryCity(search) {
+      this.show_cities = this.cities.filter((e) => {
+        return e.name.toLowerCase().indexOf(search.toLowerCase()) > -1
+          ? e
+          : false;
+      });
     },
     group_status_filter() {
       return _.filter(this.funnels, { group: this.group_status });
@@ -440,9 +524,9 @@ export default {
           self.message =
             "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
           self.snackbar = true;
-          self.reqBtn = true
-          self.step = 1
-          self.group_status = 0
+          self.reqBtn = true;
+          self.step = 1;
+          self.group_status = 0;
         })
         .catch((error) => console.log(error));
     },

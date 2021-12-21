@@ -94,7 +94,7 @@ class BanksController extends Controller
         ];
 
         $data = $request->All();
-        $send = ['data'=>$data['data']];
+        $send = ['data' => $data['data']];
         if (isset($data['bank_id'])) {
             $bank = Bank::where('id', $data['bank_id'])->first();
             $action = $a_bank_actions[$data['action']];
@@ -102,7 +102,8 @@ class BanksController extends Controller
             $response = Http::withHeaders([
                 'Authorization' => 'Token token=' . $bank['token'],
                 'Content-Type' => 'application/json'
-            ])->post($bank['url'] . $action,
+            ])->post(
+                $bank['url'] . $action,
                 $send
             );
         }
@@ -114,10 +115,10 @@ class BanksController extends Controller
     {
         $data = $request->All();
         $a_bank_actions = [
-            'updateStatus' => '/api/v1/call_easy/call_requests/'.$data['client_id'],
+            'updateStatus' => '/api/v1/call_easy/call_requests/' . $data['client_id'],
         ];
 
-        $send = ['data'=>$data['data']];
+        $send = ['data' => $data['data']];
         if (isset($data['bank_id'])) {
             $bank = Bank::where('id', $data['bank_id'])->first();
             $action = $a_bank_actions[$data['action']];
@@ -125,7 +126,8 @@ class BanksController extends Controller
             $response = Http::withHeaders([
                 'Authorization' => 'Token token=' . $bank['token'],
                 'Content-Type' => 'application/json'
-            ])->patch($bank['url'] . $action,
+            ])->patch(
+                $bank['url'] . $action,
                 $send
             );
         }
@@ -137,8 +139,8 @@ class BanksController extends Controller
     public function getRegions(Request $request)
     {
         $data = $request->All();
-       $response = 
-       json_decode('[
+        $response =
+            json_decode('[
         {
             "id": 99,
             "name": "Адыгея Республика",
@@ -721,6 +723,27 @@ class BanksController extends Controller
             "is_deleted": false
         }
     ]');
+        return response($response);
+    }
+
+    public function getCities($bank_id,$region_id,$query = '')
+    {
+
+        // api/v1/sber_mq/city?with_merchant_branches=1&region_id={region_id}
+        if ($query != '') $query = '&query=' . $query;
+        $a_bank_actions = [
+            'getCities' => '/api/v1/sber_mq/city?region_id=' . $region_id . $query,
+        ];
+
+
+            $bank = Bank::where('id', $bank_id)->first();
+            $action = $a_bank_actions['getCities'];
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Token token=' . $bank['token'],
+                'Content-Type' => 'application/json'
+            ])->get($bank['url'] . $action);
+
         return response($response);
     }
 

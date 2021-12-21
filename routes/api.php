@@ -43,5 +43,6 @@ Route::post('getReportAll', [ClientsController::class,'getReportAll']);
 Route::post('canTel', [BanksController::class,'canTel']);
 Route::post('updateStatus', [BanksController::class,'updateStatus']);
 Route::get('getRegions', [BanksController::class,'getRegions']);
+Route::get('getCities/{bank_id}/{region_id}/{query?}', [BanksController::class,'getCities']);
 
 
