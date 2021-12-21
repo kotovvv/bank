@@ -125,7 +125,7 @@
                 </div>
                 <!-- form step 3 -->
                 <v-container>
-                  <h2>Форма</h2>
+                  <h2>Форма заявки</h2>
                   <v-row>
                     <v-col cols="6">
                       <v-autocomplete
@@ -217,6 +217,20 @@
                           </v-list-item-content>
                         </template>
                       </v-autocomplete>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-select
+                        v-model="department"
+                        :hint="`${department.name}, ${department.address}`"
+                        :items="departments"
+                        item-text="(i) => {return i.name + ' - ' + i.address}"
+                        item-value="id"
+                        label="Отделение"
+                        persistent-hint
+                        return-object
+                        single-line
+                      >
+</v-select>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -404,6 +418,8 @@ export default {
     model_city: null,
     search_city: null,
     show_cities: [],
+    department: {},
+    departments: [],
   }),
   mounted() {
     this.getBanks();
@@ -411,6 +427,22 @@ export default {
     this.getUserClients();
   },
   watch: {
+    model_city(val) {
+      const self = this;
+      if (val != null) {
+        let send = {};
+        send.bank_id = this.selectedBank;
+        send.region_id = this.model_region;
+        send.city_id = this.model_city;
+        // Lazily load input items
+        axios
+          .post("/api/getDepartments", send)
+          .then((res) => {
+            self.departments = res.data;
+          })
+          .catch((error) => console.log(error));
+      }
+    },
     search_region(val) {
       if (this.regions.length == 0) {
         if (this.isLoading) return;
@@ -432,30 +464,36 @@ export default {
       }
     },
     search_city(val) {
-    let query = ''
-      if (this.cities.length == 0) {
-        if (this.isLoading) return;
+      const self = this;
+      //  if (this.cities.length == 0) {
+      if (this.isLoading) return;
 
-        this.isLoading = true;
-if(val != '') query = '/'+decodeURI(val)
-        // Lazily load input items
-        fetch(window.location.href + "api/getCities/"+ this.selectedBank+'/'+this.model_region + query)
-          .then((res) => res.json())
-          .then((res) => {
-            this.cities = res;
-          })
-          .catch((err) => {
-            console.log(err);
-          })
-          .finally(() => (this.isLoading = false));
-      } else {
-        val && this.queryCity(val);
-      }
+      this.isLoading = true;
+
+      let send = {};
+      send.bank_id = this.selectedBank;
+      send.region_id = this.model_region;
+      send.query = val;
+      // Lazily load input items
+      axios
+        .post("/api/getCities", send)
+        .then((res) => {
+          self.cities = res.data.entries;
+          self.isLoading = false;
+          val && self.queryCity(val);
+        })
+        .catch((error) => console.log(error));
+      // } else {
+      // }
     },
   },
   computed: {},
   methods: {
     queryRegion(search) {
+      this.cities = [];
+      this.model_city = null;
+      this.search_city = null;
+      this.show_cities = [];
       this.show_regions = this.regions.filter((e) => {
         return e.name.toLowerCase().indexOf(search.toLowerCase()) > -1
           ? e
@@ -463,11 +501,14 @@ if(val != '') query = '/'+decodeURI(val)
       });
     },
     queryCity(search) {
-      this.show_cities = this.cities.filter((e) => {
-        return e.name.toLowerCase().indexOf(search.toLowerCase()) > -1
-          ? e
-          : false;
-      });
+      if (this.cities.length > 0) {
+        this.show_cities = this.cities.filter((e) => {
+          return e.name.toLowerCase().indexOf(search.toLowerCase()) > -1
+            ? e
+            : false;
+        });
+        return false;
+      }
     },
     group_status_filter() {
       return _.filter(this.funnels, { group: this.group_status });

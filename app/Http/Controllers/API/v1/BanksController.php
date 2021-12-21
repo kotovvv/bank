@@ -5,10 +5,11 @@ namespace App\Http\Controllers\API\v1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Bank;
+use Barryvdh\Debugbar\Twig\Extension\Debug;
 use Illuminate\Support\Facades\Http;
 use DB;
 use Debugbar;
-
+use DebugBar\DebugBar as DebugBarDebugBar;
 
 class BanksController extends Controller
 {
@@ -726,28 +727,65 @@ class BanksController extends Controller
         return response($response);
     }
 
-    public function getCities($bank_id,$region_id,$query = '')
-    {
 
+    public function getCities(Request $request)
+    {
+        $data = $request->All();
+        $bank_id = $data['bank_id'];
+        $region_id = $data['region_id'];
+        $query = '';
+        if (isset($data['query'])) $query = '&query=' . $query;
         // api/v1/sber_mq/city?with_merchant_branches=1&region_id={region_id}
-        if ($query != '') $query = '&query=' . $query;
         $a_bank_actions = [
             'getCities' => '/api/v1/sber_mq/city?region_id=' . $region_id . $query,
         ];
 
+        $bank = Bank::where('id', $bank_id)->first();
+        $action = $a_bank_actions['getCities'];
 
-            $bank = Bank::where('id', $bank_id)->first();
-            $action = $a_bank_actions['getCities'];
-
-            $response = Http::withHeaders([
-                'Authorization' => 'Token token=' . $bank['token'],
-                'Content-Type' => 'application/json'
-            ])->get($bank['url'] . $action);
+        $response = Http::withHeaders([
+            'Authorization' => 'Token token=' . $bank['token'],
+            'Content-Type' => 'application/json'
+        ])->get($bank['url'] . $action);
 
         return response($response);
     }
 
+    public function getDepartments(Request $request)
+    {
+        $data = $request->All();
+        $bank_id = $data['bank_id'];
+        $region_id = $data['region_id'];
+        $city_id = $data['city_id'];
 
+        $a_bank_actions = [
+            'getDepartmets' => '/api/v1/sber_mq/merchant_branch?with_merchant_branches=1&region_id=' . $region_id . '&city_id=' . $city_id,
+        ];
+
+        $bank = Bank::where('id', $bank_id)->first();
+        $action = $a_bank_actions['getDepartmets'];
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Token token=' . $bank['token'],
+            'Content-Type' => 'application/json'
+        ])->get($bank['url'] . $action);
+
+        $a_ans = $response->json();
+        $entries = $response->object()->entries;
+Debugbar::info($entries);
+        $hm_page = ceil($a_ans['total_entries'] / $a_ans['per_page']);
+        if ($hm_page > 1) {
+            for ($i = 2; $i <= $hm_page; $i++) {
+                $resp = Http::withHeaders([
+                    'Authorization' => 'Token token=' . $bank['token'],
+                    'Content-Type' => 'application/json'
+                ])->get($bank['url'] . $action . '&page=' . $i);
+                $entries = array_merge($entries, $resp->object()->entries);
+            }
+        }
+        
+        return response($entries);
+    }
     /**
      * Remove the specified resource from storage.
      *
