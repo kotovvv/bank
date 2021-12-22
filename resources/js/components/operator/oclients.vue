@@ -86,7 +86,7 @@
                       color="pink accent-1"
                       @click="
                         group_status = 4;
-                        step = 3;
+
                         updateStatus('disagree');
                       "
                       >Клиент не согласен на продукт</v-btn
@@ -124,7 +124,7 @@
                   </v-container>
                 </div>
                 <!-- form step 3 -->
-                <v-container>
+                <v-container v-show="step == 3">
                   <h2>Форма заявки</h2>
                   <v-row>
                     <v-col cols="6">
@@ -218,21 +218,69 @@
                         </template>
                       </v-autocomplete>
                     </v-col>
-                    <v-col cols="12">
+                    <v-col cols="12" v-show="departments.length">
+                      <!-- :hint="`${department.name}, ${department.address}`" -->
                       <v-select
                         v-model="department"
-                        :hint="`${department.name}, ${department.address}`"
                         :items="departments"
-                        item-text="(i) => {return i.name + ' - ' + i.address}"
+                        item-text="name"
                         item-value="id"
                         label="Отделение"
                         persistent-hint
                         return-object
                         single-line
                       >
-</v-select>
+                      </v-select>
+                    </v-col>
+                    <v-col cols="4">
+                      <v-btn text @click="rr = 0">
+                        <v-icon> mdi-close </v-icon>
+                        <h3>Расчётный счёт</h3>
+                      </v-btn>
+
+                      <v-radio-group v-model="rr">
+                        <v-radio
+                          label="Пакет услуг Легкий старт"
+                          :value="18"
+                        ></v-radio>
+                        <v-radio
+                          label="Пакет услуг Набирая обороты"
+                          :value="49"
+                        ></v-radio>
+                        <v-radio
+                          label="Пакет услуг Полным ходом"
+                          :value="50"
+                        ></v-radio>
+                      </v-radio-group>
+                    </v-col>
+                    <v-col cols="4">
+                      <v-btn text @click="pp = 0">
+                        <v-icon> mdi-close </v-icon>
+                        <h3>Приём платежей</h3>
+                      </v-btn>
+
+                      <v-radio-group v-model="pp">
+                        <v-radio
+                          label="Торговый эквайринг"
+                          :value="31"
+                        ></v-radio>
+                        <v-radio label="Смарт-терминал" :value="42"></v-radio>
+                      </v-radio-group>
+                    </v-col>
+                    <v-col cols="4">
+                      <v-btn text @click="ss = 0">
+                        <v-icon> mdi-close </v-icon>
+                        <h3>Сервисы</h3>
+                      </v-btn>
+
+                      <v-radio-group v-model="ss">
+                        <v-radio label="Сберздоровье" :value="46"></v-radio>
+                      </v-radio-group>
                     </v-col>
                   </v-row>
+                  <v-btn depressed color="primary" @click="sendZ"
+                    >Отправить заявку</v-btn
+                  >
                 </v-container>
               </v-col>
             </v-row>
@@ -420,6 +468,9 @@ export default {
     show_cities: [],
     department: {},
     departments: [],
+    rr: 0,
+    pp: 0,
+    ss: 0,
   }),
   mounted() {
     this.getBanks();
@@ -439,6 +490,9 @@ export default {
           .post("/api/getDepartments", send)
           .then((res) => {
             self.departments = res.data;
+            self.departments.map((i) => {
+              i.name = i.name + " | " + i.address;
+            });
           })
           .catch((error) => console.log(error));
       }
@@ -489,6 +543,8 @@ export default {
   },
   computed: {},
   methods: {
+    sendZ() {},
+
     queryRegion(search) {
       this.cities = [];
       this.model_city = null;

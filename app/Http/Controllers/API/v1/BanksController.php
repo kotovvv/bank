@@ -772,7 +772,7 @@ class BanksController extends Controller
 
         $a_ans = $response->json();
         $entries = $response->object()->entries;
-Debugbar::info($entries);
+
         $hm_page = ceil($a_ans['total_entries'] / $a_ans['per_page']);
         if ($hm_page > 1) {
             for ($i = 2; $i <= $hm_page; $i++) {
