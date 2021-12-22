@@ -127,6 +127,25 @@
                 <v-container v-show="step == 3">
                   <h2>Форма заявки</h2>
                   <v-row>
+                    <v-col cols="4"
+                      ><v-text-field
+                        v-model="last_name"
+                        label="Фамилия"
+                      ></v-text-field
+                    ></v-col>
+                    <v-col cols="4"
+                      ><v-text-field
+                        v-model="first_name"
+                        label="Имя"
+                      ></v-text-field
+                    ></v-col>
+                    <v-col cols="4"
+                      ><v-text-field
+                        v-model="company_name"
+                        label="Наименование компании"
+                      ></v-text-field
+                    ></v-col>
+
                     <v-col cols="6">
                       <v-autocomplete
                         v-model="model_region"
@@ -218,11 +237,11 @@
                         </template>
                       </v-autocomplete>
                     </v-col>
-                    <v-col cols="12" v-show="departments.length">
-                      <!-- :hint="`${department.name}, ${department.address}`" -->
+                    <v-col cols="12" v-show="branches.length">
+                      <!-- :hint="`${branch.name}, ${branch.address}`" -->
                       <v-select
-                        v-model="department"
-                        :items="departments"
+                        v-model="branch"
+                        :items="branches"
                         item-text="name"
                         item-value="id"
                         label="Отделение"
@@ -278,7 +297,18 @@
                       </v-radio-group>
                     </v-col>
                   </v-row>
-                  <v-btn depressed color="primary" @click="sendZ"
+                  <v-btn
+                    depressed
+                    color="primary"
+                    @click="sendOrder"
+                    :disabled="
+                      model_city == null ||
+                      model_region == null ||
+                      company_name =='' ||
+        last_name == '' ||
+        first_name == '' ||
+                      (pp == 0 && ss == 0 && rr == 0)
+                    "
                     >Отправить заявку</v-btn
                   >
                 </v-container>
@@ -466,11 +496,14 @@ export default {
     model_city: null,
     search_city: null,
     show_cities: [],
-    department: {},
-    departments: [],
+    branch: {},
+    branches: [],
     rr: 0,
     pp: 0,
     ss: 0,
+            company_name:'',
+        last_name:'',
+        first_name:'',
   }),
   mounted() {
     this.getBanks();
@@ -487,10 +520,10 @@ export default {
         send.city_id = this.model_city;
         // Lazily load input items
         axios
-          .post("/api/getDepartments", send)
+          .post("/api/getBranches", send)
           .then((res) => {
-            self.departments = res.data;
-            self.departments.map((i) => {
+            self.branches = res.data;
+            self.branches.map((i) => {
               i.name = i.name + " | " + i.address;
             });
           })
@@ -521,7 +554,8 @@ export default {
       const self = this;
       //  if (this.cities.length == 0) {
       if (this.isLoading) return;
-
+      this.branch = {};
+      this.branches = [];
       this.isLoading = true;
 
       let send = {};
@@ -543,8 +577,51 @@ export default {
   },
   computed: {},
   methods: {
-    sendZ() {},
-
+    sendOrder() {
+      const self = this;
+      let send = {};
+      send.user_id = this.$attrs.user.id
+      send.client_id = this.responseBank.id
+      let branch_id = "";
+      if (this.branch != {}) branch_id = this.branch.id;
+      let products = [];
+      if (this.pp != 0) products.push(this.pp);
+      if (this.ss != 0) products.push(this.ss);
+      if (this.rr != 0) products.push(this.rr);
+      send.data = {
+        inn: this.selected.inn,
+        merchant_id: 50,
+        product_ids: products,
+        company_name:this.company_name,
+        last_name:this.last_name,
+        first_name:this.first_name,
+        // middle_name:
+        // email:
+        phone: '+'+this.selected.phoneNumber,
+        // add_info:
+        region_id: this.model_region,
+        city_id: this.model_city,
+        merchant_branch_id: branch_id,
+      };
+      send.bank_id = this.selectedBank;
+      send.action = "send_order";
+            axios
+        .post("/api/sendOrder", send)
+        .then((res) => {
+          if(res.data.errors){
+            self.message = JSON.stringify(res.data.errors)
+            self.snackbar = true
+          }
+          if(res.data.successful == true){
+            self.message = JSON.stringify(res.data.data.number)
+            self.snackbar = true
+            self.group_status = 5
+          }
+console.log(res)
+        })
+        .catch((error) => console.log(error));
+      console.log(send)
+    },
     queryRegion(search) {
       this.cities = [];
       this.model_city = null;
@@ -676,6 +753,10 @@ export default {
       row.select(true);
       this.selected = row.item;
       this.dialog = true;
+              this.company_name=this.selected.organizationName
+              let a_name = this.selected.fullName.split(' ')
+        this.last_name=a_name[0]
+        this.first_name=a_name[1]
     },
     requestBank() {
       this.reqBtn = false;
@@ -701,7 +782,6 @@ export default {
             self.responseBank = res.data;
             self.step = 2;
           }
-          console.log(res);
         })
         .catch((error) => {
           self.wait = false;

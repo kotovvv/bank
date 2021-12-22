@@ -44,6 +44,7 @@ Route::post('canTel', [BanksController::class,'canTel']);
 Route::post('updateStatus', [BanksController::class,'updateStatus']);
 Route::get('getRegions', [BanksController::class,'getRegions']);
 Route::post('getCities', [BanksController::class,'getCities']);
-Route::post('getDepartments', [BanksController::class,'getDepartments']);
+Route::post('getBranches', [BanksController::class,'getBranches']);
+Route::post('sendOrder', [BanksController::class,'sendOrder']);
 
 

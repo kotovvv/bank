@@ -751,7 +751,7 @@ class BanksController extends Controller
         return response($response);
     }
 
-    public function getDepartments(Request $request)
+    public function getBranches(Request $request)
     {
         $data = $request->All();
         $bank_id = $data['bank_id'];
@@ -759,21 +759,23 @@ class BanksController extends Controller
         $city_id = $data['city_id'];
 
         $a_bank_actions = [
-            'getDepartmets' => '/api/v1/sber_mq/merchant_branch?with_merchant_branches=1&region_id=' . $region_id . '&city_id=' . $city_id,
+            'getbranches' => '/api/v1/sber_mq/merchant_branch?with_merchant_branches=1&region_id=' . $region_id . '&city_id=' . $city_id,
         ];
 
         $bank = Bank::where('id', $bank_id)->first();
-        $action = $a_bank_actions['getDepartmets'];
+        $action = $a_bank_actions['getbranches'];
 
         $response = Http::withHeaders([
             'Authorization' => 'Token token=' . $bank['token'],
             'Content-Type' => 'application/json'
         ])->get($bank['url'] . $action);
 
-        $a_ans = $response->json();
-        $entries = $response->object()->entries;
+        // $a_ans = $response->json();
+        // $entries = $response->object()->entries;
+        $entries = $response['entries'];
 
-        $hm_page = ceil($a_ans['total_entries'] / $a_ans['per_page']);
+        // $hm_page = ceil($a_ans['total_entries'] / $a_ans['per_page']);
+        $hm_page = ceil($response['total_entries'] / $response['per_page']);
         if ($hm_page > 1) {
             for ($i = 2; $i <= $hm_page; $i++) {
                 $resp = Http::withHeaders([
@@ -786,6 +788,35 @@ class BanksController extends Controller
         
         return response($entries);
     }
+
+    public function sendOrder(Request $request)
+    {
+        // POST api/v1/sber_mq/order
+        $a_bank_actions = [
+            'send_order' => '/api/v1/sber_mq/order',
+        ];
+
+        $data = $request->All();
+        $send = ['data' => $data['data']];
+        if (isset($data['bank_id'])) {
+            $bank = Bank::where('id', $data['bank_id'])->first();
+            $action = $a_bank_actions[$data['action']];
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Token token=' . $bank['token'],
+                'Content-Type' => 'application/json'
+            ])->post(
+                $bank['url'] . $action,
+                $send
+            );
+        }
+
+        return response(['data'=>$response->object(),'successful'=>$response->successful(),'status'=>$response->status() ]);
+
+    }
+
+    
+
     /**
      * Remove the specified resource from storage.
      *
