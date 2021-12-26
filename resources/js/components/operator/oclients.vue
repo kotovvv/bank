@@ -124,7 +124,7 @@
                   </v-container>
                 </div>
                 <!-- form step 3 -->
-                <v-container v-show="step == 3">
+                <v-container v-show="step == 3 && group_status != 5">
                   <h2>Форма заявки</h2>
                   <v-row>
                     <v-col cols="4"
@@ -713,7 +713,7 @@ export default {
       if (self.selectedBank) {
         bank_id = self.selectedBank;
         self.filterClients = self.clients.filter(
-          (i) => i.banksfunnels.indexOf('"' + bank_id + ":") >= 0
+          (i) => i.banksfunnels.indexOf('"' + bank_id + ":0") >= 0
         );
       } else {
         self.filterClients = self.clients;
@@ -731,7 +731,7 @@ export default {
       const id = self.$attrs.user.id;
       let bank_id = 0;
       let funnel_id = 0;
-      //   if (self.selectedBank) bank_id = self.selectedBank;
+      // if (self.selectedBank) bank_id = self.selectedBank;
       axios
         .get("/api/getUserClients/" + id + "/" + bank_id + "/" + funnel_id)
         .then((res) => {
@@ -807,6 +807,7 @@ export default {
         .then((res) => {
           self.wait = false;
           self.other = JSON.stringify(res.data)
+          self.answer_bank = ''
           // console.log(res);
         })
         .catch((error) => {
