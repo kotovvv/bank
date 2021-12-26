@@ -304,9 +304,9 @@
                     :disabled="
                       model_city == null ||
                       model_region == null ||
-                      company_name =='' ||
-        last_name == '' ||
-        first_name == '' ||
+                      company_name == '' ||
+                      last_name == '' ||
+                      first_name == '' ||
                       (pp == 0 && ss == 0 && rr == 0)
                     "
                     >Отправить заявку</v-btn
@@ -501,9 +501,10 @@ export default {
     rr: 0,
     pp: 0,
     ss: 0,
-            company_name:'',
-        last_name:'',
-        first_name:'',
+    company_name: "",
+    last_name: "",
+    first_name: "",
+    other:'',
   }),
   mounted() {
     this.getBanks();
@@ -580,8 +581,8 @@ export default {
     sendOrder() {
       const self = this;
       let send = {};
-      send.user_id = this.$attrs.user.id
-      send.client_id = this.responseBank.id
+      send.user_id = this.$attrs.user.id;
+      send.client_id = this.responseBank.id;
       let branch_id = "";
       if (this.branch != {}) branch_id = this.branch.id;
       let products = [];
@@ -592,12 +593,12 @@ export default {
         inn: this.selected.inn,
         merchant_id: 50,
         product_ids: products,
-        company_name:this.company_name,
-        last_name:this.last_name,
-        first_name:this.first_name,
+        company_name: this.company_name,
+        last_name: this.last_name,
+        first_name: this.first_name,
         // middle_name:
         // email:
-        phone: '+'+this.selected.phoneNumber,
+        phone: "+" + this.selected.phoneNumber,
         // add_info:
         region_id: this.model_region,
         city_id: this.model_city,
@@ -605,22 +606,23 @@ export default {
       };
       send.bank_id = this.selectedBank;
       send.action = "send_order";
-            axios
+      axios
         .post("/api/sendOrder", send)
         .then((res) => {
-          if(res.data.errors){
-            self.message = JSON.stringify(res.data.errors)
-            self.snackbar = true
+          self.other = JSON.stringify(res.data)
+          if (res.data.errors) {
+            self.message = JSON.stringify(res.data.errors);
+            self.snackbar = true;
           }
-          if(res.data.successful == true){
-            self.message = JSON.stringify(res.data.data.number)
-            self.snackbar = true
-            self.group_status = 5
+          if (res.data.successful == true) {
+            self.message = JSON.stringify(res.data.data.number);
+            self.snackbar = true;
+            self.group_status = 5;
           }
-console.log(res)
+          console.log(res);
         })
         .catch((error) => console.log(error));
-      console.log(send)
+      console.log(send);
     },
     queryRegion(search) {
       this.cities = [];
@@ -687,6 +689,7 @@ console.log(res)
       send.bank_id = self.selectedBank;
       send.user_id = self.$attrs.user.id;
       send.funnel = self.selectedFunnel;
+      send.other = self.other;
       send.clients = [self.selected.id];
 
       axios
@@ -753,10 +756,10 @@ console.log(res)
       row.select(true);
       this.selected = row.item;
       this.dialog = true;
-              this.company_name=this.selected.organizationName
-              let a_name = this.selected.fullName.split(' ')
-        this.last_name=a_name[0]
-        this.first_name=a_name[1]
+      this.company_name = this.selected.organizationName;
+      let a_name = this.selected.fullName.split(" ");
+      this.last_name = a_name[0];
+      this.first_name = a_name[1];
     },
     requestBank() {
       this.reqBtn = false;
@@ -774,6 +777,7 @@ console.log(res)
           self.wait = false;
           self.reqBtn = true;
           self.group_status = 0;
+          self.other = JSON.stringify(res.data)
           if (res.data.status == "forbidden") self.group_status = 1;
           if (res.data.status == "blocked") self.group_status = 2;
           if (res.status == 200 && res.data.status == "allowed") {
@@ -802,7 +806,8 @@ console.log(res)
         .post("/api/updateStatus", send)
         .then((res) => {
           self.wait = false;
-          console.log(res);
+          self.other = JSON.stringify(res.data)
+          // console.log(res);
         })
         .catch((error) => {
           self.wait = false;

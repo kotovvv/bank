@@ -105,10 +105,11 @@ class ClientsController extends Controller
         $data = $request->All();
         // DebugBar::info( $data);
         if (!isset($data['funnel'])) $data['funnel'] = 0;
+        if (!isset($data['other'])) $data['other'] = '';
         if (isset($data['funnel']) && isset($data['user_id'])) {
             $a_log = [];
             foreach ($data['clients'] as $cl) {
-                $a_log = ['client_id' => $cl, 'user_id' => $data['user_id'], 'bank_id' => $data['bank_id'],  'funnel_id' => $data['funnel'], 'dateadd' => Now(), 'timeadd' => Now()];
+                $a_log = ['client_id' => $cl, 'user_id' => $data['user_id'], 'bank_id' => $data['bank_id'], 'funnel_id' => $data['funnel'], 'other' => $data['other'], 'dateadd' => Now(), 'timeadd' => Now()];
             }
             Log::insert($a_log);
         }
