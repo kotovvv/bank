@@ -10,6 +10,6 @@ class Funnel extends Model
     public $timestamps = false;
     use HasFactory;
     protected $fillable = [
-        'id','name','order','color'
+        'id','name','order','color','group'
     ];
 }

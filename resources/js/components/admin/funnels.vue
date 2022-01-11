@@ -8,7 +8,7 @@
       cols="6"
     >
       <template v-slot:item.name="{ item }">
-        <v-chip :style="{'background':item.color}">
+        <v-chip :style="{ background: item.color }">
           {{ item.name }}
         </v-chip>
       </template>
@@ -36,6 +36,15 @@
                         v-model="editedItem.name"
                         label="Наименование"
                       ></v-text-field>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-select
+                        v-model="editedItem.group"
+                        :items="groups"
+                        label="Группа"
+                        item-value="id"
+                        item-text="name"
+                      ></v-select>
                     </v-col>
                     <v-col cols="4">
                       <v-text-field
@@ -70,9 +79,7 @@
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
-              <v-card-title class="headline"
-                >Увенены в удалении?</v-card-title
-              >
+              <v-card-title class="headline">Увенены в удалении?</v-card-title>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="closeDelete"
@@ -115,14 +122,39 @@ export default {
     editedIndex: -1,
     editedItem: {
       name: "",
-      color:'#fff',
-      order:0
+      color: "#fff",
+      order: 0,
+      group: 0,
     },
     defaultItem: {
       name: "",
-      color:'#fff',
-      order:0
+      color: "#fff",
+      order: 0,
+      group: 0,
     },
+    selectgroup: 0,
+    groups: [
+      {
+        id: "1",
+        name: "Не звонить, Дубль",
+      },
+      {
+        id: "2",
+        name: "Заблокирован",
+      },
+      {
+        id: "3",
+        name: "Перезвонить",
+      },
+      {
+        id: "4",
+        name: "Некорректный номер",
+      },
+      {
+        id: "5",
+        name: "Заявка",
+      },
+    ],
   }),
 
   computed: {
@@ -167,6 +199,7 @@ export default {
     editItem(item) {
       this.editedIndex = this.funnels.indexOf(item);
       this.editedItem = Object.assign({}, item);
+      this.editedItem.group = this.editedItem.group.toString();
       this.dialog = true;
     },
 

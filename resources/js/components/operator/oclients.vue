@@ -12,12 +12,12 @@
       transition="dialog-top-transition"
       v-model="dialog"
       persistent
-      fullscreen
+   max-width="800"
       hide-overlay
     >
-      <!-- max-width="800" -->
+
       <template>
-        <v-card>
+        <v-card >
           <v-toolbar color="primary" dark
             ><v-icon large color="darken-2"> mdi-account-card-details </v-icon>
             <v-spacer></v-spacer>
