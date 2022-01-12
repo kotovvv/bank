@@ -105,17 +105,18 @@
             >
           </v-col>
           <v-spacer></v-spacer>
-          <v-col>
-          <v-btn depressed @click="download_table_as_csv('reportall')"
-            >Скачать отчёт CSV</v-btn>
+          <v-col v-if="td_head">
+            <v-btn depressed @click="download_table_as_csv('reportall')"
+              >Скачать отчёт CSV</v-btn
+            >
             <download-csv
-            delimiter=";"
-
-            dynamicTyping="false"
-    :data   = "report">
-  <v-btn depressed>Скачать полный отчёт CSV</v-btn>
-</download-csv>
-           </v-col>
+              delimiter=";"
+              :name="'fullreport-' + new Date().toLocaleDateString() + '.csv'"
+              :data="report"
+            >
+              <v-btn depressed class="my-1">Скачать полный отчёт CSV</v-btn>
+            </download-csv>
+          </v-col>
         </v-row>
       </v-col>
     </v-row>
@@ -152,7 +153,7 @@
                   </tr>
                 </template>
               </template>
-              <tr class="orange lighten-3">
+              <tr class="grey lighten-3">
                 <td>ИТОГО:</td>
                 <template v-for="(f, fi) in funnels">
                   <td :key="fi">
@@ -170,7 +171,6 @@
                 <td>Обработано:</td>
                 <td>{{ ubf.length }}</td>
               </tr>
-
             </tbody>
           </template>
         </v-simple-table>
@@ -182,7 +182,7 @@
 <script>
 import axios from "axios";
 import lodash from "lodash";
-import JsonCSV from 'vue-json-csv'
+import JsonCSV from "vue-json-csv";
 export default {
   data: () => ({
     period: [],
@@ -192,13 +192,13 @@ export default {
     selectbanks: [],
     selectedBank: 0,
     message: "",
-    td_head: [],
+    td_head: "",
     users: [],
-    banks: [],
-    funnels: [],
-    ubf: [],
+    banks: ["", ""],
+    funnels: ["", ""],
+    ubf: ["", ""],
     all: "",
-    report:[],
+    report: [],
   }),
   mounted() {
     this.getBanks();
@@ -253,12 +253,13 @@ export default {
     getReportAll() {
       let self = this;
       let send = {};
-    this.td_head = []
-    this.users = []
-    this.banks = []
-    this.funnels = []
-    this.ubf = []
-    this.all = ""
+      this.td_head = "";
+      this.users = [];
+      this.banks = ["", ""];
+      this.funnels = ["", ""];
+      this.ubf = ["", ""];
+
+      this.all = "";
       send.bank_id = self.selectedBank;
       if (self.period == "") {
         self.message = "Установите период";
@@ -276,8 +277,11 @@ export default {
           self.banks = res.data.banks;
           self.ubf = res.data.ubf;
           self.all = res.data.all;
-          self.report = res.data.report;
-
+          self.report = res.data.report.map((i) => {
+            i.inn = "`" + i.inn;
+            i.phoneNumber = "`+" + i.phoneNumber;
+            return i;
+          });
         })
         .catch((error) => console.log(error));
     },
@@ -304,6 +308,7 @@ export default {
         csv.push(row.join(separator));
       }
       var csv_string = csv.join("\n");
+
       // Download it
       var filename =
         "export_" + table_id + "_" + new Date().toLocaleDateString() + ".csv";
@@ -312,8 +317,9 @@ export default {
       link.setAttribute("target", "_blank");
       link.setAttribute(
         "href",
-        "data:text/csv;charset=utf-8,\uFEFF" + csv_string
+        "data:text/csv;charset=utf-8,%EF%BB%BF" + encodeURIComponent(csv_string)
       );
+
       link.setAttribute("download", filename);
       document.body.appendChild(link);
       link.click();
@@ -321,7 +327,7 @@ export default {
     },
   },
   components: {
-      'downloadCsv': JsonCSV
+    downloadCsv: JsonCSV,
   },
 };
 </script>
