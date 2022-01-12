@@ -244,6 +244,9 @@ class ClientsController extends Controller
             $usr_bnk_fnl = DB::select(DB::raw($sql));
         }
 
+        $sql = "SELECT c.`inn`,c.`organizationName`,c.`fullName`,c.`phoneNumber`,f.`name`, b.name, c.`registration`, l.`dateadd` datecall, u.`fio` operator,c.`region`,c.`address`  FROM `logs` l LEFT JOIN `clients` c ON (c.`id` = l.`client_id`) LEFT JOIN `funnels` f ON (f.`id` = l.`funnel_id`) LEFT JOIN `banks` b ON (b.id = l.`bank_id`) LEFT JOIN `users` u ON (u.`id` = l.`user_id`) WHERE l.`dateadd` " . $where_period;
+        $report = DB::select(DB::raw($sql));
+
         $a_users_o = array_unique(array_column($usr_bnk_fnl, 'user_id'));
         $a_users = User::select('id', 'fio')->whereIn('id', $a_users_o)->get()->toArray();
         $a_funnels_o = array_unique(array_column($usr_bnk_fnl, 'funnel_id'));
@@ -256,7 +259,8 @@ class ClientsController extends Controller
         $json['banks'] = $a_banks;
         $json['ubf'] = $usr_bnk_fnl;
         $json['all'] = $all_count[0]->COUNT;
-        $json['ubf'] = $usr_bnk_fnl;
+        $json['report'] =$report;
+
         return response($json);
     }
 

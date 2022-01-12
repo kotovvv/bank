@@ -54,7 +54,7 @@
               v-model="modal"
               :return-value.sync="period"
               persistent
-              width="290px"
+              width="350px"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field

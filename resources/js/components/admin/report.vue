@@ -54,7 +54,7 @@
               v-model="modal"
               :return-value.sync="period"
               persistent
-              width="290px"
+              width="350px"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
@@ -105,9 +105,17 @@
             >
           </v-col>
           <v-spacer></v-spacer>
+          <v-col>
           <v-btn depressed @click="download_table_as_csv('reportall')"
-            >Скачать отчёт CSV</v-btn
-          >
+            >Скачать отчёт CSV</v-btn>
+            <download-csv
+            delimiter=";"
+
+            dynamicTyping="false"
+    :data   = "report">
+  <v-btn depressed>Скачать полный отчёт CSV</v-btn>
+</download-csv>
+           </v-col>
         </v-row>
       </v-col>
     </v-row>
@@ -174,6 +182,7 @@
 <script>
 import axios from "axios";
 import lodash from "lodash";
+import JsonCSV from 'vue-json-csv'
 export default {
   data: () => ({
     period: [],
@@ -189,6 +198,7 @@ export default {
     funnels: [],
     ubf: [],
     all: "",
+    report:[],
   }),
   mounted() {
     this.getBanks();
@@ -266,9 +276,12 @@ export default {
           self.banks = res.data.banks;
           self.ubf = res.data.ubf;
           self.all = res.data.all;
+          self.report = res.data.report;
+
         })
         .catch((error) => console.log(error));
     },
+
     // Quick and simple export target #table_id into a csv
     download_table_as_csv(table_id, separator = ";") {
       // Select rows from table_id
@@ -307,7 +320,9 @@ export default {
       document.body.removeChild(link);
     },
   },
-  components: {},
+  components: {
+      'downloadCsv': JsonCSV
+  },
 };
 </script>
 
