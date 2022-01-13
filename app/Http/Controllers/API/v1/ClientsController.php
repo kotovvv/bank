@@ -213,6 +213,7 @@ class ClientsController extends Controller
         $data = $request->All();
         $bank_id = $data['bank_id'];
         $period = $data['period'];
+        $where_user = isset($data['user_id'])?' AND l.`user_id` = '. (int) $data['user_id']:'';
         $done_count = 0;
         $where_period = '';
         if (is_array($period)) {
@@ -236,15 +237,17 @@ class ClientsController extends Controller
             $usr_bnk_fnl = DB::select(DB::raw($sql));
             $a_banks_o = array_unique(array_column($usr_bnk_fnl, 'bank_id'));
             $a_banks = Bank::whereIn('id', $a_banks_o)->get();
+        $where_bank = '';
         } else {
             $a_banks =  Bank::where('id', $bank_id)->get();
             $sql = "SELECT COUNT(*) COUNT FROM `clients` WHERE `banksfunnels` LIKE '%\"" . $bank_id . ":%' AND `date_set` " . $where_period;
             $all_count = DB::select(DB::raw($sql));
             $sql = "SELECT `user_id`,`funnel_id`,`bank_id` FROM `logs`  WHERE `bank_id` = '" . $bank_id . "' AND `dateadd` " . $where_period;
             $usr_bnk_fnl = DB::select(DB::raw($sql));
+            $where_bank = " AND l.`bank_id` = " .(int) $bank_id;
         }
 
-        $sql = "SELECT c.`inn`,c.`organizationName`,c.`fullName`,c.`phoneNumber`,f.`name`, b.name, c.`registration`, l.`dateadd` datecall, u.`fio` operator,c.`region`,c.`address`  FROM `logs` l LEFT JOIN `clients` c ON (c.`id` = l.`client_id`) LEFT JOIN `funnels` f ON (f.`id` = l.`funnel_id`) LEFT JOIN `banks` b ON (b.id = l.`bank_id`) LEFT JOIN `users` u ON (u.`id` = l.`user_id`) WHERE l.`dateadd` " . $where_period;
+        $sql = "SELECT c.`inn`,c.`organizationName`,c.`fullName`,c.`phoneNumber`,f.`name`, b.name, c.`registration`, l.`dateadd` datecall, u.`fio` operator,c.`region`,c.`address`  FROM `logs` l LEFT JOIN `clients` c ON (c.`id` = l.`client_id`) LEFT JOIN `funnels` f ON (f.`id` = l.`funnel_id`) LEFT JOIN `banks` b ON (b.id = l.`bank_id`) LEFT JOIN `users` u ON (u.`id` = l.`user_id`) WHERE l.`dateadd` " . $where_period . $where_bank . $where_user;
         $report = DB::select(DB::raw($sql));
 
         $a_users_o = array_unique(array_column($usr_bnk_fnl, 'user_id'));

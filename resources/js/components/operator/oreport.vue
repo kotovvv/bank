@@ -16,7 +16,7 @@
           <v-col cols="2">
             <v-select
               v-model="selectedBank"
-              :items="banks"
+              :items="selectbanks"
               outlined
               dense
               chips
@@ -105,13 +105,16 @@
             >
           </v-col>
           <v-spacer></v-spacer>
-          <v-col v-if="td_body.length">
+          <v-col v-if="td_head">
+            <v-btn depressed @click="download_table_as_csv('reportall')"
+              >Скачать отчёт CSV</v-btn
+            >
             <download-csv
               delimiter=";"
-              :data="[td_head].concat(td_body)"
-              :name="period.join()+'.csv'"
+              :name="'fullreport-' + new Date().toLocaleDateString() + '.csv'"
+              :data="report"
             >
-              <v-btn depressed>Скачать отчёт CSV</v-btn>
+              <v-btn depressed class="my-1">Скачать полный отчёт CSV</v-btn>
             </download-csv>
           </v-col>
         </v-row>
@@ -119,7 +122,7 @@
     </v-row>
     <v-row>
       <v-col>
-        <v-simple-table>
+        <v-simple-table id="reportall" v-if="td_head">
           <template v-slot:default>
             <thead>
               <tr>
@@ -129,14 +132,44 @@
               </tr>
             </thead>
             <tbody>
-              <tr class="py-1" v-for="(tr, i) in td_body" :key="i">
-                <td
-                  v-for="(td, itd) in tr"
-                  :key="itd"
-                  :class="{ 'font-weight-bold': itd == 0 }"
-                >
-                  {{ td }}
-                </td>
+              <template v-for="b in banks">
+                <tr class="bank blue lighten-4" @click="toggleUser(b.id)">
+                  <td>{{ b.name }}</td>
+                  <td v-for="(f, fi) in funnels" :key="fi">
+                    {{ countb(b.id, f.id) }}
+                  </td>
+                </tr>
+                <template v-for="u in users">
+                  <tr
+                    :key="u.id + b.id"
+                    class="user"
+                    :class="'bank' + b.id"
+                    v-if="userInBank(u.id, b.id)"
+                  >
+                    <td class="text-right">{{ u.fio }}</td>
+                    <td v-for="(f, fi) in funnels" :key="fi">
+                      {{ countf(u.id, b.id, f.id) }}
+                    </td>
+                  </tr>
+                </template>
+              </template>
+              <tr class="grey lighten-3">
+                <td>ИТОГО:</td>
+                <template v-for="(f, fi) in funnels">
+                  <td :key="fi">
+                    {{ countall(f.id) }}
+                  </td>
+                </template>
+              </tr>
+              <tr>
+                <td v-for="(f, fi) in funnels.length - 1" :key="fi"></td>
+                <td>Назначено:</td>
+                <td>{{ all }}</td>
+              </tr>
+              <tr>
+                <td v-for="(f, fi) in funnels.length - 1" :key="fi"></td>
+                <td>Обработано:</td>
+                <td>{{ ubf.length }}</td>
               </tr>
             </tbody>
           </template>
@@ -148,6 +181,7 @@
 
 <script>
 import axios from "axios";
+import lodash from "lodash";
 import JsonCSV from "vue-json-csv";
 export default {
   data: () => ({
@@ -155,11 +189,16 @@ export default {
     dialog: false,
     modal: false,
     snackbar: false,
-    banks: [],
+    selectbanks: [],
     selectedBank: 0,
     message: "",
-    td_head: [],
-    td_body: [],
+    td_head: "",
+    users: [],
+    banks: ["", ""],
+    funnels: ["", ""],
+    ubf: ["", ""],
+    all: "",
+    report: [],
   }),
   mounted() {
     this.getBanks();
@@ -194,13 +233,62 @@ export default {
         .post("/api/getReportAll", send)
         .then((res) => {
           self.td_head = res.data.header;
-          self.td_body = res.data.td;
+          // self.td_body = res.data.td;
+          self.users = res.data.users;
+          self.funnels = res.data.funnels;
+          self.banks = res.data.banks;
+          self.ubf = res.data.ubf;
+          self.all = res.data.all;
+          self.report = res.data.report.map((i) => {
+            i.inn = "`" + i.inn;
+            i.phoneNumber = "`+" + i.phoneNumber;
+            return i;
+          });
         })
         .catch((error) => console.log(error));
     },
+        // Quick and simple export target #table_id into a csv
+    download_table_as_csv(table_id, separator = ";") {
+      // Select rows from table_id
+      var rows = document.querySelectorAll("#" + table_id + " table tr");
+      // Construct csv
+      var csv = [];
+      for (var i = 0; i < rows.length; i++) {
+        var row = [],
+          cols = rows[i].querySelectorAll("td, th");
+        for (var j = 0; j < cols.length; j++) {
+          // Clean innertext to remove multiple spaces and jumpline (break csv)
+          var data = cols[j].innerText
+            .replace(/(\r\n|\n|\r)/gm, "")
+            .replace(/(\s\s)/gm, " ");
+          // Escape double-quote with double-double-quote (see https://stackoverflow.com/questions/17808511/properly-escape-a-double-quote-in-csv)
+          data = data.replace(/"/g, '""');
+          // Push escaped string
+          row.push('"' + data + '"');
+        }
+        csv.push(row.join(separator));
+      }
+      var csv_string = csv.join("\n");
+
+      // Download it
+      var filename =
+        "export_" + table_id + "_" + new Date().toLocaleDateString() + ".csv";
+      var link = document.createElement("a");
+      link.style.display = "none";
+      link.setAttribute("target", "_blank");
+      link.setAttribute(
+        "href",
+        "data:text/csv;charset=utf-8,%EF%BB%BF" + encodeURIComponent(csv_string)
+      );
+
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
   },
   components: {
-    "download-csv": JsonCSV,
+    downloadCsv: JsonCSV,
   },
 };
 </script>
