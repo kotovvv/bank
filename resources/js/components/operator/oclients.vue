@@ -12,12 +12,11 @@
       transition="dialog-top-transition"
       v-model="dialog"
       persistent
-   max-width="800"
+      max-width="1200"
       hide-overlay
     >
-
       <template>
-        <v-card >
+        <v-card>
           <v-toolbar color="primary" dark
             ><v-icon large color="darken-2"> mdi-account-card-details </v-icon>
             <v-spacer></v-spacer>
@@ -140,6 +139,12 @@
                       ></v-text-field
                     ></v-col>
                     <v-col cols="4"
+                      ><v-text-field
+                        v-model="middle_name"
+                        label="Отчество"
+                      ></v-text-field
+                    ></v-col>
+                    <v-col cols="12"
                       ><v-text-field
                         v-model="company_name"
                         label="Наименование компании"
@@ -504,7 +509,8 @@ export default {
     company_name: "",
     last_name: "",
     first_name: "",
-    other:'',
+    middle_name:"",
+    other: "",
   }),
   mounted() {
     this.getBanks();
@@ -596,7 +602,7 @@ export default {
         company_name: this.company_name,
         last_name: this.last_name,
         first_name: this.first_name,
-        // middle_name:
+        middle_name: this.middle_name,
         // email:
         phone: "+" + this.selected.phoneNumber,
         // add_info:
@@ -609,9 +615,9 @@ export default {
       axios
         .post("/api/sendOrder", send)
         .then((res) => {
-          self.other = JSON.stringify(res.data)
-          if (res.data.errors) {
-            self.message = JSON.stringify(res.data.errors);
+          self.other = JSON.stringify(res.data);
+          if (res.data.data.errors) {
+            self.message = JSON.stringify(res.data.data.errors);
             self.snackbar = true;
           }
           if (res.data.successful == true) {
@@ -619,7 +625,7 @@ export default {
             self.snackbar = true;
             self.group_status = 5;
           }
-          console.log(res);
+          console.log(res.data);
         })
         .catch((error) => console.log(error));
       console.log(send);
@@ -755,11 +761,17 @@ export default {
     clickrow(i, row) {
       row.select(true);
       this.selected = row.item;
+      this.model_city = null;
+      this.model_region = null;
+      this.branch = null;
       this.dialog = true;
+      this.reqBtn = true;
+      this.step = 1;
       this.company_name = this.selected.organizationName;
       let a_name = this.selected.fullName.split(" ");
       this.last_name = a_name[0];
       this.first_name = a_name[1];
+      this.middle_name = a_name[2];
     },
     requestBank() {
       this.reqBtn = false;
@@ -777,7 +789,7 @@ export default {
           self.wait = false;
           self.reqBtn = true;
           self.group_status = 0;
-          self.other = JSON.stringify(res.data)
+          self.other = JSON.stringify(res.data);
           if (res.data.status == "forbidden") self.group_status = 1;
           if (res.data.status == "blocked") self.group_status = 2;
           if (res.status == 200 && res.data.status == "allowed") {
@@ -785,6 +797,11 @@ export default {
             self.answer_bank = res.data.status_translate;
             self.responseBank = res.data;
             self.step = 2;
+          }
+          if (res.data.errors) {
+            self.message = JSON.stringify(res.data.errors);
+
+            self.snackbar = true;
           }
         })
         .catch((error) => {
@@ -806,8 +823,8 @@ export default {
         .post("/api/updateStatus", send)
         .then((res) => {
           self.wait = false;
-          self.other = JSON.stringify(res.data)
-          self.answer_bank = ''
+          self.other = JSON.stringify(res.data);
+          self.answer_bank = "";
           // console.log(res);
         })
         .catch((error) => {

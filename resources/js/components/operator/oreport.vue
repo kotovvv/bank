@@ -204,17 +204,49 @@ export default {
     this.getBanks();
   },
   methods: {
+     countall(funnel_id) {
+      return lodash.filter(this.ubf, (i) => i.funnel_id == funnel_id).length;
+    },
+    toggleUser(bank_id) {
+      const bid = document.querySelectorAll(".bank" + bank_id);
+      for (let i = 0; i <= bid.length; i++) {
+        bid[i].classList.toggle("show");
+      }
+    },
+    userInBank(user_id, bank_id) {
+      return lodash.filter(
+        this.ubf,
+        (i) => i.user_id == user_id && i.bank_id == bank_id
+      ).length;
+    },
+    countb(bank_id, funnel_id) {
+      let hm = lodash.filter(
+        this.ubf,
+        (i) => i.funnel_id == funnel_id && i.bank_id == bank_id
+      ).length;
+      return hm > 0 ? hm : "";
+    },
+    countf(user_id, bank_id, funnel_id) {
+      let hm = lodash.filter(
+        this.ubf,
+        (i) =>
+          i.user_id == user_id &&
+          i.funnel_id == funnel_id &&
+          i.bank_id == bank_id
+      ).length;
+      return hm > 0 ? hm : "";
+    },
     getBanks() {
       let self = this;
       axios
         .get("/api/banks")
         .then((res) => {
-          self.banks = res.data.map(({ id, name, abbr }) => ({
+          self.selectbanks = res.data.map(({ id, name, abbr }) => ({
             id,
             name,
             abbr,
           }));
-          self.banks.unshift({ id: 0, name: "Все" });
+          self.selectbanks.unshift({ id: 0, name: "Все" });
         })
         .catch((error) => console.log(error));
     },

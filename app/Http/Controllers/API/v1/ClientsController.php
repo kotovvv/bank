@@ -233,7 +233,7 @@ class ClientsController extends Controller
         if ($bank_id == 0) {
             $sql = "SELECT COUNT(*) COUNT FROM `clients` WHERE `date_set` " . $where_period;
             $all_count = DB::select(DB::raw($sql));
-            $sql = "SELECT `user_id`,`funnel_id`,`bank_id` FROM `logs` WHERE `dateadd` " . $where_period;
+            $sql = "SELECT `user_id`,`funnel_id`,`bank_id` FROM `logs` l WHERE `dateadd` " . $where_period . $where_user;
             $usr_bnk_fnl = DB::select(DB::raw($sql));
             $a_banks_o = array_unique(array_column($usr_bnk_fnl, 'bank_id'));
             $a_banks = Bank::whereIn('id', $a_banks_o)->get();
@@ -242,7 +242,7 @@ class ClientsController extends Controller
             $a_banks =  Bank::where('id', $bank_id)->get();
             $sql = "SELECT COUNT(*) COUNT FROM `clients` WHERE `banksfunnels` LIKE '%\"" . $bank_id . ":%' AND `date_set` " . $where_period;
             $all_count = DB::select(DB::raw($sql));
-            $sql = "SELECT `user_id`,`funnel_id`,`bank_id` FROM `logs`  WHERE `bank_id` = '" . $bank_id . "' AND `dateadd` " . $where_period;
+            $sql = "SELECT `user_id`,`funnel_id`,`bank_id` FROM `logs` l WHERE `bank_id` = '" . $bank_id . "' AND `dateadd` " . $where_period . $where_user;
             $usr_bnk_fnl = DB::select(DB::raw($sql));
             $where_bank = " AND l.`bank_id` = " .(int) $bank_id;
         }

@@ -18,7 +18,7 @@
               v-model="modal"
               :return-value.sync="dateReg"
               persistent
-              width="290px"
+              width="330px"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
@@ -66,7 +66,7 @@
               v-model="modal2"
               :return-value.sync="dateAdd"
               persistent
-              width="290px"
+              width="330px"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
