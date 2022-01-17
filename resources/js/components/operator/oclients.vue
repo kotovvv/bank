@@ -82,24 +82,23 @@
                   <div class="my-5">
                     <v-btn
                       depressed
-                      color="pink accent-1"
+                      color="red accent-1"
                       @click="
                         group_status = 4;
-
                         updateStatus('disagree');
                       "
-                      >Клиент не согласен на продукт</v-btn
+                      >Некоректный номер</v-btn
                     >
                   </div>
                   <div class="my-5">
                     <v-btn
                       depressed
-                      color="orange darken-4"
+                      color="yellow darken-4"
                       @click="
-                        step = 3;
-                        updateStatus('call_back');
+                        step = 1;
+                        recall()
                       "
-                      >Клиент просил перезвонить</v-btn
+                      >Перезвонить</v-btn
                     >
                   </div>
                 </div>
@@ -291,7 +290,7 @@
                         <v-radio label="Смарт-терминал" :value="42"></v-radio>
                       </v-radio-group>
                     </v-col>
-                    <v-col cols="4">
+                    <!-- <v-col cols="4">
                       <v-btn text @click="ss = 0">
                         <v-icon> mdi-close </v-icon>
                         <h3>Сервисы</h3>
@@ -300,7 +299,7 @@
                       <v-radio-group v-model="ss">
                         <v-radio label="Сберздоровье" :value="46"></v-radio>
                       </v-radio-group>
-                    </v-col>
+                    </v-col> -->
                   </v-row>
                   <v-btn
                     depressed
@@ -584,6 +583,9 @@ export default {
   },
   computed: {},
   methods: {
+    recall(){
+
+    },
     sendOrder() {
       const self = this;
       let send = {};
