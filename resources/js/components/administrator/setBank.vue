@@ -251,7 +251,11 @@
     </v-row>
     <template>
       <v-row>
-        <v-spacer></v-spacer>
+        <v-progress-linear
+          :active="loading"
+          :indeterminate="loading"
+          color="deep-purple accent-4"
+        ></v-progress-linear>
         <v-col cols="12" v-if="filterClients.length">
           <v-card>
             <!-- :search="search" -->
@@ -299,6 +303,7 @@ import axios from "axios";
 
 export default {
   data: () => ({
+    loading:false,
     checkBanks: false,
     dialog: false,
     selected: [],
@@ -385,6 +390,7 @@ export default {
       let send = {};
       send.bank_id = bank_id;
       send.checkBanks = self.checkBanks
+      self.loading = true
       if (this.selected.length > 0) {
         send.clients = this.selected.map((i) => i.id);
       } else {
@@ -394,7 +400,7 @@ export default {
         .post("/api/setBankForClients", send)
         .then((res) => {
           self.getClientsWithoutBanks();
-
+self.loading = false
           self.selected = [];
           self.selectedBanks = 0;
           self.hmrow = "";
