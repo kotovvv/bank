@@ -11,6 +11,7 @@ use App\Models\Funnel;
 use App\Models\User;
 use DB;
 use Debugbar;
+use App\Http\Controllers\API\v1\BanksController;
 
 
 class ClientsController extends Controller
@@ -113,7 +114,22 @@ class ClientsController extends Controller
             }
             Log::insert($a_log);
         }
-        $bankfunnels = Client::setBankFunnels($data['clients'], $data['bank_id'], $data['funnel']);
+        if(isset($data['checkBanks']) && $data['checkBanks']){
+            $clients = Client::select('inn','phoneNumber')->whereIn('id',$data['clients'])->get();
+            foreach ($clients as $cl) {
+                $Banks = new BanksController();
+                $request = new Request([
+                    'bank_id'=>$data['bank_id'],
+                    'data' =>json_encode(['phone' => "+" . $cl->phoneNumber, 'inn' => $cl->inn]),
+                    'action' => "call_requests",
+                ]);
+                $res = $Banks->canTel($request);
+                DebugBar::info($res);
+                return response($res);
+            }
+        }else{
+            $bankfunnels = Client::setBankFunnels($data['clients'], $data['bank_id'], $data['funnel']);
+        }
         // Debugbar::info($bankfunnels);
         return response($bankfunnels);
     }

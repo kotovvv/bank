@@ -49,10 +49,11 @@
       </template>
     </v-dialog>
     <v-row>
-      <v-col cols="10">
-        <v-row id="filter">
+      <v-col cols="8">
+          <div id="filter">
+        <v-row>
           <!-- registration -->
-          <v-col cols="2">
+          <v-col cols="4">
             <v-dialog
               ref="dialog"
               v-model="modal"
@@ -100,7 +101,7 @@
           </v-col>
 
           <!-- download -->
-          <v-col cols="2">
+          <v-col cols="4">
             <v-dialog
               ref="dialog2"
               v-model="modal2"
@@ -152,21 +153,22 @@
           </v-col>
 
           <!-- firm -->
-          <v-col cols="2">
+          <v-col cols="4">
             <v-text-field
               label="Наименование:"
               id="firm"
               v-model="firm"
             ></v-text-field>
           </v-col>
-
+</v-row>
+<v-row class="align-center">
           <!-- fio -->
-          <v-col cols="2">
+          <v-col cols="3">
             <v-text-field label="ФИО:" id="fio" v-model="fio"></v-text-field>
           </v-col>
 
           <!-- inn -->
-          <v-col cols="1">
+          <v-col cols="2">
             <v-text-field
               label="ИНН"
               id="inn"
@@ -175,7 +177,7 @@
           </v-col>
 
           <!-- address -->
-          <v-col cols="1">
+          <v-col cols="2">
             <v-text-field
               label="Адрес"
               id="address"
@@ -184,7 +186,7 @@
           </v-col>
 
           <!-- reg -->
-          <v-col cols="1">
+          <v-col cols="2">
             <v-text-field
               label="Регион"
               id="region"
@@ -192,20 +194,22 @@
             ></v-text-field>
           </v-col>
           <!-- btn -->
-          <v-col cols="1">
+          <v-col>
             <v-btn
               color="primary"
               elevation="2"
               outlined
               raised
               @click="getClients"
-              ><v-icon> mdi-table-large </v-icon></v-btn
+              >Получить <v-icon> mdi-table-large </v-icon></v-btn
             >
           </v-col>
         </v-row>
+        </div>
       </v-col>
-      <v-col cols="2">
-
+      <v-col cols="4">
+              <v-row>
+          <div class="d-flex align-center">
         <v-autocomplete
           v-model="selectedBanks"
           :items="banks"
@@ -217,11 +221,19 @@
           item-value="id"
           label="Назначить банк"
           @change="dialog = true"
-          hide-details=true
+          hide-details="true"
         ></v-autocomplete>
-        <!-- multiple -->
-         <v-autocomplete
- outlined
+        <v-checkbox
+          color="red"
+          v-model="checkBanks"
+          label="С проверкой"
+        ></v-checkbox>
+        </div>
+        </v-row>
+        <v-row>
+        <!-- hide bank -->
+        <v-autocomplete
+          outlined
           dense
           chips
           small-chips
@@ -232,9 +244,9 @@
           :menu-props="{ maxHeight: '400' }"
           label="Спрятать банк"
           multiple
-          hide-details=true
+          hide-details="true"
         ></v-autocomplete>
-
+        </v-row>
       </v-col>
     </v-row>
     <template>
@@ -253,9 +265,7 @@
               :items="filterClients"
               ref="datatable"
             >
-              <template
-              v-slot:top="{  }"
-              >
+              <template v-slot:top="{}">
                 <v-row>
                   <v-col cols="6">
                     <v-row class="justify-start align-end mb-5">
@@ -289,6 +299,7 @@ import axios from "axios";
 
 export default {
   data: () => ({
+    checkBanks: false,
     dialog: false,
     selected: [],
     userid: null,
@@ -373,6 +384,7 @@ export default {
       let self = this;
       let send = {};
       send.bank_id = bank_id;
+      send.checkBanks = self.checkBanks
       if (this.selected.length > 0) {
         send.clients = this.selected.map((i) => i.id);
       } else {
@@ -385,7 +397,7 @@ export default {
 
           self.selected = [];
           self.selectedBanks = 0;
-          self.hmrow =''
+          self.hmrow = "";
 
           self.message =
             "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
@@ -457,4 +469,3 @@ export default {
   width: 100px;
 }
 </style>
-

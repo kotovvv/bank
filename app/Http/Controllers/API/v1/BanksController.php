@@ -96,6 +96,7 @@ class BanksController extends Controller
 
         $data = $request->All();
         $send = ['data' => $data['data']];
+
         if (isset($data['bank_id'])) {
             $bank = Bank::where('id', $data['bank_id'])->first();
             $action = $a_bank_actions[$data['action']];
@@ -108,7 +109,6 @@ class BanksController extends Controller
                 $send
             );
         }
-
         return response($response);
     }
 
@@ -734,7 +734,7 @@ class BanksController extends Controller
         $bank_id = $data['bank_id'];
         $region_id = $data['region_id'];
         $query = '';
-        if (isset($data['query'])) $query = '&query=' . urlencode($data['query'] );
+        if (isset($data['query'])) $query = '&query=' . urlencode($data['query']);
         // api/v1/sber_mq/city?with_merchant_branches=1&region_id={region_id}
         $a_bank_actions = [
             'getCities' => '/api/v1/sber_mq/city?region_id=' . $region_id . $query,
@@ -811,8 +811,7 @@ class BanksController extends Controller
             );
         }
 
-        return response(['data'=>$response->object(),'successful'=>$response->successful(),'status'=>$response->status() ]);
-
+        return response(['data' => $response->object(), 'successful' => $response->successful(), 'status' => $response->status()]);
     }
 
 
