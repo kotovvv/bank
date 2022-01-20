@@ -95,8 +95,7 @@
                       depressed
                       color="yellow darken-4"
                       @click="
-                        step = 1;
-                        recall()
+                        step = 5;
                       "
                       >Перезвонить</v-btn
                     >
@@ -316,6 +315,49 @@
                     >Отправить заявку</v-btn
                   >
                 </v-container>
+                <!--  step 5  recall -->
+                <v-container v-show="step == 5">
+                        <v-dialog
+        ref="recalldialog"
+        v-model="midalTime"
+        :return-value.sync="recallTime"
+        persistent
+        width="290px"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-text-field
+            v-model="recallTime"
+            label="Время звонка"
+            prepend-icon="mdi-clock-time-four-outline"
+            readonly
+            v-bind="attrs"
+            v-on="on"
+          ></v-text-field>
+        </template>
+        <v-time-picker
+          v-if="midalTime"
+          v-model="recallTime"
+          full-width
+          format="24hr"
+        >
+          <v-spacer></v-spacer>
+          <v-btn
+            text
+            color="primary"
+            @click="midalTime = false"
+          >
+            Отмена
+          </v-btn>
+          <v-btn
+            text
+            color="primary"
+            @click="$refs.recalldialog.save(recallTime);recall()"
+          >
+            Записать
+          </v-btn>
+        </v-time-picker>
+      </v-dialog>
+                </v-container>
               </v-col>
             </v-row>
           </v-card-text>
@@ -386,6 +428,14 @@
                 'items-per-page-text': 'Показать',
               }"
             >
+            <template v-slot:item.recall="{ item }">
+      <v-chip
+        color="[red=>item.recall || white]"
+        dark
+      >
+        {{ item.recall }}
+      </v-chip>
+    </template>
               <template
                 v-slot:top="{ pagination, options, updateOptions }"
                 :footer-props="{
@@ -461,6 +511,9 @@ import axios from "axios";
 import _ from "lodash";
 export default {
   data: () => ({
+    recalldialog:false,
+    recallTime:null,
+    midalTime:false,
     dialogf: false,
     all: "",
     done: "",
@@ -473,6 +526,7 @@ export default {
       { text: "Адрес", value: "address" },
       { text: "Регион", value: "region" },
       { text: "Регистрация", value: "registration" },
+      { text: "Перезвонить", value: "recall" },
     ],
     filterClients: [],
     clients: [],
@@ -508,7 +562,7 @@ export default {
     company_name: "",
     last_name: "",
     first_name: "",
-    middle_name:"",
+    middle_name: "",
     other: "",
   }),
   mounted() {
@@ -583,7 +637,32 @@ export default {
   },
   computed: {},
   methods: {
-    recall(){
+    recall() {
+let self = this
+      let send = {};
+      send.bank_id = self.selectedBank;
+      send.user_id = self.$attrs.user.id;
+      send.recall = self.recallTime
+      send.client_id = self.selected.id
+      axios
+        .post("/api/recall", send)
+        .then((res) => {
+          self.wait = false;
+          self.other = JSON.stringify(res.data);
+          self.answer_bank = "";
+          self.dialog = false
+          self.group_status = 0
+          self.step = 0
+          console.log(res.data);
+          self.message = res.data;
+          self.snackbar = true;
+          self.recallTime = null
+        })
+        .catch((error) => {
+          self.wait = false;
+          self.answer_bank = "";
+          console.error(error.message);
+        });
 
     },
     sendOrder() {
@@ -769,6 +848,8 @@ export default {
       this.dialog = true;
       this.reqBtn = true;
       this.step = 1;
+      this.group_status = 0
+      this.message = ''
       this.company_name = this.selected.organizationName;
       let a_name = this.selected.fullName.split(" ");
       this.last_name = a_name[0];
@@ -792,18 +873,27 @@ export default {
           self.reqBtn = true;
           self.group_status = 0;
           self.other = JSON.stringify(res.data);
-          if (res.data.status == "forbidden") self.group_status = 1;
-          if (res.data.status == "blocked") self.group_status = 2;
+          self.reqBtn = false;
+          if (res.data.status == "forbidden") {
+            self.group_status = 1;
+          }
+          if (res.data.status == "blocked") {
+            self.group_status = 2;
+          }
           if (res.status == 200 && res.data.status == "allowed") {
-            self.reqBtn = false;
             self.answer_bank = res.data.status_translate;
             self.responseBank = res.data;
             self.step = 2;
           }
           if (res.data.errors) {
             self.message = JSON.stringify(res.data.errors);
-
+            self.reqBtn = true;
             self.snackbar = true;
+            if(res.data.errors[0]['call_request'] == 'already_exists'){
+                self.responseBank = res.data;
+                self.reqBtn = false;
+                self.step = 2;
+            }
           }
         })
         .catch((error) => {

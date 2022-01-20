@@ -114,6 +114,7 @@ class ClientsController extends Controller
             }
             Log::insert($a_log);
         }
+        // Check clinets in bank
         if(isset($data['checkBanks']) && $data['checkBanks']){
             $i = 0;
             $clients = Client::select('id','inn','phoneNumber')->whereIn('id',$data['clients'])->get();
@@ -292,7 +293,19 @@ class ClientsController extends Controller
         return response($json);
     }
 
-
+    public function recall(Request $request)
+    {
+        $data = $request->All();
+        $bank_id = $data['bank_id'];
+        $user_id = $data['user_id'];
+        $recall = $data['recall'];
+        $client_id = $data['client_id'];
+        $a_log = [];
+            $a_log = ['client_id' =>$client_id, 'user_id' => $user_id, 'bank_id' => $bank_id,  'other' => $recall, 'dateadd' => Now(), 'timeadd' => Now()];
+        Log::insert($a_log);
+        Client::where('id', $client_id)->update(['recall' => $recall]);
+        return response("Время перезвона добавлено клиенту",200);
+    }
     /**
      * Remove the specified resource from storage.
      *
