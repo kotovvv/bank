@@ -820,7 +820,7 @@ export default {
         .get("/api/getUserClients/" + id + "/" + bank_id + "/" + funnel_id)
         .then((res) => {
           self.clients = Object.entries(res.data).map((e) => e[1]);
-
+self.clients = _.sortBy(self.clients,'recall','desc')
           self.changeFilter();
           self.howmanybank();
           self.all = self.clients.length;
