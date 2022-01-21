@@ -52,8 +52,15 @@
                   v-if="reqBtn"
                   >Запрос на звонок</v-btn
                 >
-
-                <div
+                <v-alert
+                  id="answer_bank"
+                  v-if="answer_bank"
+                  border="left"
+                  type="success"
+                  max-width="220px"
+                  >{{ answer_bank }}</v-alert
+                >
+                <!-- <div
                   id="answer_bank"
                   v-if="answer_bank"
                   class="pa-1"
@@ -63,7 +70,7 @@
                   }"
                 >
                   {{ answer_bank }}
-                </div>
+                </div> -->
 
                 <!-- answer client -->
                 <div class="mt-5" v-show="step == 2">
@@ -423,14 +430,12 @@
               }"
             >
               <template v-slot:item.recall="{ item }">
-                <!-- <v-chip
-        color="red"
-        dark
-      > -->
-                <div style="background: red" v-if="item.recall">
+                <div
+                  style="background: #ffcdd2; text-align: center"
+                  v-if="item.recall"
+                >
                   {{ item.recall }}
                 </div>
-                <!-- </v-chip> -->
               </template>
               <template
                 v-slot:top="{ pagination, options, updateOptions }"
@@ -820,7 +825,7 @@ export default {
         .get("/api/getUserClients/" + id + "/" + bank_id + "/" + funnel_id)
         .then((res) => {
           self.clients = Object.entries(res.data).map((e) => e[1]);
-self.clients = _.sortBy(self.clients,'recall','desc')
+          self.clients = _.sortBy(self.clients, "recall", "desc");
           self.changeFilter();
           self.howmanybank();
           self.all = self.clients.length;
@@ -847,6 +852,7 @@ self.clients = _.sortBy(self.clients,'recall','desc')
       this.step = 1;
       this.group_status = 0;
       this.message = "";
+      answer_bank = "";
       this.company_name = this.selected.organizationName;
       let a_name = this.selected.fullName.split(" ");
       this.last_name = a_name[0];
@@ -873,9 +879,11 @@ self.clients = _.sortBy(self.clients,'recall','desc')
           self.reqBtn = false;
           if (res.data.status == "forbidden") {
             self.group_status = 1;
+            self.answer_bank = "Запрет";
           }
           if (res.data.status == "blocked") {
             self.group_status = 2;
+            self.answer_bank = "Запрет";
           }
           if (res.status == 200 && res.data.status == "allowed") {
             self.answer_bank = res.data.status_translate;
@@ -907,7 +915,7 @@ self.clients = _.sortBy(self.clients,'recall','desc')
 
       send.data = { call_status: status };
       if (status == "call_back") {
-        let call_back
+        let call_back;
         let d = new Date();
         let nowtime = d.getHours + ":" + d.getMinutes;
         if (nowtime < self.recallTime) {
@@ -916,22 +924,24 @@ self.clients = _.sortBy(self.clients,'recall','desc')
           tomorrow.setDate(tomorrow.getDate() + 1);
           call_back = new Date(
             tomorrow.getFullYear() +
-            "-" +
-            (tomorrow.getMonth() + 1) +
-            "-" +
-            tomorrow.getDate() +
-            " " +
-            self.recallTime);
+              "-" +
+              (tomorrow.getMonth() + 1) +
+              "-" +
+              tomorrow.getDate() +
+              " " +
+              self.recallTime
+          );
         } else {
           // today
           call_back = new Date(
             d.getFullYear() +
-            "-" +
-            (d.getMonth() + 1) +
-            "-" +
-            d.getDate() +
-            " " +
-            self.recallTime);
+              "-" +
+              (d.getMonth() + 1) +
+              "-" +
+              d.getDate() +
+              " " +
+              self.recallTime
+          );
         }
         send.data = { call_status: status, call_back_at: call_back };
       }
