@@ -1,5 +1,17 @@
 <template>
   <div>
+    <div id="recallmenu" v-if="recallist">
+      <v-data-table
+        item-key="inn"
+        @click:row="clickrow"
+        :items="recallist"
+        :headers="recallheaders"
+        :hide-default-footer=true
+        :hide-default-header=true
+      >
+      </v-data-table>
+    </div>
+
     <v-snackbar v-model="snackbar" top right>
       <v-card-text v-html="message"></v-card-text>
       <template v-slot:action="{ attrs }">
@@ -52,15 +64,8 @@
                   v-if="reqBtn"
                   >Запрос на звонок</v-btn
                 >
-                <v-alert
-                  id="answer_bank"
-                  v-if="answer_bank"
-                  border="left"
-                  type="success"
-                  max-width="220px"
-                  >{{ answer_bank }}</v-alert
-                >
-                <!-- <div
+
+                <div
                   id="answer_bank"
                   v-if="answer_bank"
                   class="pa-1"
@@ -70,7 +75,7 @@
                   }"
                 >
                   {{ answer_bank }}
-                </div> -->
+                </div>
 
                 <!-- answer client -->
                 <div class="mt-5" v-show="step == 2">
@@ -419,7 +424,7 @@
             <v-data-table
               :headers="import_headers"
               :single-select="true"
-              item-key="id"
+              item-key="inn"
               show-select
               @click:row="clickrow"
               :items="filterClients"
@@ -429,13 +434,18 @@
                 'items-per-page-text': 'Показать',
               }"
             >
-              <template v-slot:item.recall="{ item }">
+              <template v-slot:item.recalltime="{ item }">
+                <!-- <v-chip
+        color="red"
+        dark
+      > -->
                 <div
                   style="background: #ffcdd2; text-align: center"
-                  v-if="item.recall"
+                  v-if="item.recalltime"
                 >
-                  {{ item.recall }}
+                  {{ item.recalltime }}
                 </div>
+                <!-- </v-chip> -->
               </template>
               <template
                 v-slot:top="{ pagination, options, updateOptions }"
@@ -512,15 +522,17 @@ import axios from "axios";
 import _ from "lodash";
 export default {
   data: () => ({
+    recallist: [],
     recalldialog: false,
     recallTime: null,
+    recallheaders: [{ text: "", value: "recalltime" }],
     midalTime: false,
     dialogf: false,
     all: "",
     done: "",
     import_headers: [
       // { text: "", value: "id" },
-      { text: "", value: "recall" },
+      { text: "", value: "recalltime" },
       { text: "ИНН", value: "inn" },
       { text: "ФИО", value: "fullName" },
       { text: "Тел", value: "phoneNumber" },
@@ -643,7 +655,7 @@ export default {
       let send = {};
       send.bank_id = self.selectedBank;
       send.user_id = self.$attrs.user.id;
-      send.recall = self.recallTime;
+      send.recall = self.callbacktime();
       send.client_id = self.selected.id;
       axios
         .post("/api/recall", send)
@@ -820,12 +832,27 @@ export default {
       const id = self.$attrs.user.id;
       let bank_id = 0;
       let funnel_id = 0;
+      self.recallist =[]
       // if (self.selectedBank) bank_id = self.selectedBank;
       axios
         .get("/api/getUserClients/" + id + "/" + bank_id + "/" + funnel_id)
         .then((res) => {
           self.clients = Object.entries(res.data).map((e) => e[1]);
-          self.clients = _.sortBy(self.clients, "recall", "desc");
+          self.clients = self.clients.map(function (i) {
+            if (i.recall){
+            let today = (new Date()).getDate()
+            let d = new Date(i.recall)
+            let recalltime = d.getHours()+':'+(d.getMinutes()<10?'0':'') + d.getMinutes()
+            i.recalltime = i.recall ? recalltime : ""; 
+            if (today == d.getDate()){
+              self.recallist.push(i);
+            }
+            } 
+            return i;
+          });
+          if(self.recallist.length){
+            self.recallist = _.orderBy(self.recallist,'recall')
+          }
           self.changeFilter();
           self.howmanybank();
           self.all = self.clients.length;
@@ -852,7 +879,6 @@ export default {
       this.step = 1;
       this.group_status = 0;
       this.message = "";
-      answer_bank = "";
       this.company_name = this.selected.organizationName;
       let a_name = this.selected.fullName.split(" ");
       this.last_name = a_name[0];
@@ -879,11 +905,9 @@ export default {
           self.reqBtn = false;
           if (res.data.status == "forbidden") {
             self.group_status = 1;
-            self.answer_bank = "Запрет";
           }
           if (res.data.status == "blocked") {
             self.group_status = 2;
-            self.answer_bank = "Запрет";
           }
           if (res.status == 200 && res.data.status == "allowed") {
             self.answer_bank = res.data.status_translate;
@@ -915,34 +939,7 @@ export default {
 
       send.data = { call_status: status };
       if (status == "call_back") {
-        let call_back;
-        let d = new Date();
-        let nowtime = d.getHours + ":" + d.getMinutes;
-        if (nowtime < self.recallTime) {
-          // tomorow
-          const tomorrow = new Date(d);
-          tomorrow.setDate(tomorrow.getDate() + 1);
-          call_back = new Date(
-            tomorrow.getFullYear() +
-              "-" +
-              (tomorrow.getMonth() + 1) +
-              "-" +
-              tomorrow.getDate() +
-              " " +
-              self.recallTime
-          );
-        } else {
-          // today
-          call_back = new Date(
-            d.getFullYear() +
-              "-" +
-              (d.getMonth() + 1) +
-              "-" +
-              d.getDate() +
-              " " +
-              self.recallTime
-          );
-        }
+        const call_back = self.callbacktime();
         send.data = { call_status: status, call_back_at: call_back };
       }
       send.bank_id = this.selectedBank;
@@ -962,10 +959,57 @@ export default {
           console.error(error.message);
         });
     },
+    callbacktime() {
+      let self = this;
+      let call_back = null;
+      let d = new Date();
+      let nowtime = d.getHours() + ":" + d.getMinutes();
+      if (nowtime > self.recallTime) {
+        // tomorow
+        const tomorrow = new Date(d);
+
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        call_back = new Date(
+          tomorrow.getFullYear() +
+            "-" +
+            (tomorrow.getMonth() + 1) +
+            "-" +
+            tomorrow.getDate() +
+            " " +
+            self.recallTime
+        );
+      } else {
+        // today
+        call_back = new Date(
+          d.getFullYear() +
+            "-" +
+            (d.getMonth() + 1) +
+            "-" +
+            d.getDate() +
+            " " +
+            self.recallTime
+        );
+      }
+      return call_back;
+    },
   },
+
   components: {},
 };
 </script>
 
 <style>
+#recallmenu {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  z-index: 3;
+  overflow: hidden;
+  max-height: 220px;
+  box-shadow: 0 0 8px;
+  color: red;
+}
+#recallmenu:hover {
+  overflow-y: auto;
+}
 </style>
