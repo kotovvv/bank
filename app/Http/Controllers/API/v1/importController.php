@@ -62,6 +62,7 @@ class ImportController extends Controller
             if (strlen($client_val['phoneNumber']) != 11) continue;
             $client_val['phoneNumber'] =  preg_replace('/^8/', '7',$client_val['phoneNumber'], 1 );
             $client_val = array_merge($client_val, ['date_added' => date("Y-m-d H:i:s")]);
+            $client_val['registration'] = date( 'Y-m-d', strtotime( $client_val['registration'] ) );
             DB::table('clients')->insert($client_val);
             $inserted++;
         }
