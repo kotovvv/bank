@@ -64,6 +64,7 @@
                   v-bind="attrs"
                   v-on="on"
                   id="period"
+                  dense=true
                 ></v-text-field>
               </template>
               <v-date-picker

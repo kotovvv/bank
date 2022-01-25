@@ -48,7 +48,7 @@
         </v-card>
       </template>
     </v-dialog>
-        <v-dialog
+    <v-dialog
       transition="dialog-top-transition"
       max-width="600"
       v-model="dialogDelClients"
@@ -74,13 +74,7 @@
               >Да</v-btn
             >
             <v-spacer></v-spacer>
-            <v-btn
-              text
-              @click="
-                dialogDelClients = false;
-              "
-              >Нет</v-btn
-            >
+            <v-btn text @click="dialogDelClients = false">Нет</v-btn>
           </v-card-actions>
         </v-card>
       </template>
@@ -108,6 +102,7 @@
                     v-on="on"
                     id="datereg"
                     hide-details="true"
+                    dense="true"
                   ></v-text-field>
                 </template>
                 <v-date-picker
@@ -161,6 +156,7 @@
                     v-on="on"
                     id="dateadd"
                     hide-details="true"
+                    dense="true"
                   ></v-text-field>
                 </template>
                 <v-date-picker
@@ -202,13 +198,20 @@
                 id="firm"
                 v-model="firm"
                 hide-details="true"
+                dense="true"
               ></v-text-field>
             </v-col>
           </v-row>
           <v-row class="align-center">
             <!-- fio -->
             <v-col cols="3">
-              <v-text-field label="ФИО:" id="fio" v-model="fio" hide-details="true"></v-text-field>
+              <v-text-field
+                label="ФИО:"
+                id="fio"
+                v-model="fio"
+                hide-details="true"
+                dense="true"
+              ></v-text-field>
             </v-col>
 
             <!-- inn -->
@@ -218,6 +221,7 @@
                 id="inn"
                 v-model.number="inn"
                 hide-details="true"
+                dense="true"
               ></v-text-field>
             </v-col>
 
@@ -228,6 +232,7 @@
                 id="address"
                 v-model="address"
                 hide-details="true"
+                dense="true"
               ></v-text-field>
             </v-col>
 
@@ -238,6 +243,7 @@
                 id="region"
                 v-model="region"
                 hide-details="true"
+                dense="true"
               ></v-text-field>
             </v-col>
             <!-- btn -->
@@ -255,33 +261,28 @@
         </div>
       </v-col>
       <v-col cols="4">
+        <div class="btn4">
+          <v-autocomplete
+            v-model="selectedBanks"
+            :items="banks"
+            outlined
+            dense
+            chips
+            small-chips
+            item-text="name"
+            item-value="id"
+            label="Назначить банк"
+            @change="dialog = true"
+            hide-details="true"
+          ></v-autocomplete>
 
-          <div class="btn4">
-
-            
-            <v-autocomplete
-              v-model="selectedBanks"
-              :items="banks"
-              outlined
-              dense
-              chips
-              small-chips
-              item-text="name"
-              item-value="id"
-              label="Назначить банк"
-              @change="dialog = true"
-              hide-details="true"
-            ></v-autocomplete>
-
-            <v-checkbox
-              class="mt-2"
-              color="red"
-              v-model="checkBanks"
-              label="С проверкой"
-              hide-details="true"
-            ></v-checkbox>
-
-         
+          <v-checkbox
+            class="mt-2"
+            color="red"
+            v-model="checkBanks"
+            label="С проверкой"
+            hide-details="true"
+          ></v-checkbox>
 
           <!-- hide bank -->
 
@@ -300,10 +301,16 @@
             hide-details="true"
           ></v-autocomplete>
 
-          <v-btn :disabled="!selected.length" outlined raised @click="dialogDelClients=true"
-            >Удалить из базы</v-btn
-          >
-  </div>
+          <v-btn
+            :disabled="!selected.length"
+            outlined
+            raised
+            @click="dialogDelClients = true"
+            height="40"
+            >
+            Удалить из базы
+            </v-btn>
+        </div>
       </v-col>
     </v-row>
     <template>
@@ -328,7 +335,7 @@
             >
               <template v-slot:top="{}">
                 <v-row>
-                  <v-col cols="6">
+                  <v-col cols="12">
                     <v-row class="justify-start align-end mb-5">
                       <span class="ml-10">Отобрать</span>
                       <span class="mx-4 hmrows">
@@ -360,7 +367,7 @@ import axios from "axios";
 
 export default {
   data: () => ({
-    dialogDelClients:false,
+    dialogDelClients: false,
     loading: false,
     checkBanks: false,
     dialog: false,
@@ -428,14 +435,16 @@ export default {
       if (this.selected.length) {
         let self = this;
         let send = {};
-        send.client_ids = this.selected.map(function(i){return i.id});
+        send.client_ids = this.selected.map(function (i) {
+          return i.id;
+        });
         axios
           .post("/api/delClients", send)
           .then((res) => {
             self.selected = [];
             self.message = "Удалены выбранные строки: " + res.data;
             self.snackbar = true;
-            self.this.getClientsWithoutBanks()
+            self.this.getClientsWithoutBanks();
           })
           .catch((error) => console.log(error));
       }
@@ -552,5 +561,10 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 15px;
+}
+@media (max-width: 1024px){
+  .btn4 {
+  grid-template-columns: 1fr;
+}
 }
 </style>

@@ -139,7 +139,7 @@ export default {
       var lines = csv.split("\n");
       var result = [];
       var headers = lines[0].split(";");
-      headers = [ "inn", "fullName", "phoneNumber", "organizationName", "address", "region", "registration"];
+      // headers = [ "inn", "fullName", "phoneNumber", "organizationName", "address", "region", "registration"];
       // vm.parse_header = lines[0].split(",");
       // lines[0].split(",").forEach(function (key) {
       //   vm.sortOrders[key] = 1;
