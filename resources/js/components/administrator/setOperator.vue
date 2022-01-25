@@ -130,7 +130,7 @@
                 getClients;
                 this.firstRequest = false;
               "
-              ><v-icon> mdi-table-large </v-icon></v-btn
+              >Фильтр <v-icon> mdi-table-large </v-icon></v-btn
             >
           </v-col>
           <v-spacer></v-spacer>

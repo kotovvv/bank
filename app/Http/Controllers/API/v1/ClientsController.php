@@ -81,6 +81,14 @@ class ClientsController extends Controller
     {
     }
 
+    public function delClients(Request $request)
+    {
+        $data = $request->All();
+        Client::destroy($data['client_ids']);
+        return count($data['client_ids']);
+    }
+
+
     public function delBankFromClients(Request $request)
     {
         $data = $request->All();
