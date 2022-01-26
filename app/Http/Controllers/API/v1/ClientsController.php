@@ -136,13 +136,14 @@ class ClientsController extends Controller
                 ]);
                 $res = $Banks->canTel($request);
                 $res = json_decode($res->content(),true);
+                Debugbar::info($res);
                 if(isset($res['status']) && ($res['status'] == 'forbidden' || $res['status'] == 'blocked')){
                     Client::setBankFunnels([$cl['id']], $data['bank_id'], 2);
                 }else{
                     Client::setBankFunnels([$cl['id']], $data['bank_id'], 0);
                     $i++;
                 }
-                usleep(50);
+                usleep(200);
             }
             return ['all' => $all, 'done' => $i];
         }else{

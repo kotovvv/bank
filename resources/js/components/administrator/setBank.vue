@@ -101,8 +101,8 @@
                     v-bind="attrs"
                     v-on="on"
                     id="datereg"
-                    hide-details="true"
-                    dense="true"
+                    hide-details=true
+                    :dense=true
                   ></v-text-field>
                 </template>
                 <v-date-picker
@@ -155,8 +155,8 @@
                     v-bind="attrs"
                     v-on="on"
                     id="dateadd"
-                    hide-details="true"
-                    dense="true"
+                    hide-details=true
+                    :dense=true
                   ></v-text-field>
                 </template>
                 <v-date-picker
@@ -197,8 +197,8 @@
                 label="Наименование:"
                 id="firm"
                 v-model="firm"
-                hide-details="true"
-                dense="true"
+                hide-details=true
+                :dense=true
               ></v-text-field>
             </v-col>
           </v-row>
@@ -209,8 +209,8 @@
                 label="ФИО:"
                 id="fio"
                 v-model="fio"
-                hide-details="true"
-                dense="true"
+                hide-details=true
+                :dense=true
               ></v-text-field>
             </v-col>
 
@@ -220,8 +220,8 @@
                 label="ИНН"
                 id="inn"
                 v-model.number="inn"
-                hide-details="true"
-                dense="true"
+                hide-details=true
+                :dense=true
               ></v-text-field>
             </v-col>
 
@@ -231,8 +231,8 @@
                 label="Адрес"
                 id="address"
                 v-model="address"
-                hide-details="true"
-                dense="true"
+                hide-details=true
+                :dense=true
               ></v-text-field>
             </v-col>
 
@@ -242,8 +242,8 @@
                 label="Регион"
                 id="region"
                 v-model="region"
-                hide-details="true"
-                dense="true"
+                hide-details=true
+                :dense=true
               ></v-text-field>
             </v-col>
             <!-- btn -->
@@ -273,7 +273,7 @@
             item-value="id"
             label="Назначить банк"
             @change="dialog = true"
-            hide-details="true"
+            hide-details=true
           ></v-autocomplete>
 
           <v-checkbox
@@ -281,7 +281,7 @@
             color="red"
             v-model="checkBanks"
             label="С проверкой"
-            hide-details="true"
+            hide-details=true
           ></v-checkbox>
 
           <!-- hide bank -->
@@ -298,7 +298,7 @@
             :menu-props="{ maxHeight: '400' }"
             label="Спрятать банк"
             multiple
-            hide-details="true"
+            hide-details=true
           ></v-autocomplete>
 
           <v-btn
