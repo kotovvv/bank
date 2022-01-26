@@ -142,7 +142,7 @@ class ClientsController extends Controller
                     Client::setBankFunnels([$cl['id']], $data['bank_id'], 0);
                     $i++;
                 }
-                usleep(200);
+                usleep(50);
             }
             return ['all' => $all, 'done' => $i];
         }else{
