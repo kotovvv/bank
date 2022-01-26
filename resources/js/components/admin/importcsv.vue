@@ -139,6 +139,7 @@ export default {
       var lines = csv.split("\n");
       var result = [];
       var headers = lines[0].split(";");
+      headers[headers.length - 1] = headers[headers.length - 1].trim()
       // headers = [ "inn", "fullName", "phoneNumber", "organizationName", "address", "region", "registration"];
       // vm.parse_header = lines[0].split(",");
       // lines[0].split(",").forEach(function (key) {

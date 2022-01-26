@@ -339,6 +339,8 @@
                         readonly
                         v-bind="attrs"
                         v-on="on"
+                                                              hide-details="true"
+                    dense="true"
                       ></v-text-field>
                     </template>
                     <v-time-picker
@@ -843,11 +845,11 @@ export default {
             let today = (new Date()).getDate()
             let d = new Date(i.recall)
             let recalltime = d.getHours()+':'+(d.getMinutes()<10?'0':'') + d.getMinutes()
-            i.recalltime = i.recall ? recalltime : ""; 
+            i.recalltime = i.recall ? recalltime : "";
             if (today == d.getDate()){
               self.recallist.push(i);
             }
-            } 
+            }
             return i;
           });
           if(self.recallist.length){

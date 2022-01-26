@@ -18,13 +18,13 @@
               v-model="selectedBank"
               :items="banks"
               outlined
-              dense
+              :dense=true
               chips
               small-chips
               item-text="name"
               item-value="id"
               label="Банк"
-              hide-details="true"
+              hide-details=true
             >
               <template v-slot:item="{ active, item, attrs, on }">
                 <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
@@ -64,6 +64,8 @@
                   v-bind="attrs"
                   v-on="on"
                   id="datereg"
+                                      hide-details=true
+                    :dense=true
                 ></v-text-field>
               </template>
               <v-date-picker
@@ -99,6 +101,8 @@
               label="Наименование:"
               id="firm"
               v-model="firm"
+                                                    hide-details=true
+                    :dense=true
             ></v-text-field>
           </v-col>
           <!-- address -->
@@ -107,6 +111,8 @@
               label="Адрес"
               id="address"
               v-model="address"
+                                                    hide-details=true
+                    :dense=true
             ></v-text-field>
           </v-col>
 
@@ -116,6 +122,8 @@
               label="Регион"
               id="region"
               v-model="region"
+                                                    hide-details=true
+                    :dense=true
             ></v-text-field>
           </v-col>
 
@@ -187,6 +195,8 @@
                   @input="selectRow"
                   :max="clients.length"
                   :messages="'Сколько записей пометить?'"
+                                                        hide-details=true
+                    :dense=true
                 ></v-text-field>
                 <v-card-text
                   >из: <span class="text-h5">{{ filterClients.length }}</span> и
@@ -563,8 +573,10 @@ export default {
       });
       self.banks = self.banks.map(function (i) {
         if (i.id > 0) i.hm = a[i.id];
-        return i;
+         return i
       });
+      self.banks = self.banks.filter((i)=>{return i.hm > 0})
+      self.selectedBank = self.banks[0].id
     },
     getClients(empty = false) {
       const self = this;

@@ -10,10 +10,9 @@
     </v-snackbar>
 
     <v-row>
-      <v-col cols="12">
-        <v-row id="filter">
+
           <!-- bank -->
-          <v-col cols="2">
+          <v-col cols="3">
             <v-select
               v-model="selectedUser"
               :items="users"
@@ -26,6 +25,7 @@
               label="Операторы"
               hide-details="true"
               @change="getUserClients"
+
             >
               <template v-slot:item="{ active, item, attrs, on }">
                 <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
@@ -47,111 +47,12 @@
                 </v-list-item>
               </template>
             </v-select>
-          </v-col>
-          <!-- registration -->
-          <!-- <v-col cols="2">
-            <v-dialog
-              ref="dialog"
-              v-model="modal"
-              :return-value.sync="dateReg"
-              persistent
-              width="330px"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  v-model.lazy="dateReg"
-                  label="Регистрация (период)"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                  id="datereg"
-                ></v-text-field>
-              </template>
-              <v-date-picker
-                v-model.lazy="dateReg"
-                scrollable
-                range
-                locale="ru-ru"
-              >
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="modal = false">
-                  Отмена
-                </v-btn>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="
-                    dateReg = [];
-                    $refs.dialog.save(dateReg);
-                    modal = false;
-                  "
-                >
-                  Очистить
-                </v-btn>
-                <v-btn text color="primary" @click="$refs.dialog.save(dateReg)">
-                  Выбрать
-                </v-btn>
-              </v-date-picker>
-            </v-dialog>
-          </v-col> -->
-          <!-- firm -->
-          <!-- <v-col cols="2">
-            <v-text-field
-              label="Наименование:"
-              id="firm"
-              v-model="firm"
-            ></v-text-field>
-          </v-col> -->
-          <!-- address -->
-          <!-- <v-col cols="1">
-            <v-text-field
-              label="Адрес"
-              id="address"
-              v-model="address"
-            ></v-text-field>
-          </v-col> -->
+</v-col>
 
-          <!-- reg -->
-          <!-- <v-col cols="1">
-            <v-text-field
-              label="Регион"
-              id="region"
-              v-model="region"
-            ></v-text-field>
-          </v-col> -->
-          <!-- status -->
-          <!-- <v-col cols="3">
-            <v-autocomplete
-              v-model="selectedFunnel"
-              :items="funnels"
-              outlined
-              dense
-              chips
-              small-chips
-              item-text="name"
-              item-value="id"
-              label="Статус"
-            ></v-autocomplete>
-          </v-col> -->
-
-          <!-- btn -->
-          <!-- <v-col cols="1">
-            <v-btn
-              color="primary"
-              elevation="2"
-              outlined
-              raised
-              @click="
-                getClients;
-                this.firstRequest = false;
-              "
-              ><v-icon> mdi-table-large </v-icon></v-btn
-            >
-          </v-col> -->
           <v-spacer></v-spacer>
 
-          <v-col v-if="selected.length && selectedUser > 0">
-            <v-btn
+<v-col class="d-flex justify-end">
+            <v-btn v-if="selected.length && selectedUser > 0"
               color="primary"
               elevation="2"
               outlined
@@ -159,21 +60,9 @@
               @click="dialogo = true"
               >Открепить оператора</v-btn
             >
-          </v-col>
-          <!-- del bank -->
-          <!-- <v-col v-if="selected.length && selectedBank">
-            <v-btn
-              color="primary"
-              elevation="2"
-              outlined
-              raised
-              @click="dialog = true"
-              >Открепить банк</v-btn
-            >
-          </v-col> -->
+</v-col>
         </v-row>
-      </v-col>
-    </v-row>
+
     <template>
       <v-row>
         <v-spacer></v-spacer>
