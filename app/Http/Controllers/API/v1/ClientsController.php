@@ -169,7 +169,7 @@ class ClientsController extends Controller
         //     $a_log[] = ['client_id' => $cl, 'user_id' => $data['user_id'], 'other' => '0', 'dateadd' => Now(), 'timeadd' => Now()];
         // }
         // Log::insert($a_log);
-        return Client::whereIn('id', $data['clients'])->update(['user_id' => $data['user_id'], 'date_set' => date('Y-m-d')]);
+        return Client::whereIn('id', $data['clients'])->update(['user_id' => $data['user_id'], 'date_set' => date('Y-m-d'),'time_set'=> date('H:i:s')]);
     }
 
     public function getClients(Request $request)

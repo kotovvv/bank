@@ -340,7 +340,7 @@
                         v-bind="attrs"
                         v-on="on"
                                                               hide-details="true"
-                    dense="true"
+                    :dense=true
                       ></v-text-field>
                     </template>
                     <v-time-picker
@@ -388,8 +388,8 @@
               item-value="id"
               label="Банк"
               hide-details="true"
-              @change="changeFilter"
             >
+              <!-- @change="changeFilter" -->
               <template v-slot:item="{ active, item, attrs, on }">
                 <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
                   <v-list-item-content>
@@ -414,6 +414,20 @@
           <v-col
             >Всего: <span class="text-h5">{{ all }}</span></v-col
           >
+          <v-col cols="3">
+                       <v-select
+              v-model="selectedDatem"
+              :items="dates"
+              outlined
+              dense
+              chips
+              small-chips
+              item-text="date"
+              item-value="date"
+              label="Дни добавления"
+              hide-details="true"
+            ></v-select>
+          </v-col>
         </v-row>
       </v-col>
     </v-row>
@@ -429,7 +443,7 @@
               item-key="inn"
               show-select
               @click:row="clickrow"
-              :items="filterClients"
+              :items="filteredItems"
               ref="datatable"
               :footer-props="{
                 'items-per-page-options': [50, 10, 100, 250, 500, -1],
@@ -524,6 +538,8 @@ import axios from "axios";
 import _ from "lodash";
 export default {
   data: () => ({
+      selectedDatem:'Все',
+dates:[],
     recallist: [],
     recalldialog: false,
     recallTime: null,
@@ -650,7 +666,16 @@ export default {
       // }
     },
   },
-  computed: {},
+  computed: {
+          filteredItems() {
+      return this.clients.filter((i) => {
+        return (
+          (!this.selectedBank || i.banksfunnels.indexOf('"' + this.selectedBank + ":0") >= 0) &&
+          (this.selectedDatem == 'Все' || i.date_set == this.selectedDatem )
+        );
+      });
+    }
+  },
   methods: {
     recall() {
       let self = this;
@@ -810,18 +835,18 @@ export default {
         })
         .catch((error) => console.log(error));
     },
-    changeFilter() {
-      const self = this;
-      let bank_id = 0;
-      if (self.selectedBank) {
-        bank_id = self.selectedBank;
-        self.filterClients = self.clients.filter(
-          (i) => i.banksfunnels.indexOf('"' + bank_id + ":0") >= 0
-        );
-      } else {
-        self.filterClients = self.clients;
-      }
-    },
+    // changeFilter() {
+    //   const self = this;
+    //   let bank_id = 0;
+    //   if (self.selectedBank) {
+    //     bank_id = self.selectedBank;
+    //     self.filterClients = self.clients.filter(
+    //       (i) => i.banksfunnels.indexOf('"' + bank_id + ":0") >= 0
+    //     );
+    //   } else {
+    //     self.filterClients = self.clients;
+    //   }
+    // },
     plueral(number, words) {
       return words[
         number % 100 > 4 && number % 100 < 20
@@ -855,9 +880,14 @@ export default {
           if(self.recallist.length){
             self.recallist = _.orderBy(self.recallist,'recall')
           }
-          self.changeFilter();
+        //   self.changeFilter();
           self.howmanybank();
           self.all = self.clients.length;
+          self.dates = Object.entries(_.groupBy(self.clients,'date_set')).map((i)=>{
+              return {date:i[0],hm:i[1].length}
+          })
+          self.dates.unshift({date:'Все'})
+
         })
         .catch((error) => console.log(error));
     },
