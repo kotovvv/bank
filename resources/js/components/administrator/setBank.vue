@@ -81,7 +81,7 @@
     </v-dialog>
     <v-row>
       <v-col cols="8">
-        <div id="filter">
+        <div id="filter" class="my-3">
           <v-row>
             <!-- registration -->
             <v-col cols="4">
@@ -399,7 +399,7 @@ export default {
       { text: "Регион", value: "region" },
       { text: "Регистрация", value: "registration" },
       { text: "Загрузка", value: "date_added" },
-      { text: "Банк:Воронка", value: "banksfunnels" },
+    //   { text: "Банк:Воронка", value: "banksfunnels" },
     ],
     clients: [],
     banksfunnels: [],

@@ -11,7 +11,7 @@
 
     <v-row>
       <v-col cols="12">
-        <v-row id="filter">
+        <v-row id="filter" class="my-5">
           <!-- bank -->
           <v-col cols="2">
             <v-select
@@ -398,8 +398,8 @@ export default {
       { text: "Регистрация", value: "registration" },
       { text: "Загрузка", value: "date_added" },
       { text: "Оператор", value: "operator" },
-      { text: "Оператор ID", value: "user_id" },
-      { text: "Банк:Воронка", value: "banksfunnels" },
+    //   { text: "Оператор ID", value: "user_id" },
+    //   { text: "Банк:Воронка", value: "banksfunnels" },
     ],
     clients: [],
     headers: [],
@@ -575,8 +575,10 @@ export default {
         if (i.id > 0) i.hm = a[i.id];
          return i
       });
-      self.banks = self.banks.filter((i)=>{return i.hm > 0})
-      self.selectedBank = self.banks[0].id
+      if(self.banks.filter((i)=>{return i.hm > 0})){
+          self.banks = self.banks.filter((i)=>{return i.hm > 0})
+          self.selectedBank = self.banks[0].id
+      }
     },
     getClients(empty = false) {
       const self = this;

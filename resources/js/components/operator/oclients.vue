@@ -374,7 +374,7 @@
     </v-dialog>
     <v-row>
       <v-col cols="12">
-        <v-row id="filter">
+        <v-row id="filter" class="my-3">
           <!-- bank -->
           <v-col cols="3">
             <v-select

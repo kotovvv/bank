@@ -22,8 +22,7 @@
 <v-bottom-navigation
  color="primary"
  background-color="transparent"
- max-width="50%"
- :value="adminMenu"
+  :value="adminMenu"
  style="box-shadow:none"
  >
     <v-btn :value="item.name"
@@ -40,7 +39,7 @@
 
 <v-spacer></v-spacer>
       <v-toolbar-items class="align-center mr-2">{{ userfio }}</v-toolbar-items>
-      
+
       <v-btn @click="$emit('login', {})">ВЫХОД</v-btn>
     </v-app-bar>
 
@@ -146,3 +145,10 @@ role:[
   methods: {},
 };
 </script>
+
+<style>
+.v-data-table > .v-data-table__wrapper > table > tbody > tr > td {
+  font-size: 1rem !important;
+}
+
+</style>

@@ -12,6 +12,7 @@ use App\Models\User;
 use DB;
 use Debugbar;
 use App\Http\Controllers\API\v1\BanksController;
+use Illuminate\Support\Facades\Log as Logg;
 
 
 class ClientsController extends Controller
@@ -105,7 +106,7 @@ class ClientsController extends Controller
 
     public function getClientsWithoutBanks()
     {
-        return Client::where('banksfunnels', '')->orderByDesc('date_added')->limit(10000)->get();
+        return Client::where('banksfunnels', '')->orderByDesc('date_added')->get();//->limit(100000)
     }
 
 
@@ -136,14 +137,22 @@ class ClientsController extends Controller
                 ]);
                 $res = $Banks->canTel($request);
                 $res = json_decode($res->content(),true);
-                Debugbar::info($res);
+                if(isset($res['errors'])){
+                     Logg::info([
+                        'bank_id'=>$data['bank_id'],
+                        'phone' => "+" . $cl->phoneNumber,
+                         'inn' => $cl->inn
+                    ]);
+                    Logg::info($res['errors']);
+                    continue;
+                }
                 if(isset($res['status']) && ($res['status'] == 'forbidden' || $res['status'] == 'blocked')){
                     Client::setBankFunnels([$cl['id']], $data['bank_id'], 2);
                 }else{
                     Client::setBankFunnels([$cl['id']], $data['bank_id'], 0);
                     $i++;
                 }
-                usleep(200);
+                usleep(300);
             }
             return ['all' => $all, 'done' => $i];
         }else{
@@ -238,7 +247,7 @@ class ClientsController extends Controller
                     $sql .= " AND 1 != 1";
             }
         }
-        $sql = $head_sql . $sql . " ORDER BY `date_added` DESC LIMIT 10000";
+        $sql = $head_sql . $sql . " ORDER BY `date_added` DESC ";//LIMIT 100000
         // Debugbar::info($sql);
         return DB::select(DB::raw($sql));
     }

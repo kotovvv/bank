@@ -11,7 +11,7 @@
 
     <v-row>
       <v-col cols="12">
-        <v-row id="filter" class="align-center">
+        <v-row id="filter" class="my-3 align-center">
           <!-- bank -->
           <v-col cols="2">
             <v-select
