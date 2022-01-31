@@ -799,7 +799,7 @@ dates:[],
       });
       self.banks = self.banks.map(function (i) {
         if (i.id > 0) i.hm = a[i.id];
-        return i;
+        if (i.hm > 0) return i;
       });
     },
     getBanks() {
