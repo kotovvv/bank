@@ -44,7 +44,7 @@ Route::post('getReportAll', [ClientsController::class,'getReportAll']);
 Route::post('recall', [ClientsController::class,'recall']);
 Route::post('canTel', [BanksController::class,'canTel']);
 Route::post('updateStatus', [BanksController::class,'updateStatus']);
-Route::get('getRegions', [BanksController::class,'getRegions']);
+Route::get('getRegions/{bank_id}', [BanksController::class,'getRegions']);
 Route::post('getCities', [BanksController::class,'getCities']);
 Route::post('getBranches', [BanksController::class,'getBranches']);
 Route::post('sendOrder', [BanksController::class,'sendOrder']);

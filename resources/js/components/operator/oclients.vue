@@ -623,12 +623,13 @@ dates:[],
     },
     search_region(val) {
       if (this.regions.length == 0) {
+          const self = this
         if (this.isLoading) return;
 
         this.isLoading = true;
 
         // Lazily load input items
-        fetch(window.location.href + "api/getRegions")
+        fetch(window.location.href + "api/getRegions"+"/"+self.selectedBank)
           .then((res) => res.json())
           .then((res) => {
             this.regions = res;
