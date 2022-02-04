@@ -51,18 +51,17 @@ class ImportController extends Controller
 
         foreach ($a_imp['clients'] as $client_val) {
             // $a_client = array_combine($a_imp['headers'], $client_val);
-            if (Client::where('inn', $client_val['inn'])->exists()) {
-                $duplicate++;
-                continue;
-            }
             if(strlen($client_val['inn']) > 12 || strlen($client_val['inn']) < 9 ) continue;
             if(strlen($client_val['inn']) == 11 || strlen($client_val['inn']) == 9 ){
                 $client_val['inn'] = '0'.$client_val['inn'];
             }
-// Debugbar::info($client_val);
-if(strlen($client_val['inn']) == 12){
-     $client_val['organizationName'] = "ИП ".$client_val['fullName'];
-}
+            if(strlen($client_val['inn']) == 12){
+                 $client_val['organizationName'] = "ИП ".$client_val['fullName'];
+            }
+            if (Client::where('inn', $client_val['inn'])->exists()) {
+                $duplicate++;
+                continue;
+            }
             $client_val['phoneNumber'] = str_replace(['+', '(', ')', '#', ' ', '-', '_'], '', $client_val['phoneNumber']);
             if (strlen($client_val['phoneNumber']) == 10 && !in_array(substr($client_val['phoneNumber'], 0, 1), ['7', '8'])) $client_val['phoneNumber'] = '7'.$client_val['phoneNumber'];
             if (strlen($client_val['phoneNumber']) != 11) continue;

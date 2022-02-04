@@ -112,6 +112,7 @@ class ClientsController extends Controller
 
     public function setBankForClients(Request $request)
     {
+        ini_set('max_execution_time', '360');
         $data = $request->All();
         // DebugBar::info( $data);
         if (!isset($data['funnel'])) $data['funnel'] = 0;
@@ -152,7 +153,7 @@ class ClientsController extends Controller
                     Client::setBankFunnels([$cl['id']], $data['bank_id'], 0);
                     $i++;
                 }
-                usleep(300);
+                usleep(60);
             }
             return ['all' => $all, 'done' => $i];
         }else{
