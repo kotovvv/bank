@@ -126,6 +126,8 @@ class ClientsController extends Controller
         }
         // Check clinets in bank
         if(isset($data['checkBanks']) && $data['checkBanks']){
+            ini_set('memory_limit', '-1');
+            set_time_limit(0);
             $i = 0;
             $clients = Client::select('id','inn','phoneNumber')->whereIn('id',$data['clients'])->get();
             $all = count($clients);
@@ -147,6 +149,7 @@ class ClientsController extends Controller
                     Logg::info($res['errors']);
                     continue;
                 }
+
                 if(isset($res['status']) && ($res['status'] == 'forbidden' || $res['status'] == 'blocked')){
                     Client::setBankFunnels([$cl['id']], $data['bank_id'], 2);
                 }else{
