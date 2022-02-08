@@ -480,7 +480,7 @@ export default {
         send.clients = this.filterClients.map((i) => i.id);
       }
       axios
-        .post("/api/setBankForClients", send)
+        .post("/api/setBankForClients", send,{timeout:60*15*1000})
         .then((res) => {
           self.getClientsWithoutBanks();
           self.loading = false;

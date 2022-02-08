@@ -106,7 +106,7 @@ class ClientsController extends Controller
 
     public function getClientsWithoutBanks()
     {
-        return Client::where('banksfunnels', '')->orderByDesc('date_added')->get();//->limit(100000)
+        return Client::where('banksfunnels', '')->orderByDesc('date_added')->get(); //->limit(100000)
     }
 
 
@@ -125,41 +125,52 @@ class ClientsController extends Controller
             Log::insert($a_log);
         }
         // Check clinets in bank
-        if(isset($data['checkBanks']) && $data['checkBanks']){
+        if (isset($data['checkBanks']) && $data['checkBanks']) {
             ini_set('memory_limit', '-1');
             set_time_limit(0);
             $i = 0;
-            $clients = Client::select('id','inn','phoneNumber')->whereIn('id',$data['clients'])->get();
+            $clients = Client::select('id', 'inn', 'phoneNumber')->whereIn('id', $data['clients'])->get();
             $all = count($clients);
+            $cl_onstat = [];
             $Banks = new BanksController();
             foreach ($clients as $cl) {
                 $request = new Request([
-                    'bank_id'=>$data['bank_id'],
-                    'data' =>['phone' => "+" . $cl->phoneNumber, 'inn' => $cl->inn],
+                    'bank_id' => $data['bank_id'],
+                    'data' => ['phone' => "+" . $cl->phoneNumber, 'inn' => $cl->inn],
                     'action' => "call_requests",
                 ]);
                 $res = $Banks->canTel($request);
-                $res = json_decode($res->content(),true);
-                if(isset($res['errors'])){
-                     Logg::info([
-                        'bank_id'=>$data['bank_id'],
+                $res = json_decode($res->content(), true);
+                if (isset($res['errors'])) {
+                    Logg::info([
+                        'bank_id' => $data['bank_id'],
                         'phone' => "+" . $cl->phoneNumber,
-                         'inn' => $cl->inn
+                        'inn' => $cl->inn
                     ]);
                     Logg::info($res['errors']);
                     continue;
                 }
 
-                if(isset($res['status']) && ($res['status'] == 'forbidden' || $res['status'] == 'blocked')){
-                    Client::setBankFunnels([$cl['id']], $data['bank_id'], 2);
-                }else{
-                    Client::setBankFunnels([$cl['id']], $data['bank_id'], 0);
+                if (isset($res['status']) && ($res['status'] == 'forbidden' || $res['status'] == 'blocked')) {
+                    $cl_onstat['2'][] = $cl['id'];
+                    // Client::setBankFunnels([$cl['id']], $data['bank_id'], 2);
+                } else {
+                    $cl_onstat['0'][] = $cl['id'];
+                    // Client::setBankFunnels([$cl['id']], $data['bank_id'], 0);
                     $i++;
                 }
-                usleep(60);
+                // usleep(1);
             }
+            Debugbar::info($cl_onstat);
+            if (isset($cl_onstat['2']) && count($cl_onstat['2'])) {
+                Client::setBankFunnels($cl_onstat['2'], $data['bank_id'], 2);
+            }
+            if (isset($cl_onstat['0']) && count($cl_onstat['0'])) {
+                Client::setBankFunnels($cl_onstat['0'], $data['bank_id'], 0);
+            }
+
             return ['all' => $all, 'done' => $i];
-        }else{
+        } else {
             $bankfunnels = Client::setBankFunnels($data['clients'], $data['bank_id'], $data['funnel']);
         }
         // Debugbar::info($bankfunnels);
@@ -182,7 +193,7 @@ class ClientsController extends Controller
         //     $a_log[] = ['client_id' => $cl, 'user_id' => $data['user_id'], 'other' => '0', 'dateadd' => Now(), 'timeadd' => Now()];
         // }
         // Log::insert($a_log);
-        return Client::whereIn('id', $data['clients'])->update(['user_id' => $data['user_id'], 'date_set' => date('Y-m-d'),'time_set'=> date('H:i:s')]);
+        return Client::whereIn('id', $data['clients'])->update(['user_id' => $data['user_id'], 'date_set' => date('Y-m-d'), 'time_set' => date('H:i:s')]);
     }
 
     public function getClients(Request $request)
@@ -251,7 +262,7 @@ class ClientsController extends Controller
                     $sql .= " AND 1 != 1";
             }
         }
-        $sql = $head_sql . $sql . " ORDER BY `date_added` DESC ";//LIMIT 100000
+        $sql = $head_sql . $sql . " ORDER BY `date_added` DESC "; //LIMIT 100000
         // Debugbar::info($sql);
         return DB::select(DB::raw($sql));
     }
@@ -261,7 +272,7 @@ class ClientsController extends Controller
         $data = $request->All();
         $bank_id = $data['bank_id'];
         $period = $data['period'];
-        $where_user = isset($data['user_id'])?' AND l.`user_id` = '. (int) $data['user_id']:'';
+        $where_user = isset($data['user_id']) ? ' AND l.`user_id` = ' . (int) $data['user_id'] : '';
         $done_count = 0;
         $where_period = '';
         if (is_array($period)) {
@@ -285,14 +296,14 @@ class ClientsController extends Controller
             $usr_bnk_fnl = DB::select(DB::raw($sql));
             $a_banks_o = array_unique(array_column($usr_bnk_fnl, 'bank_id'));
             $a_banks = Bank::whereIn('id', $a_banks_o)->get();
-        $where_bank = '';
+            $where_bank = '';
         } else {
             $a_banks =  Bank::where('id', $bank_id)->get();
             $sql = "SELECT COUNT(*) COUNT FROM `clients` WHERE `banksfunnels` LIKE '%\"" . $bank_id . ":%' AND `date_set` " . $where_period;
             $all_count = DB::select(DB::raw($sql));
             $sql = "SELECT `user_id`,`funnel_id`,`bank_id` FROM `logs` l WHERE `bank_id` = '" . $bank_id . "' AND `dateadd` " . $where_period . $where_user;
             $usr_bnk_fnl = DB::select(DB::raw($sql));
-            $where_bank = " AND l.`bank_id` = " .(int) $bank_id;
+            $where_bank = " AND l.`bank_id` = " . (int) $bank_id;
         }
 
         $sql = "SELECT c.`inn`,c.`organizationName`,c.`fullName`,c.`phoneNumber`,f.`name`, b.name, c.`registration`, l.`dateadd` datecall, u.`fio` operator,c.`region`,c.`address`  FROM `logs` l LEFT JOIN `clients` c ON (c.`id` = l.`client_id`) LEFT JOIN `funnels` f ON (f.`id` = l.`funnel_id`) LEFT JOIN `banks` b ON (b.id = l.`bank_id`) LEFT JOIN `users` u ON (u.`id` = l.`user_id`) WHERE l.`dateadd` " . $where_period . $where_bank . $where_user;
@@ -310,7 +321,7 @@ class ClientsController extends Controller
         $json['banks'] = $a_banks;
         $json['ubf'] = $usr_bnk_fnl;
         $json['all'] = $all_count[0]->COUNT;
-        $json['report'] =$report;
+        $json['report'] = $report;
 
         return response($json);
     }
@@ -323,10 +334,10 @@ class ClientsController extends Controller
         $recall = $data['recall'];
         $client_id = $data['client_id'];
         $a_log = [];
-            $a_log = ['client_id' =>$client_id, 'user_id' => $user_id, 'bank_id' => $bank_id,  'other' => $recall, 'dateadd' => Now(), 'timeadd' => Now()];
+        $a_log = ['client_id' => $client_id, 'user_id' => $user_id, 'bank_id' => $bank_id,  'other' => $recall, 'dateadd' => Now(), 'timeadd' => Now()];
         Log::insert($a_log);
         Client::where('id', $client_id)->update(['recall' => $recall]);
-        return response("Время перезвона добавлено клиенту",200);
+        return response("Время перезвона добавлено клиенту", 200);
     }
     /**
      * Remove the specified resource from storage.
