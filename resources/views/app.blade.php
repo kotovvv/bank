@@ -21,8 +21,8 @@
     </div>
 
     <script src="{{ mix('js/app.js') }}"></script>
-    @env('local')
+    @if (env('APP_ENV')!='Production')
   <script src="http://localhost:35729/livereload.js"></script>
-  @endenv
+  @endif
 </body>
 </html>

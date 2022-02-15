@@ -91,11 +91,23 @@ class BanksController extends Controller
 
     public function canTel(Request $request)
     {
+
         $a_bank_actions = [
             'call_requests' => '/api/v1/call_easy/call_requests',
         ];
 
         $data = $request->All();
+        $inn = $data['data']['inn'];
+       if( Cache::has($inn)){
+        //    Debugbar::info('inn '.$inn);
+           $response = [
+            "id" => Cache::get($inn),
+            "status"=>"allowed",
+            "status_translate"=>"Звонок разрешен"
+           ];
+        return response($response);
+       }
+
         $send = ['data' => $data['data']];
 
         if (isset($data['bank_id'])) {
@@ -109,6 +121,11 @@ class BanksController extends Controller
                 $bank['url'] . $action,
                 $send
             );
+        }
+        $res = json_decode($response);
+        if(isset($res['id'])){
+            Debugbar::info('id '.$res['inn'], $res['id']);
+            Cache::put($res['inn'], $res['id'], 60*60);
         }
         return response($response);
     }

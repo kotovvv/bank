@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-snackbar v-model="snackbar" top right>
+    <v-snackbar v-model="snackbar" top right :timeout="-1">
       <v-card-text v-html="message"></v-card-text>
       <template v-slot:action="{ attrs }">
         <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
@@ -490,6 +490,7 @@ export default {
 
           self.message =
             "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
+            console.log(res.data.done,res.data.all)
           self.snackbar = true;
         })
         .catch((error) => console.log(error));
