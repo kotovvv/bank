@@ -123,9 +123,8 @@ class BanksController extends Controller
             );
         }
         $res = json_decode($response);
-        if(isset($res['id'])){
-            Debugbar::info('id '.$res['inn'], $res['id']);
-            Cache::put($res['inn'], $res['id'], 60*60);
+        if(isset($res->id)){
+            Cache::put($res->inn, $res->id, 60*60);
         }
         return response($response);
     }
