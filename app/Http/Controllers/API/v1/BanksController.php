@@ -99,7 +99,6 @@ class BanksController extends Controller
         $data = $request->All();
         $inn = $data['data']['inn'];
        if( Cache::has($inn)){
-        //    Debugbar::info('inn '.$inn);
            $response = [
             "id" => Cache::get($inn),
             "status"=>"allowed",

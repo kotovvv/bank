@@ -20,7 +20,7 @@ class User extends Authenticatable
         'name',
         'role_id',
         'fio',
-        'group_id'
+        'group_id',
         // 'password'
     ];
 

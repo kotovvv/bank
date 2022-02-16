@@ -36,6 +36,11 @@
     </v-row>
     <v-row>
       <v-col cols="12">
+                  <v-progress-linear
+          :active="loading"
+          :indeterminate="loading"
+          color="deep-purple accent-4"
+        ></v-progress-linear>
         <v-data-table
           :headers="import_headers"
           item-key="id"
@@ -55,6 +60,7 @@ import axios from "axios";
 import JsonCSV from "vue-json-csv";
 export default {
   data: () => ({
+      loading:false,
     clients: [],
     headers: [],
     snackbar: false,
@@ -85,16 +91,19 @@ export default {
       let send = {};
       send.headers = self.headers;
       send.clients = self.clients;
-
+self.loading=true
       axios
         .post("api/import", send)
         .then(function (response) {
           //   console.log(response);
+          self.loading=false
           self.message =
             "Всего: " +
             response.data.all +
             "<br>Дубликатов: " +
             response.data.duplicate +
+            "<br>Ошибок: " +
+            response.data.error +
             "<br>Добавлено: " +
             response.data.inserted;
             self.snackbar=true;
@@ -152,6 +161,7 @@ export default {
         var obj = {};
         line = line.trim();
         var currentline = line.split(";");
+
         headers.map(function (header, indexHeader) {
           obj[header] = currentline[indexHeader];
         });

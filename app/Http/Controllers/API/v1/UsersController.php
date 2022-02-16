@@ -107,14 +107,13 @@ class UsersController extends Controller
         return response('User updated', 200);
       } else return response('User updated error', 301);
     } else {
-       Debugbar::info($data);
-      if ($user = User::create($data)) {
-        // if (isset($data['password'])) {
-        // //   $user->password = $password;
-        //   $user->save();
-        // }
+        $user = new User();
+        $user->name = $data["name"];
+        $user->fio = $data["fio"];
+        $user->role_id = $data["role_id"];
+        $user->password = $password;
+        $user->save();
         return response('User added', 200);
-      } else return response('User add error', 301);
     }
   }
 
