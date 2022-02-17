@@ -10,29 +10,27 @@
     </v-snackbar>
 
     <v-row>
-
           <!-- bank -->
           <v-col cols="3">
             <v-select
               v-model="selectedUser"
               :items="users"
               outlined
-              dense
+              :dense="true"
               chips
               small-chips
-              item-text="name"
+              item-text="fio"
               item-value="id"
               label="Операторы"
               hide-details="true"
               @change="getUserClients"
-
             >
               <template v-slot:item="{ active, item, attrs, on }">
                 <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
                   <v-list-item-content>
                     <v-list-item-title>
                       <v-row no-gutters align="center">
-                        <span>{{ item.name }}</span>
+                        <span>{{ item.fio }}</span>
                         <v-spacer></v-spacer>
                         <v-chip
                           text-color="white"

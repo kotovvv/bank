@@ -6,8 +6,8 @@
         @click:row="clickrow"
         :items="recallist"
         :headers="recallheaders"
-        :hide-default-footer=true
-        :hide-default-header=true
+        :hide-default-footer="true"
+        :hide-default-header="true"
       >
       </v-data-table>
     </div>
@@ -160,8 +160,8 @@
                       <v-autocomplete
                         v-model="model_region"
                         :items="show_regions"
-                        :loading="isLoading"
                         :search-input.sync="search_region"
+                        :loading="isLoading"
                         chips
                         clearable
                         hide-details
@@ -317,6 +317,7 @@
                       company_name == '' ||
                       last_name == '' ||
                       first_name == '' ||
+                      (branches.length > 0 && Object.keys(branch).length == 0) ||
                       (pp == 0 && ss == 0 && rr == 0)
                     "
                     >Отправить заявку</v-btn
@@ -339,8 +340,8 @@
                         readonly
                         v-bind="attrs"
                         v-on="on"
-                                                              hide-details="true"
-                    :dense=true
+                        hide-details="true"
+                        :dense="true"
                       ></v-text-field>
                     </template>
                     <v-time-picker
@@ -415,7 +416,7 @@
             >Всего: <span class="text-h5">{{ all }}</span></v-col
           >
           <v-col cols="3">
-                       <v-select
+            <v-select
               v-model="selectedDatem"
               :items="dates"
               outlined
@@ -435,8 +436,6 @@
       <v-row>
         <v-col cols="12">
           <v-card>
-            <!-- :search="search" -->
-            <!-- v-model.lazy.trim="selected" -->
             <v-data-table
               :headers="import_headers"
               :single-select="true"
@@ -451,10 +450,6 @@
               }"
             >
               <template v-slot:item.recalltime="{ item }">
-                <!-- <v-chip
-        color="red"
-        dark
-      > -->
                 <div
                   style="background: #ffcdd2; text-align: center"
                   v-if="item.recalltime"
@@ -538,8 +533,8 @@ import axios from "axios";
 import _ from "lodash";
 export default {
   data: () => ({
-      selectedDatem:'Все',
-dates:[],
+    selectedDatem: "Все",
+    dates: [],
     recallist: [],
     recalldialog: false,
     recallTime: null,
@@ -623,13 +618,13 @@ dates:[],
     },
     search_region(val) {
       if (this.regions.length == 0) {
-          const self = this
+        const self = this;
         if (this.isLoading) return;
 
         this.isLoading = true;
 
         // Lazily load input items
-        fetch(window.location.href + "api/getRegions"+"/"+self.selectedBank)
+        fetch(window.location.href + "api/getRegions/" + self.selectedBank)
           .then((res) => res.json())
           .then((res) => {
             this.regions = res;
@@ -668,14 +663,15 @@ dates:[],
     },
   },
   computed: {
-          filteredItems() {
+    filteredItems() {
       return this.clients.filter((i) => {
         return (
-          (!this.selectedBank || i.banksfunnels.indexOf('"' + this.selectedBank + ":0") >= 0) &&
-          (this.selectedDatem == 'Все' || i.date_set == this.selectedDatem )
+          (!this.selectedBank ||
+            i.banksfunnels.indexOf('"' + this.selectedBank + ":0") >= 0) &&
+          (this.selectedDatem == "Все" || i.date_set == this.selectedDatem)
         );
       });
-    }
+    },
   },
   methods: {
     recall() {
@@ -836,18 +832,6 @@ dates:[],
         })
         .catch((error) => console.log(error));
     },
-    // changeFilter() {
-    //   const self = this;
-    //   let bank_id = 0;
-    //   if (self.selectedBank) {
-    //     bank_id = self.selectedBank;
-    //     self.filterClients = self.clients.filter(
-    //       (i) => i.banksfunnels.indexOf('"' + bank_id + ":0") >= 0
-    //     );
-    //   } else {
-    //     self.filterClients = self.clients;
-    //   }
-    // },
     plueral(number, words) {
       return words[
         number % 100 > 4 && number % 100 < 20
@@ -860,35 +844,40 @@ dates:[],
       const id = self.$attrs.user.id;
       let bank_id = 0;
       let funnel_id = 0;
-      self.recallist =[]
+      self.recallist = [];
       // if (self.selectedBank) bank_id = self.selectedBank;
       axios
         .get("/api/getUserClients/" + id + "/" + bank_id + "/" + funnel_id)
         .then((res) => {
           self.clients = Object.entries(res.data).map((e) => e[1]);
           self.clients = self.clients.map(function (i) {
-            if (i.recall){
-            let today = (new Date()).getDate()
-            let d = new Date(i.recall)
-            let recalltime = d.getHours()+':'+(d.getMinutes()<10?'0':'') + d.getMinutes()
-            i.recalltime = i.recall ? recalltime : "";
-            if (today == d.getDate()){
-              self.recallist.push(i);
-            }
+            if (i.recall) {
+              let today = new Date().getDate();
+              let d = new Date(i.recall);
+              let recalltime =
+                d.getHours() +
+                ":" +
+                (d.getMinutes() < 10 ? "0" : "") +
+                d.getMinutes();
+              i.recalltime = i.recall ? recalltime : "";
+              if (today == d.getDate()) {
+                self.recallist.push(i);
+              }
             }
             return i;
           });
-          if(self.recallist.length){
-            self.recallist = _.orderBy(self.recallist,'recall')
+          if (self.recallist.length) {
+            self.recallist = _.orderBy(self.recallist, "recall");
           }
-        //   self.changeFilter();
+          //   self.changeFilter();
           self.howmanybank();
           self.all = self.clients.length;
-          self.dates = Object.entries(_.groupBy(self.clients,'date_set')).map((i)=>{
-              return {date:i[0],hm:i[1].length}
-          })
-          self.dates.unshift({date:'Все'})
-
+          self.dates = Object.entries(_.groupBy(self.clients, "date_set")).map(
+            (i) => {
+              return { date: i[0], hm: i[1].length };
+            }
+          );
+          self.dates.unshift({ date: "Все" });
         })
         .catch((error) => console.log(error));
     },
@@ -1034,7 +1023,7 @@ dates:[],
 <style>
 #recallmenu {
   position: fixed;
-  bottom: 10px;
+  bottom: 35px;
   left: 10px;
   z-index: 3;
   overflow: hidden;

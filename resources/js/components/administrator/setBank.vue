@@ -435,6 +435,8 @@ export default {
       if (this.selected.length) {
         let self = this;
         let send = {};
+        self.clients = []
+        self.loading = true
         send.client_ids = this.selected.map(function (i) {
           return i.id;
         });
@@ -442,9 +444,10 @@ export default {
           .post("/api/delClients", send)
           .then((res) => {
             self.selected = [];
+            self.loading = false
             self.message = "Удалены выбранные строки: " + res.data;
             self.snackbar = true;
-            self.this.getClientsWithoutBanks();
+            self.getClientsWithoutBanks();
           })
           .catch((error) => console.log(error));
       }
@@ -461,6 +464,7 @@ export default {
     },
     getClientsWithoutBanks() {
       let self = this;
+      self.clients = []
       axios
         .get("/api/getClientsWithoutBanks")
         .then((res) => {
