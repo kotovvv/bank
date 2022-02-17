@@ -101,8 +101,8 @@
                     v-bind="attrs"
                     v-on="on"
                     id="datereg"
-                    hide-details=true
-                    :dense=true
+                    hide-details="true"
+                    :dense="true"
                   ></v-text-field>
                 </template>
                 <v-date-picker
@@ -155,8 +155,8 @@
                     v-bind="attrs"
                     v-on="on"
                     id="dateadd"
-                    hide-details=true
-                    :dense=true
+                    hide-details="true"
+                    :dense="true"
                   ></v-text-field>
                 </template>
                 <v-date-picker
@@ -197,8 +197,8 @@
                 label="Наименование:"
                 id="firm"
                 v-model="firm"
-                hide-details=true
-                :dense=true
+                hide-details="true"
+                :dense="true"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -209,8 +209,8 @@
                 label="ФИО:"
                 id="fio"
                 v-model="fio"
-                hide-details=true
-                :dense=true
+                hide-details="true"
+                :dense="true"
               ></v-text-field>
             </v-col>
 
@@ -220,8 +220,8 @@
                 label="ИНН"
                 id="inn"
                 v-model.number="inn"
-                hide-details=true
-                :dense=true
+                hide-details="true"
+                :dense="true"
               ></v-text-field>
             </v-col>
 
@@ -231,8 +231,8 @@
                 label="Адрес"
                 id="address"
                 v-model="address"
-                hide-details=true
-                :dense=true
+                hide-details="true"
+                :dense="true"
               ></v-text-field>
             </v-col>
 
@@ -242,8 +242,8 @@
                 label="Регион"
                 id="region"
                 v-model="region"
-                hide-details=true
-                :dense=true
+                hide-details="true"
+                :dense="true"
               ></v-text-field>
             </v-col>
             <!-- btn -->
@@ -273,7 +273,7 @@
             item-value="id"
             label="Назначить банк"
             @change="dialog = true"
-            hide-details=true
+            hide-details="true"
           ></v-autocomplete>
 
           <v-checkbox
@@ -281,7 +281,7 @@
             color="red"
             v-model="checkBanks"
             label="С проверкой"
-            hide-details=true
+            hide-details="true"
           ></v-checkbox>
 
           <!-- hide bank -->
@@ -298,7 +298,7 @@
             :menu-props="{ maxHeight: '400' }"
             label="Спрятать банк"
             multiple
-            hide-details=true
+            hide-details="true"
           ></v-autocomplete>
 
           <v-btn
@@ -307,9 +307,9 @@
             raised
             @click="dialogDelClients = true"
             height="40"
-            >
+          >
             Удалить из базы
-            </v-btn>
+          </v-btn>
         </div>
       </v-col>
     </v-row>
@@ -399,7 +399,7 @@ export default {
       { text: "Регион", value: "region" },
       { text: "Регистрация", value: "registration" },
       { text: "Загрузка", value: "date_added" },
-    //   { text: "Банк:Воронка", value: "banksfunnels" },
+      //   { text: "Банк:Воронка", value: "banksfunnels" },
     ],
     clients: [],
     banksfunnels: [],
@@ -435,8 +435,8 @@ export default {
       if (this.selected.length) {
         let self = this;
         let send = {};
-        self.clients = []
-        self.loading = true
+        self.clients = [];
+        self.loading = true;
         send.client_ids = this.selected.map(function (i) {
           return i.id;
         });
@@ -444,7 +444,7 @@ export default {
           .post("/api/delClients", send)
           .then((res) => {
             self.selected = [];
-            self.loading = false
+            self.loading = false;
             self.message = "Удалены выбранные строки: " + res.data;
             self.snackbar = true;
             self.getClientsWithoutBanks();
@@ -464,7 +464,7 @@ export default {
     },
     getClientsWithoutBanks() {
       let self = this;
-      self.clients = []
+      self.clients = [];
       axios
         .get("/api/getClientsWithoutBanks")
         .then((res) => {
@@ -483,23 +483,55 @@ export default {
       } else {
         send.clients = this.filterClients.map((i) => i.id);
       }
-      axios
-        .post("/api/setBankForClients", send,{timeout:60*15*1000})
-        .then((res) => {
-          self.getClientsWithoutBanks();
-          self.loading = false;
-          self.selected = [];
-          self.selectedBanks = 0;
-          self.hmrow = "";
-
-          self.message =
-            "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
-            console.log(res.data.done,res.data.all)
+      if (self.checkBanks) {
+        let alldone = {};
+        alldone.all = send.clients.length
+        alldone.done = 0
+        let sendb = {};
+        sendb.bank_id = bank_id;
+        sendb.checkBanks = self.checkBanks;
           self.snackbar = true;
+        send.clients.forEach((i) => {
+          sendb.clients = [i];
+           self.checkClient(sendb,alldone)
+        });
+        self.getClientsWithoutBanks();
+        self.loading = false;
+        self.selected = [];
+        self.selectedBanks = 0;
+        self.hmrow = "";
+      } else {
+        axios
+          .post("/api/setBankForClients", send, { timeout: 60 * 15 * 1000 })
+          .then((res) => {
+            self.getClientsWithoutBanks();
+            self.loading = false;
+            self.selected = [];
+            self.selectedBanks = 0;
+            self.hmrow = "";
+
+            self.message =
+              "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
+            console.log(res.data.done, res.data.all);
+            self.snackbar = true;
+          })
+          .catch((error) => console.log(error));
+      }
+    },
+    clickrow() {},
+    async checkClient(s_end,alldone) {
+      const self = this
+
+      await axios
+        .post("/api/setBankForClients", s_end)
+        .then((res) => {
+          alldone.done += parseInt(res.data.done);
+          console.log(alldone.done)
+        self.message =
+          "Записей: " + alldone.all + "<br>Изменено: " + alldone.done;
         })
         .catch((error) => console.log(error));
     },
-    clickrow() {},
     getBanks() {
       let self = this;
       axios
@@ -567,9 +599,9 @@ export default {
   grid-template-columns: 1fr 1fr;
   grid-gap: 15px;
 }
-@media (max-width: 1024px){
+@media (max-width: 1024px) {
   .btn4 {
-  grid-template-columns: 1fr;
-}
+    grid-template-columns: 1fr;
+  }
 }
 </style>

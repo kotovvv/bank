@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="recallmenu" v-if="recallist">
+    <div id="recallmenu" v-if="recallist.length">
       <v-data-table
         item-key="inn"
         @click:row="clickrow"
