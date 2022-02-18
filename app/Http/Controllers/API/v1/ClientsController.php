@@ -159,9 +159,9 @@ class ClientsController extends Controller
                     // Client::setBankFunnels([$cl['id']], $data['bank_id'], 0);
                     $i++;
                 }
-                // usleep(1);
+                 usleep(200);
             }
-            Debugbar::info($cl_onstat);
+            // Debugbar::info($cl_onstat);
             if (isset($cl_onstat['2']) && count($cl_onstat['2'])) {
                 Client::setBankFunnels($cl_onstat['2'], $data['bank_id'], 2);
             }

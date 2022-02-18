@@ -487,14 +487,10 @@ export default {
         let alldone = {};
         alldone.all = send.clients.length
         alldone.done = 0
-        let sendb = {};
-        sendb.bank_id = bank_id;
-        sendb.checkBanks = self.checkBanks;
-          self.snackbar = true;
-        send.clients.forEach((i) => {
-          sendb.clients = [i];
-           self.checkClient(sendb,alldone)
-        });
+        self.snackbar = true;
+
+           self.checkClient(send,alldone)
+
         self.getClientsWithoutBanks();
         self.loading = false;
         self.selected = [];
@@ -519,18 +515,36 @@ export default {
       }
     },
     clickrow() {},
-    async checkClient(s_end,alldone) {
-      const self = this
 
-      await axios
-        .post("/api/setBankForClients", s_end)
+    checkClient(send,alldone) {
+      const self = this
+      const  clients_ids = send.clients
+
+let promises = [];
+for (let step = 0, show = 100; alldone.all - (step*show);step++) {
+    send.clients = clients_ids.slice(step*show,show+step*show)
+    promises.push(
+        axios
+        .post("/api/setBankForClients", send)
         .then((res) => {
           alldone.done += parseInt(res.data.done);
-          console.log(alldone.done)
+        //   console.log(alldone.done)
         self.message =
           "Записей: " + alldone.all + "<br>Изменено: " + alldone.done;
         })
-        .catch((error) => console.log(error));
+        .catch((error) => console.log(error))
+    )
+    /* You can use Timeout */
+    setTimeout(() => {
+        console.log("go_to_sleep")
+    }, 200);
+}
+
+Promise.all(promises)
+    .then(async (r) => {
+        console.log(r)
+    })
+
     },
     getBanks() {
       let self = this;
