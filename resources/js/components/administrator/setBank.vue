@@ -532,29 +532,8 @@ export default {
         self.loading = false;
         self.selected = [];
         self.selectedBanks = 0;
-        self.hmrow = "";     
+        self.hmrow = "";
         })();
-        
-
-      // let promises = [];
-      // for (let step = 0, show = 1; alldone.all - step * show; step++) {
-      //   send.clients = clients_ids.slice(step * show, show + step * show);
-      //   promises.push(
-      //     await axios
-      //       .post("/api/setBankForClients", send)
-      //       .then((res) => {
-      //         alldone.done += parseInt(res.data.done);
-      //         //   console.log(alldone.done)
-      //         self.message =
-      //           "Записей: " + alldone.all + "<br>Изменено: " + alldone.done;
-      //       })
-      //       .catch((error) => console.log(error))
-      //   );
-      // }
-
-      // Promise.all(promises).then(async (r) => {
-      //   console.log(r);
-      // });
     },
     getBanks() {
       let self = this;
