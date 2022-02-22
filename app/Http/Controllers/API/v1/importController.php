@@ -51,8 +51,8 @@ class ImportController extends Controller
 
         foreach ($a_imp['clients'] as $client_val) {
             // $a_client = array_combine($a_imp['headers'], $client_val);
-            if(count($client_val) < 5) continue;
-            if(strlen($client_val['inn']) > 12 || strlen($client_val['inn']) < 9 ) continue;
+            if(count($client_val) < 5) {$error++;continue;}
+            if(strlen($client_val['inn']) > 12 || strlen($client_val['inn']) < 9 ) {$error++;continue;}
             if(strlen($client_val['inn']) == 11 || strlen($client_val['inn']) == 9 ){
                 $client_val['inn'] = '0'.$client_val['inn'];
             }
@@ -67,7 +67,7 @@ class ImportController extends Controller
 
             $client_val['phoneNumber'] = str_replace('/\D/', '', $client_val['phoneNumber']);
             if (strlen($client_val['phoneNumber']) == 10 && !in_array(substr($client_val['phoneNumber'], 0, 1), ['7', '8'])) $client_val['phoneNumber'] = '7'.$client_val['phoneNumber'];
-            if (strlen($client_val['phoneNumber']) != 11) continue;
+            if (strlen($client_val['phoneNumber']) != 11) {$error++;continue;}
             $client_val['phoneNumber'] =  preg_replace('/^8/', '7',$client_val['phoneNumber'], 1 );
             $client_val = array_merge($client_val, ['date_added' => date("Y-m-d H:i:s")]);
             $client_val['registration'] = date( 'Y-m-d', strtotime( $client_val['registration'] ) );

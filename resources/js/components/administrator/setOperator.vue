@@ -158,7 +158,11 @@
     </v-row>
     <template>
       <v-row>
-        <v-spacer></v-spacer>
+        <v-progress-linear
+          :active="loading"
+          :indeterminate="loading"
+          color="deep-purple accent-4"
+        ></v-progress-linear>
         <v-col cols="12" v-if="clients.length">
           <v-card>
             <!-- :search="search" -->
@@ -420,6 +424,7 @@ export default {
     address: "",
     region: "",
     firstRequest: true,
+    loading: false,
   }),
   mounted() {
     this.getBanks();
@@ -453,6 +458,7 @@ export default {
     delBankFromClients(bank_id) {
       let self = this;
       let send = {};
+      self.loading = true;
       send.bank_id = bank_id;
       send.clients = this.selected.map((i) => {
         return i.id;
@@ -469,6 +475,7 @@ export default {
             "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
           self.snackbar = true;
           self.selected = [];
+          self.loading = false;
         })
         .catch((error) => console.log(error));
     },
@@ -484,6 +491,7 @@ export default {
     },
     getUserClients(id) {
       let self = this;
+      self.loading = true;
       self.disableuser = id;
       axios
         .get("/api/getUserClients/" + id)
@@ -494,6 +502,7 @@ export default {
           //   });
           self.howmanybank();
           self.selectedBanks = 0;
+          self.loading = false;
         })
         .catch((error) => console.log(error));
     },
@@ -510,6 +519,7 @@ export default {
     changeUserOfClients() {
       let self = this;
       let send = {};
+      self.loading= true
       if (self.selectedBank != 0) send.bank_id = self.selectedBank;
       send.user_id = this.userid;
       if (this.selected.length) {
@@ -525,6 +535,7 @@ export default {
           self.userid = null;
           self.disableuser = 0;
           self.selected = [];
+          self.loading= false
         })
         .catch((error) => console.log(error));
     },
@@ -591,6 +602,7 @@ export default {
     getClients(empty = false) {
       const self = this;
       let send = {};
+      self.loading= true
       if (empty) {
         send.banksfunnelsNotEmpty = 1;
       } else {
@@ -635,6 +647,7 @@ export default {
             })
           );
           self.howmanybank();
+          self.loading= false
         })
         .catch((error) => console.log(error));
     },
