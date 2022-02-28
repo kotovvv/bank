@@ -490,7 +490,6 @@ export default {
         self.snackbar = true;
 
         self.checkClient(send, alldone);
-
       } else {
         axios
           .post("/api/setBankForClients", send, { timeout: 60 * 15 * 1000 })
@@ -514,26 +513,26 @@ export default {
     async checkClient(send, alldone) {
       const self = this;
       const clients_ids = send.clients;
-(async() => {
-            for (let step = 0, show = 100; alldone.all - step * show; step++) {
-              send.clients = clients_ids.slice(step * show, show + step * show);
-                // Currently using await before axios call
-                await axios
+      (async () => {
+        for (let step = 0, show = 100; alldone.all - step * show; step++) {
+          send.clients = clients_ids.slice(step * show, show + step * show);
+          // Currently using await before axios call
+          await axios
             .post("/api/setBankForClients", send)
             .then((res) => {
               alldone.done += parseInt(res.data.done);
-                 console.log(alldone.done)
+              console.log(alldone.done);
               self.message =
                 "Записей: " + alldone.all + "<br>Изменено: " + alldone.done;
             })
-            .catch((error) => console.log(error))
-            }
-               self.getClientsWithoutBanks();
+            .catch((error) => console.log(error));
+        }
+        self.getClientsWithoutBanks();
         self.loading = false;
         self.selected = [];
         self.selectedBanks = 0;
         self.hmrow = "";
-        })();
+      })();
     },
     getBanks() {
       let self = this;

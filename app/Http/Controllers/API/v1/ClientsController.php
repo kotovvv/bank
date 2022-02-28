@@ -246,6 +246,9 @@ class ClientsController extends Controller
                 case 'region':
                     $sql .= " AND MATCH (region) AGAINST ('" . $filter_word . "')";
                     break;
+                case 'bankfunnels':
+                    $sql .= " AND `banksfunnels` LIKE '%\"" . $filter_word . "\"%'";
+                       break; 
                 case 'bank_id':
                     $sql .= " AND `banksfunnels` LIKE '%\"" . $filter_word . ":%'";
                     break;
@@ -253,7 +256,7 @@ class ClientsController extends Controller
                     $sql .= " AND `banksfunnels` LIKE '%:" . $filter_word . "\"%'";
                     break;
                 case 'banksfunnelsNotEmpty':
-                    $sql .= " AND `banksfunnels` != ''";
+                    $sql .= " AND `banksfunnels` LIKE '%:0\"%'";
                     break;
                 case 'user_id':
                     $sql .= " AND `user_id` = '" . $filter_word . "'";

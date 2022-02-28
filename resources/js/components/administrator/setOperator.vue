@@ -135,7 +135,7 @@
               outlined
               raised
               @click="
-                getClients;
+                getClients(selectedBank);
                 this.firstRequest = false;
               "
               >Фильтр <v-icon> mdi-table-large </v-icon></v-btn
@@ -360,7 +360,7 @@
               text
               @click="
                 dialog = false;
-                selectedBanks = 0;
+                selectedBanks = [];
               "
               >Нет</v-btn
             >
@@ -501,7 +501,7 @@ export default {
           //     e.operator = self.users.find((u) => u.id == e.user_id).fio;
           //   });
           self.howmanybank();
-          self.selectedBanks = 0;
+          self.selectedBanks = [];
           self.loading = false;
         })
         .catch((error) => console.log(error));
@@ -520,7 +520,7 @@ export default {
       let self = this;
       let send = {};
       self.loading= true
-      if (self.selectedBank != 0) send.bank_id = self.selectedBank;
+      if (self.selectedBank) send.bank_id = self.selectedBank;
       send.user_id = this.userid;
       if (this.selected.length) {
         send.clients = this.selected.map((i) => i.id);
@@ -612,8 +612,12 @@ export default {
           if (el.value != "" && el.getAttribute("id"))
             send[el.getAttribute("id")] = el.value;
         });
-        if (this.selectedBank) send.bank_id = this.selectedBank;
-        if (this.selectedFunnel) send.funnel_id = this.selectedFunnel;
+        // if (this.selectedBank) send.bank_id = this.selectedBank;
+        if (this.selectedBank && this.selectedFunnel) {
+          send.bankfunnels = this.selectedBank+':'+this.selectedFunnel;
+        } else if(this.selectedBank){
+send.bankfunnels = this.selectedBank+':'+0
+        }
       }
       send.user_id = 0;
       axios
@@ -646,7 +650,9 @@ export default {
               banksfunnels,
             })
           );
+           if (empty) {
           self.howmanybank();
+           }
           self.loading= false
         })
         .catch((error) => console.log(error));
