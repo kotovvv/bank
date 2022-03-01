@@ -10,56 +10,71 @@
     </v-snackbar>
 
     <v-row>
-          <!-- bank -->
-          <v-col cols="3">
-            <v-select
-              v-model="selectedUser"
-              :items="users"
-              outlined
-              :dense="true"
-              chips
-              small-chips
-              item-text="fio"
-              item-value="id"
-              label="Операторы"
-              hide-details="true"
-              @change="getUserClients"
-            >
-              <template v-slot:item="{ active, item, attrs, on }">
-                <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      <v-row no-gutters align="center">
-                        <span>{{ item.fio }}</span>
-                        <v-spacer></v-spacer>
-                        <v-chip
-                          text-color="white"
-                          class="indigo darken-4"
-                          small
-                          v-if="item.hmlids > 0"
-                          >{{ item.hmlids }}</v-chip
-                        >
-                      </v-row>
-                    </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-            </v-select>
-</v-col>
+      <!-- bank -->
+      <v-col cols="3">
+        <v-select
+          v-model="selectedUser"
+          :items="users"
+          outlined
+          :dense="true"
+          chips
+          small-chips
+          item-text="fio"
+          item-value="id"
+          label="Операторы"
+          hide-details="true"
+          @change="getUserClients"
+        >
+          <template v-slot:item="{ active, item, attrs, on }">
+            <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
+              <v-list-item-content>
+                <v-list-item-title>
+                  <v-row no-gutters align="center">
+                    <span>{{ item.fio }}</span>
+                    <v-spacer></v-spacer>
+                    <v-chip
+                      text-color="white"
+                      class="indigo darken-4"
+                      small
+                      v-if="item.hmlids > 0"
+                      >{{ item.hmlids }}</v-chip
+                    >
+                  </v-row>
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </template>
+        </v-select>
+      </v-col>
+      <!-- download -->
+      <v-col cols="2">
+        <v-select
+          v-model="selectedDatem"
+          :items="dates"
+          outlined
+          dense
+          chips
+          small-chips
+          item-text="date"
+          item-value="date"
+          label="Дни добавления"
+          hide-details="true"
+        ></v-select>
+      </v-col>
+      <v-spacer></v-spacer>
 
-          <v-spacer></v-spacer>
-
-<v-col class="d-flex justify-end">
-            <v-btn v-if="selected.length && selectedUser > 0"
-              color="primary"
-              elevation="2"
-              outlined
-              raised
-              @click="dialogo = true"
-              >Открепить оператора</v-btn
-            >
-</v-col>
-        </v-row>
+      <v-col class="d-flex justify-end">
+        <v-btn
+          v-if="selected.length && selectedUser > 0"
+          color="primary"
+          elevation="2"
+          outlined
+          raised
+          @click="dialogo = true"
+          >Открепить оператора</v-btn
+        >
+      </v-col>
+    </v-row>
 
     <template>
       <v-row>
@@ -81,9 +96,7 @@
                 'items-per-page-text': 'Показать',
               }"
             >
-              <template
-              v-slot:top="{  }"
-              >
+              <template v-slot:top="{}">
                 <v-row>
                   <v-col cols="6">
                     <v-row class="justify-start align-end mb-5">
@@ -281,9 +294,11 @@
 
 <script>
 import axios from "axios";
-
+import _ from "lodash";
 export default {
   data: () => ({
+    selectedDatem: "Все",
+    dates: [],
     selected: [],
     userid: null,
     disableuser: 0,
@@ -312,8 +327,8 @@ export default {
       { text: "Регистрация", value: "registration" },
       { text: "Загрузка", value: "date_added" },
       { text: "Оператор", value: "operator" },
-    //   { text: "Оператор ID", value: "user_id" },
-    //   { text: "Банк:Воронка", value: "banksfunnels" },
+      //   { text: "Оператор ID", value: "user_id" },
+      //   { text: "Банк:Воронка", value: "banksfunnels" },
     ],
     clients: [],
     headers: [],
@@ -328,7 +343,6 @@ export default {
     dialogo: false,
     dialogset: false,
     dateReg: [],
-    dateAdd: [],
     firm: "",
     address: "",
     region: "",
@@ -338,7 +352,6 @@ export default {
     // this.getBanks();
     // this.getFunnels();
     this.getUsers();
-
   },
   watch: {},
   computed: {
@@ -352,7 +365,8 @@ export default {
             new RegExp('"' + this.selectedBank + ":").test(i.banksfunnels)) &&
           (!this.firm || regfirm.test(i.organizationName)) &&
           (!this.address || regaddress.test(i.address)) &&
-          (!this.region || regregion.test(i.region))
+          (!this.region || regregion.test(i.region)) &&
+          (!(this.selectedDatem != 'Все') || i.date_set == this.selectedDatem)
         );
       });
     },
@@ -405,6 +419,12 @@ export default {
           self.clients.map(function (e) {
             e.operator = self.users.find((u) => u.id == e.user_id).fio;
           });
+          self.dates = Object.entries(_.groupBy(self.clients, "date_set")).map(
+            (i) => {
+              return { date: i[0], hm: i[1].length };
+            }
+          );
+          self.dates.unshift({ date: "Все" });
         })
         .catch((error) => console.log(error));
     },
@@ -422,7 +442,7 @@ export default {
       let self = this;
       let send = {};
       if (this.selected.length == 0) return;
-      send.user_id = self.userid == 0? 0 :this.selectedUser;
+      send.user_id = self.userid == 0 ? 0 : this.selectedUser;
       send.clients = this.selected.map((i) => i.id);
 
       axios
@@ -499,8 +519,11 @@ export default {
           if (el.value != "" && el.getAttribute("id"))
             send[el.getAttribute("id")] = el.value;
         });
-        if (this.selectedBank) send.bank_id = this.selectedBank;
-        if (this.selectedFunnel) send.funnel_id = this.selectedFunnel;
+        if (this.selectedBank && this.selectedFunnel) {
+          send.bankfunnels = this.selectedBank + ":" + this.selectedFunnel;
+        } else if (this.selectedBank) {
+          send.bankfunnels = this.selectedBank + ":" + 0;
+        }
       }
       send.user_id = self.selectedUser;
       axios

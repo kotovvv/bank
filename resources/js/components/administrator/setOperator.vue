@@ -95,8 +95,61 @@
               </v-date-picker>
             </v-dialog>
           </v-col>
-          <!-- firm -->
+          <!-- download -->
           <v-col cols="2">
+            <v-dialog
+              ref="dialog2"
+              v-model="modal2"
+              :return-value.sync="dateAdd"
+              persistent
+              width="330px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model.lazy="dateAdd"
+                  label="Загрузка (период)"
+                  prepend-icon="mdi-calendar"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  id="dateadd"
+                  hide-details="true"
+                  :dense="true"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model.lazy="dateAdd"
+                scrollable
+                range
+                locale="ru-ru"
+              >
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="modal2 = false">
+                  Отмена
+                </v-btn>
+                <v-btn
+                  text
+                  color="primary"
+                  @click="
+                    dateAdd = [];
+                    $refs.dialog2.save(dateAdd);
+                    modal2 = false;
+                  "
+                >
+                  Очистить
+                </v-btn>
+                <v-btn
+                  text
+                  color="primary"
+                  @click="$refs.dialog2.save(dateAdd)"
+                >
+                  Выбрать
+                </v-btn>
+              </v-date-picker>
+            </v-dialog>
+          </v-col>
+          <!-- firm -->
+          <v-col cols="1">
             <v-text-field
               label="Наименование:"
               id="firm"
@@ -106,7 +159,7 @@
             ></v-text-field>
           </v-col>
           <!-- address -->
-          <v-col cols="1">
+          <v-col>
             <v-text-field
               label="Адрес"
               id="address"
@@ -117,7 +170,7 @@
           </v-col>
 
           <!-- reg -->
-          <v-col cols="1">
+          <v-col>
             <v-text-field
               label="Регион"
               id="region"
@@ -128,7 +181,7 @@
           </v-col>
 
           <!-- btn -->
-          <v-col cols="1">
+          <v-col>
             <v-btn
               color="primary"
               elevation="2"
@@ -376,6 +429,7 @@ import axios from "axios";
 
 export default {
   data: () => ({
+    dialog2: false,
     selected: [],
     userid: null,
     disableuser: 0,
@@ -384,7 +438,6 @@ export default {
     users: [],
     tab: null,
     dateReg: [],
-    dateAdd: [],
     firm: "",
     fio: "",
     inn: "",
@@ -519,7 +572,7 @@ export default {
     changeUserOfClients() {
       let self = this;
       let send = {};
-      self.loading= true
+      self.loading = true;
       if (self.selectedBank) send.bank_id = self.selectedBank;
       send.user_id = this.userid;
       if (this.selected.length) {
@@ -535,7 +588,7 @@ export default {
           self.userid = null;
           self.disableuser = 0;
           self.selected = [];
-          self.loading= false
+          self.loading = false;
         })
         .catch((error) => console.log(error));
     },
@@ -602,7 +655,7 @@ export default {
     getClients(empty = false) {
       const self = this;
       let send = {};
-      self.loading= true
+      self.loading = true;
       if (empty) {
         send.banksfunnelsNotEmpty = 1;
       } else {
@@ -614,10 +667,13 @@ export default {
         });
         // if (this.selectedBank) send.bank_id = this.selectedBank;
         if (this.selectedBank && this.selectedFunnel) {
-          send.bankfunnels = this.selectedBank+':'+this.selectedFunnel;
-        } else if(this.selectedBank){
-send.bankfunnels = this.selectedBank+':'+0
+          send.bankfunnels = this.selectedBank + ":" + this.selectedFunnel;
+        } else if (this.selectedBank) {
+          send.bankfunnels = this.selectedBank + ":" + 0;
         }
+      }
+      if (this.dateAdd.length) {
+        send.dateadd = this.dateAdd;
       }
       send.user_id = 0;
       axios
@@ -650,12 +706,15 @@ send.bankfunnels = this.selectedBank+':'+0
               banksfunnels,
             })
           );
-           if (empty) {
-          self.howmanybank();
-           }
-          self.loading= false
+          if (empty) {
+            self.howmanybank();
+          }
+          self.loading = false;
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          self.loading = false;
+          console.log(error);
+        });
     },
   },
   components: {},

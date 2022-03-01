@@ -159,7 +159,7 @@ class ClientsController extends Controller
                     // Client::setBankFunnels([$cl['id']], $data['bank_id'], 0);
                     $i++;
                 }
-                 usleep(200);
+                usleep(200);
             }
             // Debugbar::info($cl_onstat);
             if (isset($cl_onstat['2']) && count($cl_onstat['2'])) {
@@ -220,11 +220,17 @@ class ClientsController extends Controller
                     break;
                 case 'dateadd':
 
-                    if (strpos($filter_word, ',')) {
-                        $a_date = explode(',', $filter_word);
+                    if (is_array($filter_word)) {
+                        $a_date = $filter_word;
+                    } else {
+                        if (strpos($filter_word, ',')) {
+                            $a_date = explode(',', $filter_word);
+                        }
+                    }
+                    if (count($a_date) == 2) {
                         $sql .= " AND date(`date_added`) BETWEEN date('$a_date[0]') AND date('$a_date[1]')";
                     } else {
-                        $sql .= " AND date(`date_added`) = date('$filter_word')";
+                        $sql .= " AND date(`date_added`) = date('$a_date[0]')";
                     }
                     break;
                 case 'firm':
@@ -248,7 +254,7 @@ class ClientsController extends Controller
                     break;
                 case 'bankfunnels':
                     $sql .= " AND `banksfunnels` LIKE '%\"" . $filter_word . "\"%'";
-                       break; 
+                    break;
                 case 'bank_id':
                     $sql .= " AND `banksfunnels` LIKE '%\"" . $filter_word . ":%'";
                     break;
