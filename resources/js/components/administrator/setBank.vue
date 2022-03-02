@@ -80,7 +80,7 @@
       </template>
     </v-dialog>
     <v-row>
-      <v-col cols="8">
+      <v-col cols="12">
         <div id="filter" class="my-3">
           <v-row>
             <!-- registration -->
@@ -190,7 +190,43 @@
                 </v-date-picker>
               </v-dialog>
             </v-col>
-
+          <!-- bank -->
+          <v-col cols="2">
+            <v-select
+              v-model="filterBanks"
+              :items="banks"
+              :dense="true"
+              chips
+              small-chips
+              item-text="name"
+              item-value="id"
+              label="Банк"
+multiple
+              hide-details="true"
+            >
+              <template v-slot:item="{ active, item, attrs, on }">
+                <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      <v-row no-gutters align="center">
+                        <span>{{ item.name }}</span>
+                        <v-spacer></v-spacer>
+                        <v-chip
+                          text-color="white"
+                          class="indigo darken-4"
+                          small
+                          v-if="item.hm > 0"
+                          >{{ item.hm }}</v-chip
+                        >
+                      </v-row>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-select>
+          </v-col>
+          </v-row>
+          <v-row class="align-center">
             <!-- firm -->
             <v-col cols="4">
               <v-text-field
@@ -201,8 +237,6 @@
                 :dense="true"
               ></v-text-field>
             </v-col>
-          </v-row>
-          <v-row class="align-center">
             <!-- fio -->
             <v-col cols="3">
               <v-text-field
@@ -260,58 +294,6 @@
           </v-row>
         </div>
       </v-col>
-      <v-col cols="4">
-        <div class="btn4">
-          <v-autocomplete
-            v-model="selectedBanks"
-            :items="banks"
-            outlined
-            dense
-            chips
-            small-chips
-            item-text="name"
-            item-value="id"
-            label="Назначить банк"
-            @change="dialog = true"
-            hide-details="true"
-          ></v-autocomplete>
-
-          <v-checkbox
-            class="mt-2"
-            color="red"
-            v-model="checkBanks"
-            label="С проверкой"
-            hide-details="true"
-          ></v-checkbox>
-
-          <!-- hide bank -->
-
-          <v-autocomplete
-            outlined
-            dense
-            chips
-            small-chips
-            v-model="hidedBank"
-            :items="banks"
-            item-text="name"
-            item-value="id"
-            :menu-props="{ maxHeight: '400' }"
-            label="Спрятать банк"
-            multiple
-            hide-details="true"
-          ></v-autocomplete>
-
-          <v-btn
-            :disabled="!selected.length"
-            outlined
-            raised
-            @click="dialogDelClients = true"
-            height="40"
-          >
-            Удалить из базы
-          </v-btn>
-        </div>
-      </v-col>
     </v-row>
     <template>
       <v-row>
@@ -335,7 +317,7 @@
             >
               <template v-slot:top="{}">
                 <v-row>
-                  <v-col cols="12">
+                  <v-col>
                     <v-row class="justify-start align-end mb-5">
                       <span class="ml-10">Отобрать</span>
                       <span class="mx-4 hmrows">
@@ -351,7 +333,61 @@
                       <v-spacer></v-spacer>
                     </v-row>
                   </v-col>
-                  <v-spacer></v-spacer>
+                  <!-- <v-spacer></v-spacer> -->
+                  <v-col>
+                    <!-- <div class="btn4"> -->
+                    <v-autocomplete
+                      v-model="selectedBanks"
+                      :items="banks"
+                      outlined
+                      dense
+                      chips
+                      small-chips
+                      item-text="name"
+                      item-value="id"
+                      label="Назначить банк"
+                      @change="dialog = true"
+                      hide-details="true"
+                    ></v-autocomplete>
+                    <!-- </v-col>
+                        <v-col> -->
+                    <v-checkbox
+                      class="mt-2"
+                      color="red"
+                      v-model="checkBanks"
+                      label="С проверкой"
+                      hide-details="true"
+                    ></v-checkbox>
+                  </v-col>
+                  <!-- hide bank -->
+                  <v-col>
+                    <v-autocomplete
+                      outlined
+                      dense
+                      chips
+                      small-chips
+                      v-model="hidedBank"
+                      :items="banks"
+                      item-text="name"
+                      item-value="id"
+                      :menu-props="{ maxHeight: '400' }"
+                      label="Спрятать банк"
+                      multiple
+                      hide-details="true"
+                    ></v-autocomplete>
+                  </v-col>
+                  <v-col>
+                    <v-btn
+                      :disabled="!selected.length"
+                      outlined
+                      raised
+                      @click="dialogDelClients = true"
+                      height="40"
+                    >
+                      Удалить из базы
+                    </v-btn>
+                    <!-- </div> -->
+                  </v-col>
                 </v-row>
               </template>
             </v-data-table>
@@ -374,6 +410,7 @@ export default {
     selected: [],
     userid: null,
     disableuser: 0,
+    filterBanks: [],
     selectedBanks: [],
     banks: [],
     hidedBank: [],
