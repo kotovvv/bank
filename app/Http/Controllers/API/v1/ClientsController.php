@@ -206,6 +206,24 @@ class ClientsController extends Controller
         foreach ($a_filter as $key => $filter_word) {
             // Debugbar::info(iconv_strlen($filter_word));
             switch ($key) {
+                case 'banks':
+                    $str = ' AND (';
+                    foreach ($filter_word as $key => $bank_id) {
+                        $or = $key > 0 ? " OR " : "";
+                        $str .= $or . " `banksfunnels` LIKE '%\"" . $bank_id . ":%'";
+                    }
+                    $str .= ') ';
+                    $sql .= $str;
+                    break;
+                case 'funnels':
+                    $str = ' AND (';
+                    foreach ($filter_word as $key => $funnel) {
+                        $or = $key > 0 ? " OR " : "";
+                        $str .= $or . " `banksfunnels` LIKE '%:" . $funnel . "\"%'";
+                    }
+                    $str .= ') ';
+                    $sql .= $str;
+                    break;
                 case 'datereg':
                     if (strpos($filter_word, ',')) {
                         $a_date = explode(',', $filter_word);
@@ -219,12 +237,13 @@ class ClientsController extends Controller
                     }
                     break;
                 case 'dateadd':
-
                     if (is_array($filter_word)) {
                         $a_date = $filter_word;
                     } else {
                         if (strpos($filter_word, ',')) {
                             $a_date = explode(',', $filter_word);
+                        } else {
+                            $a_date[] = $filter_word;
                         }
                     }
                     if (count($a_date) == 2) {

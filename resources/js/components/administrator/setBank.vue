@@ -22,9 +22,9 @@
           >
           <v-card-text>
             <div class="text-h4 pa-12">
-              Отправить на {{ howrows }}
-              {{ plueral(howrows, ["запись", "записи", "записей"]) }} выбранный
-              банк?
+              Отправить {{ howrows }}
+              {{ plueral(howrows, ["запись", "записи", "записей"]) }} на
+              выбранный банк?
             </div>
           </v-card-text>
           <v-card-actions class="justify-end">
@@ -84,7 +84,7 @@
         <div id="filter" class="my-3">
           <v-row>
             <!-- registration -->
-            <v-col cols="4">
+            <v-col>
               <v-dialog
                 ref="dialog"
                 v-model="modal"
@@ -138,7 +138,7 @@
             </v-col>
 
             <!-- download -->
-            <v-col cols="4">
+            <v-col>
               <v-dialog
                 ref="dialog2"
                 v-model="modal2"
@@ -190,45 +190,47 @@
                 </v-date-picker>
               </v-dialog>
             </v-col>
-          <!-- bank -->
-          <v-col cols="2">
-            <v-select
-              v-model="filterBanks"
-              :items="banks"
-              :dense="true"
-              chips
-              small-chips
-              item-text="name"
-              item-value="id"
-              label="Банк"
-multiple
-              hide-details="true"
-            >
-              <template v-slot:item="{ active, item, attrs, on }">
-                <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      <v-row no-gutters align="center">
-                        <span>{{ item.name }}</span>
-                        <v-spacer></v-spacer>
-                        <v-chip
-                          text-color="white"
-                          class="indigo darken-4"
-                          small
-                          v-if="item.hm > 0"
-                          >{{ item.hm }}</v-chip
-                        >
-                      </v-row>
-                    </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-            </v-select>
-          </v-col>
+
+            <!-- banks -->
+            <v-col>
+              <v-select
+                v-model="filterBanks"
+                :items="banks"
+                :dense="true"
+                chips
+                small-chips
+                id="banks"
+                item-text="name"
+                item-value="id"
+                label="Банк"
+                multiple
+                hide-details="true"
+                :value="selected"
+              >
+              </v-select>
+            </v-col>
+
+            <!-- funnels -->
+            <v-col>
+              <v-select
+                v-model="filterFunnels"
+                :items="funnels"
+                :dense="true"
+                id="funnels"
+                chips
+                small-chips
+                item-text="name"
+                item-value="id"
+                label="Статусы"
+                multiple
+                hide-details="true"
+              >
+              </v-select>
+            </v-col>
           </v-row>
           <v-row class="align-center">
             <!-- firm -->
-            <v-col cols="4">
+            <v-col>
               <v-text-field
                 label="Наименование:"
                 id="firm"
@@ -237,8 +239,9 @@ multiple
                 :dense="true"
               ></v-text-field>
             </v-col>
+
             <!-- fio -->
-            <v-col cols="3">
+            <v-col>
               <v-text-field
                 label="ФИО:"
                 id="fio"
@@ -249,7 +252,7 @@ multiple
             </v-col>
 
             <!-- inn -->
-            <v-col cols="2">
+            <v-col>
               <v-text-field
                 label="ИНН"
                 id="inn"
@@ -260,7 +263,7 @@ multiple
             </v-col>
 
             <!-- address -->
-            <v-col cols="2">
+            <v-col>
               <v-text-field
                 label="Адрес"
                 id="address"
@@ -271,7 +274,7 @@ multiple
             </v-col>
 
             <!-- reg -->
-            <v-col cols="2">
+            <v-col>
               <v-text-field
                 label="Регион"
                 id="region"
@@ -280,17 +283,18 @@ multiple
                 :dense="true"
               ></v-text-field>
             </v-col>
+            <v-spacer></v-spacer>
+
             <!-- btn -->
-            <v-col>
-              <v-btn
-                color="primary"
-                elevation="2"
-                outlined
-                raised
-                @click="getClients"
-                >Фильтр <v-icon> mdi-table-large </v-icon></v-btn
-              >
-            </v-col>
+            <v-btn
+              class="mr-3"
+              color="primary"
+              elevation="2"
+              outlined
+              raised
+              @click="getClients"
+              >Фильтр <v-icon> mdi-table-large </v-icon></v-btn
+            >
           </v-row>
         </div>
       </v-col>
@@ -318,24 +322,24 @@ multiple
               <template v-slot:top="{}">
                 <v-row>
                   <v-col>
-                    <v-row class="justify-start align-end mb-5">
-                      <span class="ml-10">Отобрать</span>
-                      <span class="mx-4 hmrows">
+                    <v-row class="mb-5">
+                      <span class="ml-7 mx-4 d-flex align-end"
+                        >Отбор
                         <v-text-field
+                          class="mx-2"
                           label="Сколько?"
                           @input="selectRow"
                           :max="filterClients.length"
                           v-model.number.lazy="hmrow"
                           hide-details="auto"
+                          color="red"
                         ></v-text-field>
+                        из {{ filterClients.length }}
                       </span>
-                      <span> записей из {{ filterClients.length }}</span>
-                      <v-spacer></v-spacer>
                     </v-row>
                   </v-col>
-                  <!-- <v-spacer></v-spacer> -->
+
                   <v-col>
-                    <!-- <div class="btn4"> -->
                     <v-autocomplete
                       v-model="selectedBanks"
                       :items="banks"
@@ -349,8 +353,7 @@ multiple
                       @change="dialog = true"
                       hide-details="true"
                     ></v-autocomplete>
-                    <!-- </v-col>
-                        <v-col> -->
+
                     <v-checkbox
                       class="mt-2"
                       color="red"
@@ -359,6 +362,7 @@ multiple
                       hide-details="true"
                     ></v-checkbox>
                   </v-col>
+
                   <!-- hide bank -->
                   <v-col>
                     <v-autocomplete
@@ -376,6 +380,8 @@ multiple
                       hide-details="true"
                     ></v-autocomplete>
                   </v-col>
+
+                  <!-- del from base -->
                   <v-col>
                     <v-btn
                       :disabled="!selected.length"
@@ -386,7 +392,19 @@ multiple
                     >
                       Удалить из базы
                     </v-btn>
-                    <!-- </div> -->
+                  </v-col>
+                  <v-col>
+                    <v-btn>
+                      <download-csv
+                        :data="filterClients"
+                        delimiter=";"
+                        :name="
+                          'osn-' + new Date().toLocaleDateString() + '.csv'
+                        "
+                      >
+                        Экспорт
+                      </download-csv>
+                    </v-btn>
                   </v-col>
                 </v-row>
               </template>
@@ -400,7 +418,7 @@ multiple
 
 <script>
 import axios from "axios";
-
+import JsonCSV from "vue-json-csv";
 export default {
   data: () => ({
     dialogDelClients: false,
@@ -413,6 +431,7 @@ export default {
     filterBanks: [],
     selectedBanks: [],
     banks: [],
+    filterFunnels: [],
     hidedBank: [],
     users: [],
     tab: null,
@@ -440,6 +459,8 @@ export default {
     ],
     clients: [],
     banksfunnels: [],
+    funnels: [],
+    filterfunnels: [],
     headers: [],
     message: "",
     snackbar: false,
@@ -448,6 +469,7 @@ export default {
   mounted() {
     this.getBanks();
     // this.getUsers();
+    this.getFunnels();
     this.getClientsWithoutBanks();
   },
   computed: {
@@ -468,6 +490,15 @@ export default {
   },
   watch: {},
   methods: {
+    getFunnels() {
+      let self = this;
+      axios
+        .get("/api/funnels")
+        .then((res) => {
+          self.funnels = res.data;
+        })
+        .catch((error) => console.log(error));
+    },
     delClients() {
       if (this.selected.length) {
         let self = this;
@@ -591,8 +622,15 @@ export default {
       const filter = document.getElementById("filter");
       const inputs = filter.querySelectorAll("input");
       inputs.forEach(function (el) {
-        if (el.value != "") send[el.getAttribute("id")] = el.value;
+        if (el.value != "" && el.getAttribute("id"))
+          send[el.getAttribute("id")] = el.value;
       });
+      if (this.filterBanks.length) {
+        send.banks = this.filterBanks;
+      }
+      if (this.filterFunnels.length) {
+        send.funnels = this.filterFunnels;
+      }
       axios
         .post("/api/getClients", send)
         .then((res) => {
@@ -625,22 +663,11 @@ export default {
         .catch((error) => console.log(error));
     },
   },
-  components: {},
+  components: {
+    downloadCsv: JsonCSV,
+  },
 };
 </script>
 
 <style scoped>
-.hmrows {
-  width: 100px;
-}
-.btn4 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 15px;
-}
-@media (max-width: 1024px) {
-  .btn4 {
-    grid-template-columns: 1fr;
-  }
-}
 </style>
