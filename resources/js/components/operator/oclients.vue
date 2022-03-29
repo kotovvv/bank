@@ -270,15 +270,15 @@
                       <v-radio-group v-model="rr">
                         <v-radio
                           label="Пакет услуг Легкий старт"
-                          :value="18"
+                          :value="1"
                         ></v-radio>
                         <v-radio
                           label="Пакет услуг Набирая обороты"
-                          :value="49"
+                          :value="29"
                         ></v-radio>
                         <v-radio
                           label="Пакет услуг Полным ходом"
-                          :value="50"
+                          :value="30"
                         ></v-radio>
                       </v-radio-group>
                     </v-col>
@@ -291,9 +291,9 @@
                       <v-radio-group v-model="pp">
                         <v-radio
                           label="Торговый эквайринг"
-                          :value="31"
+                          :value="14"
                         ></v-radio>
-                        <v-radio label="Смарт-терминал" :value="42"></v-radio>
+                        <v-radio label="Смарт-терминал" :value="22"></v-radio>
                       </v-radio-group>
                     </v-col>
                     <!-- <v-col cols="4">
@@ -303,7 +303,7 @@
                       </v-btn>
 
                       <v-radio-group v-model="ss">
-                        <v-radio label="Сберздоровье" :value="46"></v-radio>
+                        <v-radio label="Сберздоровье" :value="26"></v-radio>
                       </v-radio-group>
                     </v-col> -->
                   </v-row>
@@ -317,7 +317,8 @@
                       company_name == '' ||
                       last_name == '' ||
                       first_name == '' ||
-                      (branches.length > 0 && Object.keys(branch).length == 0) ||
+                      (branches.length > 0 &&
+                        Object.keys(branch).length == 0) ||
                       (pp == 0 && ss == 0 && rr == 0)
                     "
                     >Отправить заявку</v-btn
@@ -716,7 +717,7 @@ export default {
       if (this.rr != 0) products.push(this.rr);
       send.data = {
         inn: this.selected.inn,
-        merchant_id: 50,
+        merchant_id: 39,
         product_ids: products,
         company_name: this.company_name,
         last_name: this.last_name,
