@@ -48,6 +48,12 @@
                   <li><b>Регион: </b>{{ selected.region }}</li>
                   <li><b>Регистрация: </b>{{ selected.registration }}</li>
                 </ul>
+                <v-textarea
+                  v-model="add_info"
+                  outlined
+                  name="message"
+                  label="Коментарии"
+                ></v-textarea>
               </v-col>
               <v-col cols="8">
                 <v-progress-linear
@@ -64,18 +70,16 @@
                   v-if="reqBtn"
                   >Запрос на звонок</v-btn
                 >
-
-                <div
+                <v-alert
                   id="answer_bank"
                   v-if="answer_bank"
                   class="pa-1"
-                  :class="{
-                    'green white--text': responseBank.status == 'allowed',
-                    'pink white--text': responseBank.status != 'allowed',
-                  }"
+                  dense
+                  text
+                  type="{responseBank.status == 'allowed'? 'success': 'error'}"
                 >
                   {{ answer_bank }}
-                </div>
+                </v-alert>
 
                 <!-- answer client -->
                 <div class="mt-5" v-show="step == 2">
@@ -319,7 +323,8 @@
                       first_name == '' ||
                       (branches.length > 0 &&
                         Object.keys(branch).length == 0) ||
-                      (pp == 0 && ss == 0 && rr == 0)
+                      (pp == 0 && ss == 0 && rr == 0) ||
+                      isLoading
                     "
                     >Отправить заявку</v-btn
                   >
@@ -591,6 +596,7 @@ export default {
     first_name: "",
     middle_name: "",
     other: "",
+    add_info: "",
   }),
   mounted() {
     this.getBanks();
@@ -725,27 +731,32 @@ export default {
         middle_name: this.middle_name,
         // email:
         phone: "+" + this.selected.phoneNumber,
-        // add_info:
+        add_info: this.add_info,
         region_id: this.model_region,
         city_id: this.model_city,
         merchant_branch_id: branch_id,
       };
       send.bank_id = this.selectedBank;
       send.action = "send_order";
+      this.isLoading = true;
       axios
         .post("/api/sendOrder", send)
         .then((res) => {
           self.other = JSON.stringify(res.data);
           if (res.data.data.errors) {
             self.message = JSON.stringify(res.data.data.errors);
+            if (self.message.call_easy_permission == "is_required") {
+              self.message = "Нет разрешения от Колизея";
+            }
             self.snackbar = true;
           }
           if (res.data.successful == true) {
             self.message = JSON.stringify(res.data.data.number);
+            self.message = "Подтвердите заявку";
             self.snackbar = true;
             self.group_status = 5;
           }
-          console.log(res.data);
+          self.isLoading = false;
         })
         .catch((error) => console.log(error));
       console.log(send);
@@ -1034,5 +1045,8 @@ export default {
 }
 #recallmenu:hover {
   overflow-y: auto;
+}
+.v-card__text {
+  min-height: 70vh;
 }
 </style>

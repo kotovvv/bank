@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\v1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Bank;
+use App\Models\Log;
 use Barryvdh\Debugbar\Twig\Extension\Debug;
 use Illuminate\Support\Facades\Http;
 use DB;
@@ -98,14 +99,14 @@ class BanksController extends Controller
 
         $data = $request->All();
         $inn = $data['data']['inn'];
-       if( Cache::has($inn)){
-           $response = [
-            "id" => Cache::get($inn),
-            "status"=>"allowed",
-            "status_translate"=>"Звонок разрешен"
-           ];
-        return response($response);
-       }
+        if (Cache::has($inn)) {
+            $response = [
+                "id" => Cache::get($inn),
+                "status" => "allowed",
+                "status_translate" => "Звонок разрешен"
+            ];
+            return response($response);
+        }
 
         $send = ['data' => $data['data']];
 
@@ -122,8 +123,8 @@ class BanksController extends Controller
             );
         }
         $res = json_decode($response);
-        if(isset($res->id)){
-            Cache::put($res->inn, $res->id, 60*60);
+        if (isset($res->id)) {
+            Cache::put($res->inn, $res->id, 60 * 60);
         }
         return response($response);
     }
@@ -153,7 +154,7 @@ class BanksController extends Controller
     }
 
 
-    public function getRegions( $bank_id)
+    public function getRegions($bank_id)
     {
         if (Cache::store('file')->has('regions')) {
             $entries = Cache::store('file')->get('regions');
@@ -270,6 +271,11 @@ class BanksController extends Controller
                 $bank['url'] . $action,
                 $send
             );
+        }
+        if ($data['data']['add_info']) {
+            $a_log = [];
+            $a_log = ['client_id' => $data['client_id'], 'user_id' => $data['user_id'], 'bank_id' => $data['bank_id'],  'other' => $data['data']['add_info'], 'dateadd' => Now(), 'timeadd' => Now()];
+            Log::insert($a_log);
         }
 
         return response(['data' => $response->object(), 'successful' => $response->successful(), 'status' => $response->status()]);
