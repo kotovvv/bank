@@ -77,7 +77,7 @@
                   class="pa-1"
                   dense
                   text
-                  type="{responseBank.status == 'allowed'? 'success': 'error'}"
+                  :type="type"
                 >
                   {{ answer_bank }}
                 </v-alert>
@@ -680,6 +680,9 @@ export default {
         );
       });
     },
+    type() {
+      return this.responseBank.status == "allowed" ? "success" : "error";
+    },
   },
   methods: {
     recall() {
@@ -905,6 +908,7 @@ export default {
     },
     clickrow(i, row) {
       row.select(true);
+      this.answer_bank = "";
       this.selected = row.item;
       this.model_city = null;
       this.model_region = null;
@@ -1033,7 +1037,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 #recallmenu {
   position: fixed;
   bottom: 35px;
