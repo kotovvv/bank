@@ -49,6 +49,7 @@
                   <li><b>Регистрация: </b>{{ selected.registration }}</li>
                 </ul>
                 <v-textarea
+                  v-show="step == 3 && group_status != 5"
                   v-model="add_info"
                   outlined
                   name="message"
