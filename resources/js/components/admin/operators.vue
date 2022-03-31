@@ -17,8 +17,6 @@
           :items="users"
           outlined
           :dense="true"
-          chips
-          small-chips
           item-text="fio"
           item-value="id"
           label="Операторы"
@@ -53,8 +51,6 @@
           :items="dates"
           outlined
           dense
-          chips
-          small-chips
           item-text="date"
           item-value="date"
           label="Дни добавления"
@@ -66,7 +62,7 @@
       <v-col class="d-flex justify-end">
         <v-btn
           v-if="selected.length && selectedUser > 0"
-          color="primary"
+          color="error"
           elevation="2"
           outlined
           raised
@@ -78,7 +74,11 @@
 
     <template>
       <v-row>
-        <v-spacer></v-spacer>
+        <v-progress-linear
+          :active="loading"
+          :indeterminate="loading"
+          color="deep-purple accent-4"
+        ></v-progress-linear>
         <v-col cols="12" v-if="clients.length">
           <v-card>
             <!-- :search="search" -->
@@ -108,6 +108,8 @@
                           :max="filterClients.length"
                           v-model.number.lazy="hmrow"
                           hide-details="auto"
+                          color="#004D40"
+                          class="align-center"
                         ></v-text-field>
                       </span>
                       <span> записей из {{ filterClients.length }}</span>
@@ -347,6 +349,7 @@ export default {
     address: "",
     region: "",
     firstRequest: true,
+    loading: false,
   }),
   mounted() {
     // this.getBanks();
@@ -366,7 +369,7 @@ export default {
           (!this.firm || regfirm.test(i.organizationName)) &&
           (!this.address || regaddress.test(i.address)) &&
           (!this.region || regregion.test(i.region)) &&
-          (!(this.selectedDatem != 'Все') || i.date_set == this.selectedDatem)
+          (!(this.selectedDatem != "Все") || i.date_set == this.selectedDatem)
         );
       });
     },
@@ -384,6 +387,7 @@ export default {
       send.clients = this.selected.map((i) => {
         return i.id;
       });
+      self.loading = true;
       axios
         .post("/api/delBankFromClients", send)
         .then((res) => {
@@ -396,6 +400,7 @@ export default {
             "Записей: " + res.data.all + "<br>Изменено: " + res.data.done;
           self.snackbar = true;
           self.selected = [];
+          self.loading = false;
         })
         .catch((error) => console.log(error));
     },
@@ -444,7 +449,7 @@ export default {
       if (this.selected.length == 0) return;
       send.user_id = self.userid == 0 ? 0 : this.selectedUser;
       send.clients = this.selected.map((i) => i.id);
-
+      self.loading = true;
       axios
         .post("/api/changeUserOfClients", send)
         .then((res) => {
@@ -453,6 +458,7 @@ export default {
           self.userid = null;
           self.disableuser = 0;
           self.selected = [];
+          self.loading = false;
         })
         .catch((error) => console.log(error));
     },
@@ -526,6 +532,7 @@ export default {
         }
       }
       send.user_id = self.selectedUser;
+      self.loading = true;
       axios
         .post("/api/getClients", send)
         .then((res) => {
@@ -557,6 +564,7 @@ export default {
             })
           );
           self.howmanybank();
+          self.loading = false;
         })
         .catch((error) => console.log(error));
     },

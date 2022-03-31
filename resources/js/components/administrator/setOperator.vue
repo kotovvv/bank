@@ -19,8 +19,6 @@
               :items="banks"
               outlined
               :dense="true"
-              chips
-              small-chips
               item-text="name"
               item-value="id"
               label="Банк"
@@ -36,7 +34,6 @@
                         <v-chip
                           text-color="white"
                           class="indigo darken-4"
-                          small
                           v-if="item.hm > 0"
                           >{{ item.hm }}</v-chip
                         >
@@ -198,7 +195,7 @@
 
           <v-col v-if="selected.length && selectedBank">
             <v-btn
-              color="primary"
+              color="error"
               elevation="2"
               outlined
               raised
@@ -242,6 +239,8 @@
                         v-model.number.lazy="hmrow"
                         @input="selectRow"
                         :max="clients.length"
+                        class="align-center"
+                        color="#004D40"
                         hide-details="true"
                         :dense="true"
                       ></v-text-field>
@@ -260,8 +259,6 @@
                       :items="users"
                       outlined
                       :dense="true"
-                      chips
-                      small-chips
                       item-text="fio"
                       item-value="id"
                       label="Операторы"
@@ -722,4 +719,7 @@ export default {
 </script>
 
 <style>
+.align-center input {
+  text-align: center;
+}
 </style>

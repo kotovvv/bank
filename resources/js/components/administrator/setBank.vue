@@ -197,8 +197,6 @@
                 v-model="filterBanks"
                 :items="banks"
                 :dense="true"
-                chips
-                small-chips
                 id="banks"
                 item-text="name"
                 item-value="id"
@@ -217,8 +215,6 @@
                 :items="funnels"
                 :dense="true"
                 id="funnels"
-                chips
-                small-chips
                 item-text="name"
                 item-value="id"
                 label="Статусы"
@@ -326,13 +322,13 @@
                       <span class="ml-7 mx-4 d-flex align-end"
                         >Отбор
                         <v-text-field
-                          class="mx-2"
+                          class="mx-2 align-center"
                           label="Сколько?"
                           @input="selectRow"
                           :max="filterClients.length"
                           v-model.number.lazy="hmrow"
                           hide-details="auto"
-                          color="red"
+                          color="#004D40"
                         ></v-text-field>
                         из {{ filterClients.length }}
                       </span>
@@ -345,8 +341,6 @@
                       :items="banks"
                       outlined
                       dense
-                      chips
-                      small-chips
                       item-text="name"
                       item-value="id"
                       label="Назначить банк"
@@ -368,8 +362,6 @@
                     <v-autocomplete
                       outlined
                       dense
-                      chips
-                      small-chips
                       v-model="hidedBank"
                       :items="banks"
                       item-text="name"
@@ -389,6 +381,7 @@
                       raised
                       @click="dialogDelClients = true"
                       height="40"
+                      color="red"
                     >
                       Удалить из базы
                     </v-btn>
@@ -533,10 +526,12 @@ export default {
     getClientsWithoutBanks() {
       let self = this;
       self.clients = [];
+      self.loading = true;
       axios
         .get("/api/getClientsWithoutBanks")
         .then((res) => {
           self.clients = Object.entries(res.data).map((e) => e[1]);
+          self.loading = false;
         })
         .catch((error) => console.log(error));
     },
@@ -631,6 +626,7 @@ export default {
       if (this.filterFunnels.length) {
         send.funnels = this.filterFunnels;
       }
+      self.loading = true;
       axios
         .post("/api/getClients", send)
         .then((res) => {
@@ -659,6 +655,7 @@ export default {
               banksfunnels,
             })
           );
+          self.loading = false;
         })
         .catch((error) => console.log(error));
     },

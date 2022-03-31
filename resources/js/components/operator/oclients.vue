@@ -24,7 +24,7 @@
       transition="dialog-top-transition"
       v-model="dialog"
       persistent
-      max-width="1200"
+      width="auto"
       hide-overlay
     >
       <template>
@@ -38,7 +38,7 @@
           </v-toolbar>
           <v-card-text>
             <v-row class="pt-3">
-              <v-col cols="4">
+              <v-col>
                 <ul style="color: #000">
                   <li><b>ФИО: </b>{{ selected.fullName }}</li>
                   <li><b>Тел: </b>{{ selected.phoneNumber }}</li>
@@ -49,6 +49,7 @@
                   <li><b>Регистрация: </b>{{ selected.registration }}</li>
                 </ul>
                 <v-textarea
+                  class="mt-4"
                   v-show="step == 3 && group_status != 5"
                   v-model="add_info"
                   outlined
@@ -56,7 +57,7 @@
                   label="Коментарии"
                 ></v-textarea>
               </v-col>
-              <v-col cols="8">
+              <v-col>
                 <v-progress-linear
                   color="deep-purple accent-4"
                   indeterminate
@@ -167,7 +168,6 @@
                         :items="show_regions"
                         :search-input.sync="search_region"
                         :loading="isLoading"
-                        chips
                         clearable
                         hide-details
                         hide-selected
@@ -213,7 +213,6 @@
                         :items="show_cities"
                         :loading="isLoading"
                         :search-input.sync="search_city"
-                        chips
                         clearable
                         hide-details
                         hide-selected
@@ -390,8 +389,6 @@
               :items="banks"
               outlined
               dense
-              chips
-              small-chips
               item-text="name"
               item-value="id"
               label="Банк"
@@ -408,7 +405,6 @@
                         <v-chip
                           text-color="white"
                           class="indigo darken-4"
-                          small
                           v-if="item.hm > 0"
                           >{{ item.hm }}</v-chip
                         >
@@ -428,8 +424,6 @@
               :items="dates"
               outlined
               dense
-              chips
-              small-chips
               item-text="date"
               item-value="date"
               label="Дни добавления"
@@ -1050,8 +1044,5 @@ export default {
 }
 #recallmenu:hover {
   overflow-y: auto;
-}
-.v-card__text {
-  min-height: 70vh;
 }
 </style>
