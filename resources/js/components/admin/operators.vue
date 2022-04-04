@@ -109,7 +109,7 @@
                           v-model.number.lazy="hmrow"
                           hide-details="auto"
                           color="#004D40"
-                          class="align-center"
+                          class="talign-center"
                         ></v-text-field>
                       </span>
                       <span> записей из {{ filterClients.length }}</span>

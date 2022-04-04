@@ -905,6 +905,8 @@ export default {
       this.answer_bank = "";
       this.selected = row.item;
       this.model_city = null;
+      this.regions = []
+      this.cities = [];
       this.model_region = null;
       this.branch = null;
       this.dialog = true;
@@ -917,6 +919,7 @@ export default {
       this.last_name = a_name[0];
       this.first_name = a_name[1];
       this.middle_name = a_name[2];
+      this.add_info = "";
     },
     requestBank() {
       this.reqBtn = false;

@@ -123,7 +123,7 @@ class BanksController extends Controller
             );
         }
         $res = json_decode($response);
-        if (isset($res->id)) {
+        if (isset($res->id) && $res->status == 'allowed') {
             Cache::put($res->inn, $res->id, 60 * 60);
         }
         return response($response);

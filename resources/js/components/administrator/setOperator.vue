@@ -239,7 +239,7 @@
                         v-model.number.lazy="hmrow"
                         @input="selectRow"
                         :max="clients.length"
-                        class="align-center"
+                        class="talign-center"
                         color="#004D40"
                         hide-details="true"
                         :dense="true"
@@ -719,7 +719,7 @@ export default {
 </script>
 
 <style>
-.align-center input {
+.talign-center input {
   text-align: center;
 }
 </style>

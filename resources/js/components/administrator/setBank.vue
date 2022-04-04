@@ -322,7 +322,7 @@
                       <span class="ml-7 mx-4 d-flex align-end"
                         >Отбор
                         <v-text-field
-                          class="mx-2 align-center"
+                          class="mx-2 talign-center"
                           label="Сколько?"
                           @input="selectRow"
                           :max="filterClients.length"
