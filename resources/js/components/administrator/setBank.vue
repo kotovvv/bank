@@ -322,7 +322,7 @@
                       <span class="ml-7 mx-4 d-flex align-end"
                         >Отбор
                         <v-text-field
-                          class="mx-2 talign-center"
+                          class="mx-2 talign-center nn"
                           label="Сколько?"
                           @input="selectRow"
                           :max="filterClients.length"
@@ -580,11 +580,12 @@ export default {
         for (let step = 0, show = 100; alldone.all - step * show; step++) {
           send.clients = clients_ids.slice(step * show, show + step * show);
           // Currently using await before axios call
+          if (alldone.all < step * show) break;
           await axios
             .post("/api/setBankForClients", send)
             .then((res) => {
               alldone.done += parseInt(res.data.done);
-              console.log(alldone.done);
+              // console.log(alldone.done);
               self.message =
                 "Записей: " + alldone.all + "<br>Изменено: " + alldone.done;
             })
@@ -666,5 +667,8 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+.talign-center input {
+  text-align: center;
+}
 </style>

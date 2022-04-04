@@ -577,4 +577,7 @@ export default {
 .hmrows {
   width: 100px;
 }
+.talign-center input {
+  text-align: center;
+}
 </style>
