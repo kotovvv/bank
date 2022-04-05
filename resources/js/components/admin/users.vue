@@ -195,6 +195,10 @@ export default {
         .get("/api/users")
         .then((res) => {
           self.users = res.data;
+          if (self.$attrs.user.role_id == 2) {
+              self.roles = self.roles[self.roles.findIndex((i)=>(i.id==3 ))]
+              self.users = self.users.filter((u)=> u.role_id ==3 )
+          }
           self.users.map(function (u) {
             u.role = (self.roles.find((r) => r.id == u.role_id)).name;
             if (u.role_id == 2) self.group.push(u)

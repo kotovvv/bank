@@ -343,8 +343,8 @@
                       dense
                       item-text="name"
                       item-value="id"
-                      label="Назначить банк"
-                      @change="dialog = true"
+                      label="Банк"
+
                       hide-details="true"
                     ></v-autocomplete>
 
@@ -387,7 +387,21 @@
                     </v-btn>
                   </v-col>
                   <v-col>
-                    <v-btn>
+                    <v-btn
+                     :disabled="btn_act"
+                      outlined
+                      raised
+                      @click="dialog = true"
+                      height="40"
+                      >
+                      Назначить
+                    </v-btn>
+                  </v-col>
+                  <v-spacer></v-spacer>
+                  <v-col>
+                    <v-btn
+                    v-if="$attrs.user.role_id == 1"
+                    >
                       <download-csv
                         :data="filterClients"
                         delimiter=";"
@@ -466,6 +480,10 @@ export default {
     this.getClientsWithoutBanks();
   },
   computed: {
+      btn_act(){
+          if(this.hmrow > 0 && this.selectedBanks > 0) return false
+          return true
+      },
     filterClients() {
       let re = "";
       re = this.hidedBank.map((i) => '"' + i + ":").join("|");
