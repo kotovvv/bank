@@ -389,10 +389,11 @@
                   <v-col>
                     <v-btn
                      :disabled="btn_act"
-                      outlined
+                      outlined_
                       raised
                       @click="dialog = true"
                       height="40"
+                      color="success"
                       >
                       Назначить
                     </v-btn>
