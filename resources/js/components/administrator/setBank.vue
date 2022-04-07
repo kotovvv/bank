@@ -344,7 +344,6 @@
                       item-text="name"
                       item-value="id"
                       label="Банк"
-
                       hide-details="true"
                     ></v-autocomplete>
 
@@ -372,9 +371,9 @@
                       hide-details="true"
                     ></v-autocomplete>
                   </v-col>
-
-                  <!-- del from base -->
-                  <v-col>
+                  <v-spacer></v-spacer>
+                  <v-col class="d-flex align-right mr-2" style="grid-gap: 1rem">
+                    <!-- del from base -->
                     <v-btn
                       :disabled="!selected.length"
                       outlined
@@ -385,24 +384,17 @@
                     >
                       Удалить из базы
                     </v-btn>
-                  </v-col>
-                  <v-col>
                     <v-btn
-                     :disabled="btn_act"
+                      :disabled="btn_act"
                       outlined_
                       raised
                       @click="dialog = true"
                       height="40"
                       color="success"
-                      >
+                    >
                       Назначить
                     </v-btn>
-                  </v-col>
-                  <v-spacer></v-spacer>
-                  <v-col>
-                    <v-btn
-                    v-if="$attrs.user.role_id == 1"
-                    >
+                    <v-btn v-if="$attrs.user.role_id == 1">
                       <download-csv
                         :data="filterClients"
                         delimiter=";"
@@ -481,10 +473,10 @@ export default {
     this.getClientsWithoutBanks();
   },
   computed: {
-      btn_act(){
-          if(this.hmrow > 0 && this.selectedBanks > 0) return false
-          return true
-      },
+    btn_act() {
+      if (this.hmrow > 0 && this.selectedBanks > 0) return false;
+      return true;
+    },
     filterClients() {
       let re = "";
       re = this.hidedBank.map((i) => '"' + i + ":").join("|");
