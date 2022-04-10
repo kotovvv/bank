@@ -10,6 +10,8 @@ use Barryvdh\Debugbar\Twig\Extension\Debug;
 use Illuminate\Support\Facades\Http;
 use DB;
 use Debugbar;
+use DebugBar\DebugBar as DebugBarDebugBar;
+use Illuminate\Support\Facades\Log as Loging;
 use Illuminate\Support\Facades\Cache;
 
 
@@ -92,41 +94,81 @@ class BanksController extends Controller
 
     public function canTel(Request $request)
     {
-
-        $a_bank_actions = [
-            'call_requests' => '/api/v1/call_easy/call_requests',
-        ];
-
         $data = $request->All();
         $inn = $data['data']['inn'];
         if (Cache::has($inn)) {
             $response = [
                 "id" => Cache::get($inn),
                 "status" => "allowed",
-                "status_translate" => "Звонок разрешен"
+                "status_translate" => "Звонок разрешен",
+                'fromcash' => true
             ];
             return response($response);
         }
 
-        $send = ['data' => $data['data']];
-
         if (isset($data['bank_id'])) {
             $bank = Bank::where('id', $data['bank_id'])->first();
-            $action = $a_bank_actions[$data['action']];
+            $a_bank_actions = [
+                1 => [
+                    'action' => '/api/v1/call_easy/call_requests',
+                    'header' => [
+                        'Authorization' => 'Token token=' . $bank['token'],
+                        'Content-Type' => 'application/json'
+                    ]
+                ],
+                2 => [
+                    'action' => 'checks',
+                    'header' => [
+                        'API-key' => $bank['token'],
+                        'Content-Type' => 'application/json; charset=UTF-8'
+                    ]
+                ]
+            ];
 
-            $response = Http::withHeaders([
-                'Authorization' => 'Token token=' . $bank['token'],
-                'Content-Type' => 'application/json'
-            ])->post(
-                $bank['url'] . $action,
-                $send
-            );
+            $action = $a_bank_actions[$data['bank_id']]['action'];
+            if ($data['bank_id'] == 1) {
+                $send = ['data' => $data['data']];
+                $response = Http::withHeaders($a_bank_actions[$data['bank_id']]['header'])->post(
+                    $bank['url'] . $action,
+                    $send
+                );
+            }
+            if ($data['bank_id'] == 2) {
+                $send = json_encode([
+                    "organizationInfo" => ["inn" => $inn],
+                    "contactInfo" => [
+                        ['phoneNumber' => str_replace('+', '', $data['data']['phone'])]
+                    ],
+                    "productInfo" => [
+                        ["productCode" => "LP_RKO"]
+                    ]
+                ]);
+                $response = Http::withBody($send, 'application/json')->withHeaders($a_bank_actions[$data['bank_id']]['header'])->post(
+                    $bank['url'] . $action
+                );
+            }
+
+
+            if ($data['bank_id'] == 1) {
+                $res = json_decode($response);
+                if (isset($res->id) && $res->status == 'allowed') {
+                    Cache::put($res->inn, $res->id, 60 * 60);
+                }
+                return response($response);
+            }
+            if ($data['bank_id'] == 2) {
+                $res = [];
+                if ($response->status() == 200) {
+                    $res['status']  = "allowed";
+                    $res['status_translate']  = "Звонок разрешен";
+                    Cache::put($inn, $inn, 60 * 60);
+                } else {
+                    $res['status']  = "forbidden";
+                }
+                return response($res);
+            }
         }
-        $res = json_decode($response);
-        if (isset($res->id) && $res->status == 'allowed') {
-            Cache::put($res->inn, $res->id, 60 * 60);
-        }
-        return response($response);
+        return response('error');
     }
 
     public function updateStatus(Request $request)
