@@ -280,13 +280,13 @@ class BanksController extends Controller
         if ($bank_id == 2) {
             if (Storage::exists('cities' . $bank_id . '.json')) {
                 $cities = json_decode(Storage::get('cities' . $bank_id . '.json'));
-                   $entries = [];
-                    foreach($cities as $city){
-                        if ($city->regionFias == $region_id ){
-                        $entries[] = ['id'=>$city->fias,'name'=>$city->name];
+                $entries = [];
+                foreach ($cities as $city) {
+                    if ($city->regionFias == $region_id) {
+                        $entries[] = ['id' => $city->fias, 'name' => $city->name];
                     }
-                    }
-$response = $entries;
+                }
+                $response['entries'] = $entries;
             }
         }
         return response($response);

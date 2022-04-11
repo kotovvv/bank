@@ -51,14 +51,14 @@ class AlfaGetRef extends Command
         // ])->get($bank['url'] . $action);
         // if ($response->successful()) {
         //     $regions = json_decode($response)->values;
-        // $entries = [];
-        // foreach($regions as $region){
-        //     $entries[] = ['id'=>$region->fias,'name'=>$region->name];
-        // }
-        // $regions = $entries;
-        //     Storage::disk('local')->put('regions'.$bank_id.'.json', json_encode($regions, JSON_UNESCAPED_UNICODE));
+        //     $entries = [];
+        //     foreach ($regions as $region) {
+        //         $entries[] = ['id' => $region->fias, 'name' => $region->name];
+        //     }
+        //     $regions = $entries;
+        //     Storage::disk('local')->put('regions' . $bank_id . '.json', json_encode($regions, JSON_UNESCAPED_UNICODE));
         // } else {
-        //     Storage::disk('local')->put('regions'.$bank_id.'.error', 'error' . $response);
+        //     Storage::disk('local')->put('regions' . $bank_id . '.error', 'error' . $response);
         // }
         // //get cities
         // $action = 'dictionaries?code=cities';
@@ -68,9 +68,9 @@ class AlfaGetRef extends Command
         // ])->get($bank['url'] . $action);
         // if ($response->successful()) {
         //     $sities = json_decode($response)->values;
-        //     Storage::disk('local')->put('cities'.$bank_id.'.json', json_encode($sities, JSON_UNESCAPED_UNICODE));
+        //     Storage::disk('local')->put('cities' . $bank_id . '.json', json_encode($sities, JSON_UNESCAPED_UNICODE));
         // } else {
-        //     Storage::disk('local')->put('cities'.$bank_id.'.error', 'error' . $response);
+        //     Storage::disk('local')->put('cities' . $bank_id . '.error', 'error' . $response);
         // }
 
         return Command::SUCCESS;

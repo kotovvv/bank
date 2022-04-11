@@ -265,7 +265,51 @@
                       >
                       </v-select>
                     </v-col>
-                    <v-col cols="4">
+                    <!-- Alfa-bank -->
+                    <v-col cols="12" v-if="selectedBank == 2">
+                      <v-btn text @click="rr = []">
+                        <v-icon> mdi-close </v-icon>
+                        <h3>Продукты</h3>
+                      </v-btn>
+                      <v-checkbox
+                        v-model="productsAlfa"
+                        label="РКО"
+                        value="LP_RKO"
+                      ></v-checkbox>
+                      <v-checkbox
+                        v-model="productsAlfa"
+                        label="Эквайринг (Торговый)"
+                        value="LP_ACQ_TR"
+                      ></v-checkbox>
+                      <v-checkbox
+                        v-model="productsAlfa"
+                        label="Альфа-касса"
+                        value="LP_AKASSA"
+                      ></v-checkbox>
+                      <v-checkbox
+                        v-model="productsAlfa"
+                        label="Бизнес кредит - кредит на ЮЛ/ИП"
+                        value="LP_LOAN_BUS"
+                      ></v-checkbox>
+                      <v-checkbox
+                        v-model="productsAlfa"
+                        label="Овердрафт для новых клиентов банка"
+                        value="LP_OVER_ADV"
+                      ></v-checkbox>
+                      <v-checkbox
+                        v-model="productsAlfa"
+                        label="Спец. счет 44-ФЗ"
+                        value="LP_SPECACC44"
+                      ></v-checkbox>
+                      <v-checkbox
+                        v-model="productsAlfa"
+                        label="Эквайринг (Интернет)"
+                        value="LP_ACQ_E"
+                      ></v-checkbox>
+                    </v-col>
+                    <v-col cols="6" v-if="selectedBank == 1">
+                      <!-- Sberbank -->
+
                       <v-btn text @click="rr = 0">
                         <v-icon> mdi-close </v-icon>
                         <h3>Расчётный счёт</h3>
@@ -286,7 +330,7 @@
                         ></v-radio>
                       </v-radio-group>
                     </v-col>
-                    <v-col cols="4">
+                    <v-col cols="6" v-if="selectedBank == 1">
                       <v-btn text @click="pp = 0">
                         <v-icon> mdi-close </v-icon>
                         <h3>Приём платежей</h3>
@@ -300,16 +344,6 @@
                         <v-radio label="Смарт-терминал" :value="22"></v-radio>
                       </v-radio-group>
                     </v-col>
-                    <!-- <v-col cols="4">
-                      <v-btn text @click="ss = 0">
-                        <v-icon> mdi-close </v-icon>
-                        <h3>Сервисы</h3>
-                      </v-btn>
-
-                      <v-radio-group v-model="ss">
-                        <v-radio label="Сберздоровье" :value="26"></v-radio>
-                      </v-radio-group>
-                    </v-col> -->
                   </v-row>
                   <v-btn
                     depressed
@@ -323,7 +357,10 @@
                       first_name == '' ||
                       (branches.length > 0 &&
                         Object.keys(branch).length == 0) ||
-                      (pp == 0 && ss == 0 && rr == 0) ||
+                      (pp == 0 &&
+                        ss == 0 &&
+                        rr == 0 &&
+                        productsAlfa.length == 0) ||
                       isLoading
                     "
                     >Отправить заявку</v-btn
@@ -559,7 +596,7 @@ export default {
     clients: [],
     selected: {},
     banks: [],
-    selectedBank: '',
+    selectedBank: "",
     funnels: [],
     selectedFunnel: 0,
     message: "",
@@ -592,6 +629,7 @@ export default {
     middle_name: "",
     other: "",
     add_info: "",
+    productsAlfa: [],
   }),
   mounted() {
     this.getBanks();
@@ -601,8 +639,8 @@ export default {
   watch: {
     model_city(val) {
       const self = this;
-    //   only for sber
-      if (this.selectedBank != 1) return
+      //   only for sber
+      if (this.selectedBank != 1) return;
 
       if (val != null) {
         let send = {};
@@ -633,6 +671,9 @@ export default {
           .then((res) => res.json())
           .then((res) => {
             this.regions = res;
+            this.model_city = null;
+            this.search_city = null;
+            this.show_cities = [];
           })
           .catch((err) => {
             console.log(err);
@@ -643,7 +684,6 @@ export default {
       }
     },
     search_city(val) {
-
       const self = this;
       //  if (this.cities.length == 0) {
       if (this.isLoading) return;
@@ -660,6 +700,7 @@ export default {
         .post("/api/getCities", send)
         .then((res) => {
           self.cities = res.data.entries;
+          console.log();
           self.isLoading = false;
           val && self.queryCity(val);
         })
@@ -693,9 +734,9 @@ export default {
       axios
         .post("/api/recall", send)
         .then((res) => {
-            if (send.bank_id == 1) {
+          if (send.bank_id == 1) {
             self.updateStatus("call_back");
-            }
+          }
           self.wait = false;
           self.other = JSON.stringify(res.data);
           self.answer_bank = "";
@@ -725,21 +766,48 @@ export default {
       if (this.pp != 0) products.push(this.pp);
       if (this.ss != 0) products.push(this.ss);
       if (this.rr != 0) products.push(this.rr);
-      send.data = {
-        inn: this.selected.inn,
-        merchant_id: 39,
-        product_ids: products,
-        company_name: this.company_name,
-        last_name: this.last_name,
-        first_name: this.first_name,
-        middle_name: this.middle_name,
-        // email:
-        phone: "+" + this.selected.phoneNumber,
-        add_info: this.add_info,
-        region_id: this.model_region,
-        city_id: this.model_city,
-        merchant_branch_id: branch_id,
-      };
+      if (this.selectedBank == 1) {
+        send.data = {
+          inn: this.selected.inn,
+          merchant_id: 39,
+          product_ids: products,
+          company_name: this.company_name,
+          last_name: this.last_name,
+          first_name: this.first_name,
+          middle_name: this.middle_name,
+          // email:
+          phone: "+" + this.selected.phoneNumber,
+          add_info: this.add_info,
+          region_id: this.model_region,
+          city_id: this.model_city,
+          merchant_branch_id: branch_id,
+        };
+      }
+      if (this.selectedBank == 2) {
+        let product = [];
+        this.productsAlfa.map((i) => {
+          product.push({ productCode: i });
+        });
+        send.data = {
+          organizationInfo: {
+            organizationName: this.company_name,
+            inn: this.selected.inn,
+          },
+          contactInfo: [
+            {
+              fullName:
+                this.last_name + " " + this.first_name + " " + this.middle_name,
+              phoneNumber: this.selected.phoneNumber,
+            },
+          ],
+          requestInfo: {
+            advCode: "advcode_1",
+            comment: this.add_info,
+            cityCode: this.model_city,
+          },
+          productInfo: product,
+        };
+      }
       send.bank_id = this.selectedBank;
       send.action = "send_order";
       this.isLoading = true;
@@ -811,10 +879,10 @@ export default {
         }
       });
       self.banks = self.banks.filter(function (i) {
-        if (i.id > 0) i.hm = a[i.id] != undefined ?a[i.id]:0;
+        if (i.id > 0) i.hm = a[i.id] != undefined ? a[i.id] : 0;
         if (i.hm > 0) return i;
       });
-      self.selectedBank = self.banks[0].id
+      self.selectedBank = self.banks[0].id;
     },
     getBanks() {
       let self = this;
@@ -895,7 +963,6 @@ export default {
             }
           );
           self.dates.unshift({ date: "Все" });
-
         })
         .catch((error) => console.log(error));
     },
@@ -913,7 +980,7 @@ export default {
       this.answer_bank = "";
       this.selected = row.item;
       this.model_city = null;
-      this.regions = []
+      this.regions = [];
       this.cities = [];
       this.model_region = null;
       this.branch = null;
@@ -977,10 +1044,11 @@ export default {
         });
     },
     updateStatus(status) {
-        if (this.selectedBank != 1 && status == "agree"){
-  return
-        }
       const self = this;
+      console.log(self.selectedBank);
+      if (self.selectedBank != 1 && status == "agree") {
+        return;
+      }
       this.wait = true;
       let send = {};
 
@@ -998,7 +1066,6 @@ export default {
           self.wait = false;
           self.other = JSON.stringify(res.data);
           self.answer_bank = "";
-
         })
         .catch((error) => {
           self.wait = false;
