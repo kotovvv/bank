@@ -559,7 +559,7 @@ export default {
     clients: [],
     selected: {},
     banks: [],
-    selectedBank: 1,
+    selectedBank: '',
     funnels: [],
     selectedFunnel: 0,
     message: "",
@@ -601,6 +601,9 @@ export default {
   watch: {
     model_city(val) {
       const self = this;
+    //   only for sber
+      if (this.selectedBank != 1) return
+
       if (val != null) {
         let send = {};
         send.bank_id = this.selectedBank;
@@ -640,6 +643,7 @@ export default {
       }
     },
     search_city(val) {
+
       const self = this;
       //  if (this.cities.length == 0) {
       if (this.isLoading) return;
@@ -689,14 +693,16 @@ export default {
       axios
         .post("/api/recall", send)
         .then((res) => {
-          self.updateStatus("call_back");
+            if (send.bank_id == 1) {
+            self.updateStatus("call_back");
+            }
           self.wait = false;
           self.other = JSON.stringify(res.data);
           self.answer_bank = "";
           self.dialog = false;
           self.group_status = 0;
           self.step = 0;
-          console.log(res.data);
+
           self.message = res.data;
           self.snackbar = true;
           self.recallTime = null;
@@ -804,10 +810,11 @@ export default {
           if (el[1] == 0) a[el[0]] += 1;
         }
       });
-      self.banks = self.banks.map(function (i) {
-        if (i.id > 0) i.hm = a[i.id];
+      self.banks = self.banks.filter(function (i) {
+        if (i.id > 0) i.hm = a[i.id] != undefined ?a[i.id]:0;
         if (i.hm > 0) return i;
       });
+      self.selectedBank = self.banks[0].id
     },
     getBanks() {
       let self = this;
@@ -888,6 +895,7 @@ export default {
             }
           );
           self.dates.unshift({ date: "Все" });
+
         })
         .catch((error) => console.log(error));
     },
@@ -969,6 +977,9 @@ export default {
         });
     },
     updateStatus(status) {
+        if (this.selectedBank != 1 && status == "agree"){
+  return
+        }
       const self = this;
       this.wait = true;
       let send = {};
@@ -987,7 +998,7 @@ export default {
           self.wait = false;
           self.other = JSON.stringify(res.data);
           self.answer_bank = "";
-          console.log(res);
+
         })
         .catch((error) => {
           self.wait = false;

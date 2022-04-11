@@ -13,6 +13,8 @@ use Debugbar;
 use DebugBar\DebugBar as DebugBarDebugBar;
 use Illuminate\Support\Facades\Log as Loging;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Artisan;
 
 
 class BanksController extends Controller
@@ -94,6 +96,15 @@ class BanksController extends Controller
 
     public function canTel(Request $request)
     {
+        // ========DDDDDDDDDDDDDDDDDDDDDDDDELETE TEST=========================
+        $response = [
+            "status" => "allowed",
+            "status_translate" => "Звонок разрешен",
+            'fromcash' => 'test'
+        ];
+        return response($response);
+        // ========DDDDDDDDDDDDDDDDDDDDDDDDELETE TEST=========================
+
         $data = $request->All();
         $inn = $data['data']['inn'];
         if (Cache::has($inn)) {
@@ -191,42 +202,55 @@ class BanksController extends Controller
                 $send
             );
         }
-
         return response($response);
     }
 
 
     public function getRegions($bank_id)
     {
-        if (Cache::store('file')->has('regions')) {
-            $entries = Cache::store('file')->get('regions');
+
+        if (Cache::store('file')->has('regions' . $bank_id)) {
+            $entries = Cache::store('file')->get('regions' . $bank_id);
         } else {
+            if ($bank_id == 1) {
+                $a_bank_actions = [
+                    'region' => '/api/v1/sber_mq/region?with_merchant_branches=1',
+                ];
 
-            $a_bank_actions = [
-                'region' => '/api/v1/sber_mq/region?with_merchant_branches=1',
-            ];
+                $bank = Bank::where('id', $bank_id)->first();
+                $action = $a_bank_actions['region'];
 
-            $bank = Bank::where('id', $bank_id)->first();
-            $action = $a_bank_actions['region'];
+                $response = Http::withHeaders([
+                    'Authorization' => 'Token token=' . $bank['token'],
+                    'Content-Type' => 'application/json'
+                ])->get($bank['url'] . $action);
 
-            $response = Http::withHeaders([
-                'Authorization' => 'Token token=' . $bank['token'],
-                'Content-Type' => 'application/json'
-            ])->get($bank['url'] . $action);
+                $entries = $response['entries'];
 
-            $entries = $response['entries'];
-
-            $hm_page = ceil($response['total_entries'] / $response['per_page']);
-            if ($hm_page > 1) {
-                for ($i = 2; $i <= $hm_page; $i++) {
-                    $resp = Http::withHeaders([
-                        'Authorization' => 'Token token=' . $bank['token'],
-                        'Content-Type' => 'application/json'
-                    ])->get($bank['url'] . $action . '&page=' . $i);
-                    $entries = array_merge($entries, $resp->object()->entries);
+                $hm_page = ceil($response['total_entries'] / $response['per_page']);
+                if ($hm_page > 1) {
+                    for ($i = 2; $i <= $hm_page; $i++) {
+                        $resp = Http::withHeaders([
+                            'Authorization' => 'Token token=' . $bank['token'],
+                            'Content-Type' => 'application/json'
+                        ])->get($bank['url'] . $action . '&page=' . $i);
+                        $entries = array_merge($entries, $resp->object()->entries);
+                    }
+                }
+                Cache::store('file')->put('regions' . $bank_id, $entries, 2592000);
+            }
+            if ($bank_id == 2) {
+                if (Storage::exists('regions' . $bank_id . '.json')) {
+                    $regions = json_decode(Storage::get('regions' . $bank_id . '.json'));
+                    //    $entries = [];
+                    //     foreach($regions as $region){
+                    //         $entries[] = ['id'=>$region->fias,'name'=>$region->name];
+                    //     }
+                    Cache::store('file')->put('regions' . $bank_id, $regions, 2592000);
+                } else {
+                    Artisan::call("Alfa:references");
                 }
             }
-            Cache::store('file')->put('regions', $entries, 2592000);
         }
         return response($entries);
     }
@@ -237,21 +261,34 @@ class BanksController extends Controller
         $data = $request->All();
         $bank_id = $data['bank_id'];
         $region_id = $data['region_id'];
-        $query = '';
-        if (isset($data['query'])) $query = '&query=' . urlencode($data['query']);
-        // api/v1/sber_mq/city?with_merchant_branches=1&region_id={region_id}
-        $a_bank_actions = [
-            'getCities' => '/api/v1/sber_mq/city?region_id=' . $region_id . $query,
-        ];
+        if ($bank_id == 1) {
+            $query = '';
+            if (isset($data['query'])) $query = '&query=' . urlencode($data['query']);
+            // api/v1/sber_mq/city?with_merchant_branches=1&region_id={region_id}
+            $a_bank_actions = [
+                'getCities' => '/api/v1/sber_mq/city?region_id=' . $region_id . $query,
+            ];
 
-        $bank = Bank::where('id', $bank_id)->first();
-        $action = $a_bank_actions['getCities'];
+            $bank = Bank::where('id', $bank_id)->first();
+            $action = $a_bank_actions['getCities'];
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Token token=' . $bank['token'],
-            'Content-Type' => 'application/json'
-        ])->get($bank['url'] . $action);
-
+            $response = Http::withHeaders([
+                'Authorization' => 'Token token=' . $bank['token'],
+                'Content-Type' => 'application/json'
+            ])->get($bank['url'] . $action);
+        }
+        if ($bank_id == 2) {
+            if (Storage::exists('cities' . $bank_id . '.json')) {
+                $cities = json_decode(Storage::get('cities' . $bank_id . '.json'));
+                   $entries = [];
+                    foreach($cities as $city){
+                        if ($city->regionFias == $region_id ){
+                        $entries[] = ['id'=>$city->fias,'name'=>$city->name];
+                    }
+                    }
+$response = $entries;
+            }
+        }
         return response($response);
     }
 
