@@ -185,22 +185,25 @@ class BanksController extends Controller
     public function updateStatus(Request $request)
     {
         $data = $request->All();
-        $a_bank_actions = [
-            'updateStatus' => '/api/v1/call_easy/call_requests/' . $data['client_id'],
-        ];
+        $response = [];
+        if ($data['bank_id'] == 1) {
+            $a_bank_actions = [
+                'updateStatus' => '/api/v1/call_easy/call_requests/' . $data['client_id'],
+            ];
 
-        $send = ['data' => $data['data']];
-        if (isset($data['bank_id'])) {
-            $bank = Bank::where('id', $data['bank_id'])->first();
-            $action = $a_bank_actions[$data['action']];
+            $send = ['data' => $data['data']];
+            if (isset($data['bank_id'])) {
+                $bank = Bank::where('id', $data['bank_id'])->first();
+                $action = $a_bank_actions[$data['action']];
 
-            $response = Http::withHeaders([
-                'Authorization' => 'Token token=' . $bank['token'],
-                'Content-Type' => 'application/json'
-            ])->patch(
-                $bank['url'] . $action,
-                $send
-            );
+                $response = Http::withHeaders([
+                    'Authorization' => 'Token token=' . $bank['token'],
+                    'Content-Type' => 'application/json'
+                ])->patch(
+                    $bank['url'] . $action,
+                    $send
+                );
+            }
         }
         return response($response);
     }
@@ -242,10 +245,6 @@ class BanksController extends Controller
             if ($bank_id == 2) {
                 if (Storage::exists('regions' . $bank_id . '.json')) {
                     $regions = json_decode(Storage::get('regions' . $bank_id . '.json'));
-                    //    $entries = [];
-                    //     foreach($regions as $region){
-                    //         $entries[] = ['id'=>$region->fias,'name'=>$region->name];
-                    //     }
                     Cache::store('file')->put('regions' . $bank_id, $regions, 2592000);
                 } else {
                     Artisan::call("Alfa:references");
@@ -333,16 +332,13 @@ class BanksController extends Controller
     public function sendOrder(Request $request)
     {
         // POST api/v1/sber_mq/order
-        $a_bank_actions = [
-            'send_order' => '/api/v1/sber_mq/order',
-        ];
-
         $data = $request->All();
-        $send = ['data' => $data['data']];
-        if (isset($data['bank_id'])) {
-            $bank = Bank::where('id', $data['bank_id'])->first();
-            $action = $a_bank_actions[$data['action']];
-
+        $bank = Bank::where('id', $data['bank_id'])->first();
+        $response = (object)[];
+        // Sber bank
+        if ($data['bank_id'] == 1) {
+            $send = ['data' => $data['data']];
+            $action = '/api/v1/sber_mq/order';
             $response = Http::withHeaders([
                 'Authorization' => 'Token token=' . $bank['token'],
                 'Content-Type' => 'application/json'
@@ -350,17 +346,45 @@ class BanksController extends Controller
                 $bank['url'] . $action,
                 $send
             );
-        }
-        if ($data['data']['add_info']) {
-            $a_log = [];
-            $a_log = ['client_id' => $data['client_id'], 'user_id' => $data['user_id'], 'bank_id' => $data['bank_id'],  'other' => $data['data']['add_info'], 'dateadd' => Now(), 'timeadd' => Now()];
-            Log::insert($a_log);
+            if (isset($response->id)){
+                $data['add_info'] += $response->id;
+            }
+            if($data['add_info']){
+                $this->addInfo($data);
+            }
+            return response(['data' => $response->object(), 'successful' => $response->successful(), 'status' => $response->status()]);
         }
 
-        return response(['data' => $response->object(), 'successful' => $response->successful(), 'status' => $response->status()]);
+        // Alfa bank
+        if ($data['bank_id'] == 2) {
+            $action = 'leads';
+            $header = [
+                'API-key' => $bank['token'],
+                'Content-Type' => 'application/json; charset=UTF-8'
+            ];
+            $send = json_encode($data['data'],JSON_UNESCAPED_UNICODE);
+
+            $response = Http::withBody($send, 'application/json')->withHeaders($header)->post(
+                $bank['url'] . $action
+            );
+            if (isset($response->id)){
+                $data['add_info'] += $response->id;
+            }
+            if($data['add_info']){
+                $this->addInfo($data);
+            }
+
+           return response(['data' => $response->object(), 'successful' => $response->successful(), 'status' => $response->status()]);
+        }
+
+        return;
     }
 
-
+private function addInfo($data){
+    $a_log = [];
+    $a_log = ['client_id' => $data['client_id'], 'user_id' => $data['user_id'], 'bank_id' => $data['bank_id'],  'other' => $data['add_info'], 'dateadd' => Now(), 'timeadd' => Now()];
+    Log::insert($a_log);
+}
 
     /**
      * Remove the specified resource from storage.

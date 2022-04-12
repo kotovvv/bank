@@ -760,6 +760,7 @@ export default {
       let send = {};
       send.user_id = this.$attrs.user.id;
       send.client_id = this.responseBank.id;
+      send.add_info = this.add_info
       let branch_id = "";
       if (this.branch != {}) branch_id = this.branch.id;
       let products = [];
@@ -801,7 +802,7 @@ export default {
             },
           ],
           requestInfo: {
-            advCode: "advcode_1",
+            advCode: "advcode_1", //replace on right!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             comment: this.add_info,
             cityCode: this.model_city,
           },
@@ -809,7 +810,6 @@ export default {
         };
       }
       send.bank_id = this.selectedBank;
-      send.action = "send_order";
       this.isLoading = true;
       axios
         .post("/api/sendOrder", send)
@@ -998,6 +998,7 @@ export default {
     },
     requestBank() {
       this.reqBtn = false;
+      if(![1,2].includes(this.selectedBank)) return
       this.wait = true;
       const self = this;
       const item = this.selected;
