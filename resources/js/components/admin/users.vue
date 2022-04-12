@@ -180,14 +180,15 @@ export default {
     },
   },
 
-  created() {
+   mounted() {
     // this.initialize(),
     this.getUsers();
   },
 
   methods: {
     rolename(user) {
-      user.role = (this.roles.find((r) => r.id == user.role_id)).name;
+        let self = this
+      user.role = (self.roles.find((r) => r.id == user.role_id)).name;
     },
     getUsers() {
       let self = this;
@@ -200,7 +201,7 @@ export default {
               self.users = self.users.filter((u)=> u.role_id ==3 )
           }
           self.users.map(function (u) {
-            u.role = (self.roles.find((r) => r.id == u.role_id)).name;
+            self.rolename(u)
             if (u.role_id == 2) self.group.push(u)
           });
         })
@@ -208,10 +209,12 @@ export default {
     },
     saveUsers(u) {
       let self = this;
+      console.log(u)
       axios
         .post("/api/user/update", u)
         .then((res) => {
-          console.log(res);
+          this.dialog = false;
+          this.getUsers()
         })
         .catch((error) => console.log(error));
     },
