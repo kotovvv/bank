@@ -96,15 +96,6 @@ class BanksController extends Controller
 
     public function canTel(Request $request)
     {
-        // ========DDDDDDDDDDDDDDDDDDDDDDDDELETE TEST=========================
-        $response = [
-            "status" => "allowed",
-            "status_translate" => "Звонок разрешен",
-            'fromcash' => 'test'
-        ];
-        return response($response);
-        // ========DDDDDDDDDDDDDDDDDDDDDDDDELETE TEST=========================
-
         $data = $request->All();
         $inn = $data['data']['inn'];
         if (Cache::has($inn)) {
@@ -346,10 +337,10 @@ class BanksController extends Controller
                 $bank['url'] . $action,
                 $send
             );
-            if (isset($response->id)){
+            if (isset($response->id)) {
                 $data['add_info'] += $response->id;
             }
-            if($data['add_info']){
+            if ($data['add_info']) {
                 $this->addInfo($data);
             }
             return response(['data' => $response->object(), 'successful' => $response->successful(), 'status' => $response->status()]);
@@ -362,29 +353,30 @@ class BanksController extends Controller
                 'API-key' => $bank['token'],
                 'Content-Type' => 'application/json; charset=UTF-8'
             ];
-            $send = json_encode($data['data'],JSON_UNESCAPED_UNICODE);
+            $send = json_encode($data['data'], JSON_UNESCAPED_UNICODE);
 
             $response = Http::withBody($send, 'application/json')->withHeaders($header)->post(
                 $bank['url'] . $action
             );
-            if (isset($response->id)){
+            if (isset($response->id)) {
                 $data['add_info'] += $response->id;
             }
-            if($data['add_info']){
+            if ($data['add_info']) {
                 $this->addInfo($data);
             }
 
-           return response(['data' => $response->object(), 'successful' => $response->successful(), 'status' => $response->status()]);
+            return response(['data' => $response->object(), 'successful' => $response->successful(), 'status' => $response->status()]);
         }
 
         return;
     }
 
-private function addInfo($data){
-    $a_log = [];
-    $a_log = ['client_id' => $data['client_id'], 'user_id' => $data['user_id'], 'bank_id' => $data['bank_id'],  'other' => $data['add_info'], 'dateadd' => Now(), 'timeadd' => Now()];
-    Log::insert($a_log);
-}
+    private function addInfo($data)
+    {
+        $a_log = [];
+        $a_log = ['client_id' => $data['client_id'], 'user_id' => $data['user_id'], 'bank_id' => $data['bank_id'],  'other' => $data['add_info'], 'dateadd' => Now(), 'timeadd' => Now()];
+        Log::insert($a_log);
+    }
 
     /**
      * Remove the specified resource from storage.

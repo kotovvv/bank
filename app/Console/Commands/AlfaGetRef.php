@@ -42,36 +42,36 @@ class AlfaGetRef extends Command
     {
         //2=Alfa bank
         $bank_id = 2;
-        // $bank = Bank::where('id', $bank_id)->first();
-        // //get regions
-        // $action = 'dictionaries?code=regions';
-        // $response = Http::withHeaders([
-        //     'API-key' => $bank['token'],
-        //     'Content-Type' => 'application/json; charset=UTF-8'
-        // ])->get($bank['url'] . $action);
-        // if ($response->successful()) {
-        //     $regions = json_decode($response)->values;
-        //     $entries = [];
-        //     foreach ($regions as $region) {
-        //         $entries[] = ['id' => $region->fias, 'name' => $region->name];
-        //     }
-        //     $regions = $entries;
-        //     Storage::disk('local')->put('regions' . $bank_id . '.json', json_encode($regions, JSON_UNESCAPED_UNICODE));
-        // } else {
-        //     Storage::disk('local')->put('regions' . $bank_id . '.error', 'error' . $response);
-        // }
-        // //get cities
-        // $action = 'dictionaries?code=cities';
-        // $response = Http::withHeaders([
-        //     'API-key' => $bank['token'],
-        //     'Content-Type' => 'application/json; charset=UTF-8'
-        // ])->get($bank['url'] . $action);
-        // if ($response->successful()) {
-        //     $sities = json_decode($response)->values;
-        //     Storage::disk('local')->put('cities' . $bank_id . '.json', json_encode($sities, JSON_UNESCAPED_UNICODE));
-        // } else {
-        //     Storage::disk('local')->put('cities' . $bank_id . '.error', 'error' . $response);
-        // }
+        $bank = Bank::where('id', $bank_id)->first();
+        //get regions
+        $action = 'dictionaries?code=regions';
+        $response = Http::withHeaders([
+            'API-key' => $bank['token'],
+            'Content-Type' => 'application/json; charset=UTF-8'
+        ])->get($bank['url'] . $action);
+        if ($response->successful()) {
+            $regions = json_decode($response)->values;
+            $entries = [];
+            foreach ($regions as $region) {
+                $entries[] = ['id' => $region->fias, 'name' => $region->name];
+            }
+            $regions = $entries;
+            Storage::disk('local')->put('regions' . $bank_id . '.json', json_encode($regions, JSON_UNESCAPED_UNICODE));
+        } else {
+            Storage::disk('local')->put('regions' . $bank_id . '.error', 'error' . $response);
+        }
+        //get cities
+        $action = 'dictionaries?code=cities';
+        $response = Http::withHeaders([
+            'API-key' => $bank['token'],
+            'Content-Type' => 'application/json; charset=UTF-8'
+        ])->get($bank['url'] . $action);
+        if ($response->successful()) {
+            $sities = json_decode($response)->values;
+            Storage::disk('local')->put('cities' . $bank_id . '.json', json_encode($sities, JSON_UNESCAPED_UNICODE));
+        } else {
+            Storage::disk('local')->put('cities' . $bank_id . '.error', 'error' . $response);
+        }
 
         return Command::SUCCESS;
     }
