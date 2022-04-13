@@ -7,7 +7,7 @@
     </v-tabs>
     <v-tabs-items v-model="tab">
       <v-tab-item>
-        <users></users>
+        <users :user="$props.user"></users>
       </v-tab-item>
       <v-tab-item>
         <banks></banks>
@@ -22,15 +22,16 @@
 <script>
 import users from "./users";
 import funnel from "./funnels";
-import banks from './banks.vue';
+import banks from "./banks.vue";
 export default {
-    data:()=>({
-tab: null,
-    }),
-    components:{
-        users,
-        funnel,
-        banks
-    }
-}
+  props: ["user"],
+  data: () => ({
+    tab: null,
+  }),
+  components: {
+    users,
+    funnel,
+    banks,
+  },
+};
 </script>

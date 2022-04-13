@@ -26,17 +26,15 @@
           @dragenter="handleDragover"
         >
           Перетяните файл сюда
-
         </div>
         <div id="selectFile" class="mt-10">
-            Выбор для загрузки<input type="file" @change="handleDrop">
+          Выбор для загрузки<input type="file" @change="handleDrop" />
         </div>
       </v-col>
-
     </v-row>
     <v-row>
       <v-col cols="12">
-                  <v-progress-linear
+        <v-progress-linear
           :active="loading"
           :indeterminate="loading"
           color="deep-purple accent-4"
@@ -55,12 +53,11 @@
 
 
 <script>
-
 import axios from "axios";
 import JsonCSV from "vue-json-csv";
 export default {
   data: () => ({
-      loading:false,
+    loading: false,
     clients: [],
     headers: [],
     snackbar: false,
@@ -75,15 +72,18 @@ export default {
       { text: "Регион", value: "region" },
       { text: "Регистрация", value: "registration" },
     ],
-    demo: [{
-      inn: "11111111111",
-      fullName: "ЮПОВА ЕЛЕНА СЕРГЕЕВНА",
-      phoneNumber: "79999999999",
-      organizationName: "ИП ЮПОВА ЕЛЕНА СЕРГЕЕВНА",
-      address: "452379,БАШКОРТОСТАН РЕСПУБЛИКА,КАРАИДЕЛЬСКИЙ РАЙОН,УСТЬ-БАРТАГА ДЕРЕВНЯ,СОЛНЕЧНАЯ ПОЛЯНА УЛИЦА",
-      region: "БАШКОРТОСТАН",
-      registration: "2021-10-01"
-    }],
+    demo: [
+      {
+        inn: "11111111111",
+        fullName: "ЮПОВА ЕЛЕНА СЕРГЕЕВНА",
+        phoneNumber: "79999999999",
+        organizationName: "ИП ЮПОВА ЕЛЕНА СЕРГЕЕВНА",
+        address:
+          "452379,БАШКОРТОСТАН РЕСПУБЛИКА,КАРАИДЕЛЬСКИЙ РАЙОН,УСТЬ-БАРТАГА ДЕРЕВНЯ,СОЛНЕЧНАЯ ПОЛЯНА УЛИЦА",
+        region: "БАШКОРТОСТАН",
+        registration: "2021-10-01",
+      },
+    ],
   }),
   methods: {
     importfile() {
@@ -91,12 +91,12 @@ export default {
       let send = {};
       send.headers = self.headers;
       send.clients = self.clients;
-self.loading=true
+      self.loading = true;
       axios
         .post("api/import", send)
         .then(function (response) {
           //   console.log(response);
-          self.loading=false
+          self.loading = false;
           self.message =
             "Всего: " +
             response.data.all +
@@ -106,7 +106,7 @@ self.loading=true
             response.data.error +
             "<br>Добавлено: " +
             response.data.inserted;
-            self.snackbar=true;
+          self.snackbar = true;
         })
         .catch(function (error) {
           console.log(error);
@@ -132,15 +132,15 @@ self.loading=true
         "text/anytext",
         "text/plain",
       ];
-        //  console.log("DROPPED");
+      //  console.log("DROPPED");
       var files = e.target.files || e.dataTransfer.files,
         i,
         f;
       for (i = 0, f = files[i]; i != files.length; ++i) {
-             if (f == null) return
-     if (ftype.indexOf(f.type) >= 0) {
-        this.createInput(f);
-      }
+        if (f == null) return;
+        if (ftype.indexOf(f.type) >= 0) {
+          this.createInput(f);
+        }
       }
     },
     csvJSON(csv) {
@@ -148,7 +148,7 @@ self.loading=true
       var lines = csv.split("\n");
       var result = [];
       var headers = lines[0].split(";");
-      headers[headers.length - 1] = headers[headers.length - 1].trim()
+      headers[headers.length - 1] = headers[headers.length - 1].trim();
       // headers = [ "inn", "fullName", "phoneNumber", "organizationName", "address", "region", "registration"];
       // vm.parse_header = lines[0].split(",");
       // lines[0].split(",").forEach(function (key) {
@@ -179,7 +179,7 @@ self.loading=true
         reader.onload = (e) => {
           resolve((vm.fileinput = reader.result));
         };
-        reader.readAsText(file);
+        reader.readAsText(file, "windows-1251");
       });
 
       promise.then(
@@ -189,8 +189,8 @@ self.loading=true
           // console.log(vm.csvJSON(this.fileinput));
           // reader.onload = function(event) {
           // arr.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i)
-          vm.clients = vm.csvJSON(this.fileinput)
-          vm.importfile()
+          vm.clients = vm.csvJSON(this.fileinput);
+          vm.importfile();
           // };
         },
         (error) => {
@@ -217,16 +217,15 @@ self.loading=true
   text-align: center;
   font: 20pt bold, "Roboto";
   color: #bbb;
-
 }
 
-#selectFile{
-    margin:auto;
-    padding: 10px 20px;
-    border:2px solid grey;
-    max-width: 200px;
-    position:relative
-    }
+#selectFile {
+  margin: auto;
+  padding: 10px 20px;
+  border: 2px solid grey;
+  max-width: 200px;
+  position: relative;
+}
 #selectFile input {
   position: absolute;
   cursor: pointer;
