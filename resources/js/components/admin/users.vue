@@ -260,11 +260,11 @@ export default {
     },
 
     save() {
-      if (_.find(this.users, { name: this.editedItem.name })) {
-        this.message = "Такой логин уже есть";
-        this.snackbar = true;
-        return;
-      }
+      // if (_.find(this.users, { name: this.editedItem.name })) {
+      //   this.message = "Такой логин уже есть";
+      //   this.snackbar = true;
+      //   return;
+      // }
       this.message = "";
       this.snackbar = false;
       if (this.editedIndex > -1) {

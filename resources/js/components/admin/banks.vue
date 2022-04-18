@@ -8,7 +8,7 @@
       cols="6"
     >
       <template v-slot:item.name="{ item }">
-        <v-chip :style="{'background':item.color}">
+        <v-chip :style="{ background: item.color }">
           {{ item.name }}
         </v-chip>
       </template>
@@ -37,7 +37,7 @@
                         label="Наименование"
                       ></v-text-field>
                     </v-col>
-                     <v-col cols="12">
+                    <v-col cols="12">
                       <v-text-field
                         v-model="editedItem.url"
                         label="Ссылка"
@@ -49,12 +49,20 @@
                         label="Key"
                       ></v-text-field>
                     </v-col>
-                   
+
                     <v-col cols="4">
                       <v-text-field
                         v-model="editedItem.abbr"
                         label="Аббревиатура"
                       ></v-text-field>
+                    </v-col>
+                    <v-col cols="8">
+                      <v-color-picker
+                        class="ma-2"
+                        canvas-height="100"
+                        :mode="hexa"
+                        v-model="editedItem.color"
+                      ></v-color-picker>
                     </v-col>
                     <v-col cols="4"> </v-col>
                   </v-row>
@@ -74,9 +82,7 @@
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
-              <v-card-title class="headline"
-                >Увенены в удалении?</v-card-title
-              >
+              <v-card-title class="headline">Увенены в удалении?</v-card-title>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="closeDelete"
@@ -118,13 +124,13 @@ export default {
     editedIndex: -1,
     editedItem: {
       name: "",
-      color:'#fff',
-      order:0
+      color: "#fff",
+      order: 0,
     },
     defaultItem: {
       name: "",
-      color:'#fff',
-      order:0
+      color: "#fff",
+      order: 0,
     },
   }),
 
@@ -159,6 +165,9 @@ export default {
     },
     saveBanks(bank) {
       let self = this;
+      if (typeof bank.color == "object") {
+        bank.color = bank.color.hexa;
+      }
       axios
         .post("/api/banks", bank)
         .then((res) => {

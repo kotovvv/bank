@@ -58,6 +58,7 @@
                         canvas-height="100"
                         mode="hexa"
                         value="hexa"
+                        hide-mode-switch
                         v-model="editedItem.color"
                       ></v-color-picker>
                     </v-col>
