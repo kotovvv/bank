@@ -24,12 +24,29 @@
               label="Банк"
               hide-details="true"
             >
+            <template v-slot:selection="{ item }">
+              <i
+                :style="{
+                  background: item.color,
+                  outline: '1px solid grey',
+                }"
+                class="sel_stat mr-4"
+              ></i
+              >{{ item.name }}
+            </template>
               <template v-slot:item="{ active, item, attrs, on }">
                 <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
                   <v-list-item-content>
                     <v-list-item-title>
                       <v-row no-gutters align="center">
-                        <span>{{ item.name }}</span>
+                        <i
+                :style="{
+                  background: item.color,
+                  outline: '1px solid grey',
+                }"
+                class="sel_stat mr-4"
+              ></i
+              ><span>{{ item.name }}</span>
                         <v-spacer></v-spacer>
                         <v-chip
                           text-color="white"
@@ -594,11 +611,12 @@ export default {
       axios
         .get("/api/banks")
         .then((res) => {
-          self.banks = res.data.map(({ id, name, abbr, hm }) => ({
+          self.banks = res.data.map(({ id, name, abbr, hm,color }) => ({
             id,
             name,
             abbr,
             hm,
+            color
           }));
         })
         .catch((error) => console.log(error));
@@ -609,6 +627,9 @@ export default {
         .get("/api/users")
         .then((res) => {
           self.users = res.data;
+          if(self.$attrs.user.role_id == 2){
+              self.users = self.users.filter(u=>u.group_id == self.$attrs.user.group_id && u.role_id == 3 )
+          }
           self.hmrow = "";
         })
         .catch((error) => console.log(error));
@@ -646,7 +667,7 @@ export default {
         self.banks = self.banks.filter((i) => {
           return i.hm > 0;
         });
-        self.selectedBank = self.banks[0].id;
+        // self.selectedBank = self.banks[0].id;
       }
     },
     getClients(empty = false) {
@@ -721,5 +742,20 @@ export default {
 <style>
 .talign-center input {
   text-align: center;
+}
+.sel_stat {
+  border-radius: 30px;
+  height: 20px;
+  min-width: 20px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: inherit;
+  outline-offset: 3px;
+  color: #fff;
+  margin-left: 3px;
+  margin-right: 4px;
+  padding: 0 3px;
 }
 </style>

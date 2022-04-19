@@ -197,6 +197,7 @@ export default {
         .get("/api/users")
         .then((res) => {
           self.users = res.data;
+
           if (self.$props.user.role_id == 2) {
             self.roles = [self.roles[self.roles.findIndex((i) => i.id == 3)]];
             self.users = self.users.filter((u) => u.role_id == 3);
@@ -260,11 +261,6 @@ export default {
     },
 
     save() {
-      // if (_.find(this.users, { name: this.editedItem.name })) {
-      //   this.message = "Такой логин уже есть";
-      //   this.snackbar = true;
-      //   return;
-      // }
       this.message = "";
       this.snackbar = false;
       if (this.editedIndex > -1) {
@@ -273,6 +269,11 @@ export default {
         this.rolename(this.editedItem);
         Object.assign(this.users[this.editedIndex], this.editedItem);
       } else {
+        if (_.find(this.users, { name: this.editedItem.name })) {
+          this.message = "Такой логин уже есть";
+          this.snackbar = true;
+          return;
+        }
         delete this.editedItem.role;
         this.saveUsers(this.editedItem);
         this.rolename(this.editedItem);

@@ -96,6 +96,17 @@ class BanksController extends Controller
 
     public function canTel(Request $request)
     {
+
+        // =======dddddddddddddddddddDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD===========
+        return response([
+
+            "status" => "allowed",
+            "status_translate" => "Звонок разрешен",
+            'fromcash' => 'delete'
+        ]);
+        // =======dddddddddddddddddddDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD===========
+
+
         $data = $request->All();
         $inn = $data['data']['inn'];
         if (Cache::has($inn)) {

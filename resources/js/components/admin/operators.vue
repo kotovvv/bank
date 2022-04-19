@@ -482,7 +482,7 @@ export default {
         .get("/api/users")
         .then((res) => {
           self.users = res.data;
-          // .filter(i=>i.role_id==3);
+          self.users = self.users.filter(i => i.role_id == 3)
           self.hmrow = "";
         })
         .catch((error) => console.log(error));

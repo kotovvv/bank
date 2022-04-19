@@ -266,7 +266,7 @@
                       </v-select>
                     </v-col>
                     <!-- Alfa-bank -->
-                    <v-col cols="12" v-if="selectedBank == 2">
+                    <v-col cols="12" class="products" v-if="selectedBank == 2">
                       <v-btn text @click="rr = []">
                         <v-icon> mdi-close </v-icon>
                         <h3>Продукты</h3>
@@ -275,36 +275,43 @@
                         v-model="productsAlfa"
                         label="РКО"
                         value="LP_RKO"
+                      hide-details="auto"
                       ></v-checkbox>
                       <v-checkbox
                         v-model="productsAlfa"
                         label="Эквайринг (Торговый)"
                         value="LP_ACQ_TR"
+                      hide-details="auto"
                       ></v-checkbox>
                       <v-checkbox
                         v-model="productsAlfa"
                         label="Альфа-касса"
                         value="LP_AKASSA"
+                      hide-details="auto"
                       ></v-checkbox>
                       <v-checkbox
                         v-model="productsAlfa"
                         label="Бизнес кредит - кредит на ЮЛ/ИП"
                         value="LP_LOAN_BUS"
+                      hide-details="auto"
                       ></v-checkbox>
                       <v-checkbox
                         v-model="productsAlfa"
                         label="Овердрафт для новых клиентов банка"
                         value="LP_OVER_ADV"
+                      hide-details="auto"
                       ></v-checkbox>
                       <v-checkbox
                         v-model="productsAlfa"
                         label="Спец. счет 44-ФЗ"
                         value="LP_SPECACC44"
+                      hide-details="auto"
                       ></v-checkbox>
                       <v-checkbox
                         v-model="productsAlfa"
                         label="Эквайринг (Интернет)"
                         value="LP_ACQ_E"
+                      hide-details="auto"
                       ></v-checkbox>
                     </v-col>
                     <v-col cols="6" v-if="selectedBank == 1">
@@ -348,6 +355,7 @@
                   <v-btn
                     depressed
                     color="primary"
+                    class="mt-3"
                     @click="sendOrder"
                     :disabled="
                       model_city == null ||
@@ -431,13 +439,29 @@
               label="Банк"
               hide-details="true"
             >
-              <!-- @change="changeFilter" -->
+              <template v-slot:selection="{ item }">
+                <i
+                  :style="{
+                    background: item.color,
+                    outline: '1px solid grey',
+                  }"
+                  class="sel_stat mr-4"
+                ></i
+                >{{ item.name }}
+              </template>
               <template v-slot:item="{ active, item, attrs, on }">
                 <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
                   <v-list-item-content>
                     <v-list-item-title>
                       <v-row no-gutters align="center">
-                        <span>{{ item.name }}</span>
+                        <i
+                          :style="{
+                            background: item.color,
+                            outline: '1px solid grey',
+                          }"
+                          class="sel_stat mr-4"
+                        ></i
+                        ><span>{{ item.name }}</span>
                         <v-spacer></v-spacer>
                         <v-chip
                           text-color="white"
@@ -760,7 +784,7 @@ export default {
       let send = {};
       send.user_id = this.$attrs.user.id;
       send.client_id = this.responseBank.id;
-      send.add_info = this.add_info
+      send.add_info = this.add_info;
       let branch_id = "";
       if (this.branch != {}) branch_id = this.branch.id;
       let products = [];
@@ -998,7 +1022,7 @@ export default {
     },
     requestBank() {
       this.reqBtn = false;
-      if(![1,2].includes(this.selectedBank)) return
+      if (![1, 2].includes(this.selectedBank)) return;
       this.wait = true;
       const self = this;
       const item = this.selected;
@@ -1126,5 +1150,23 @@ export default {
 }
 #recallmenu:hover {
   overflow-y: auto;
+}
+.sel_stat {
+  border-radius: 30px;
+  height: 20px;
+  min-width: 20px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: inherit;
+  outline-offset: 3px;
+  color: #fff;
+  margin-left: 3px;
+  margin-right: 4px;
+  padding: 0 3px;
+}
+.products{
+    columns:2
 }
 </style>

@@ -345,7 +345,43 @@
                       item-value="id"
                       label="Банк"
                       hide-details="true"
-                    ></v-autocomplete>
+                    >
+                                <template v-slot:selection="{ item }">
+              <i
+                :style="{
+                  background: item.color,
+                  outline: '1px solid grey',
+                }"
+                class="sel_stat mr-4"
+              ></i
+              >{{ item.name }}
+            </template>
+              <template v-slot:item="{ active, item, attrs, on }">
+                <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      <v-row no-gutters align="center">
+                        <i
+                :style="{
+                  background: item.color,
+                  outline: '1px solid grey',
+                }"
+                class="sel_stat mr-4"
+              ></i
+              ><span>{{ item.name }}</span>
+                        <v-spacer></v-spacer>
+                        <v-chip
+                          text-color="white"
+                          class="indigo darken-4"
+                          v-if="item.hm > 0"
+                          >{{ item.hm }}</v-chip
+                        >
+                      </v-row>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+                    </v-autocomplete>
 
                     <v-checkbox
                       class="mt-2"
@@ -614,10 +650,11 @@ export default {
       axios
         .get("/api/banks")
         .then((res) => {
-          self.banks = res.data.map(({ id, name, abbr }) => ({
+          self.banks = res.data.map(({ id, name, abbr,color }) => ({
             id,
             name,
             abbr,
+            color
           }));
         })
         .catch((error) => console.log(error));
@@ -681,5 +718,20 @@ export default {
 <style>
 .talign-center input {
   text-align: center;
+}
+.sel_stat {
+  border-radius: 30px;
+  height: 20px;
+  min-width: 20px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: inherit;
+  outline-offset: 3px;
+  color: #fff;
+  margin-left: 3px;
+  margin-right: 4px;
+  padding: 0 3px;
 }
 </style>

@@ -37,7 +37,7 @@
     </v-btn>
 
   </v-bottom-navigation>
-      <v-toolbar-title>{{ user.fio }}</v-toolbar-title>
+      <div >{{ user.fio }}</div>
 
       <v-btn @click="$emit('login', {})">ВЫХОД</v-btn>
     </v-app-bar>
@@ -51,7 +51,7 @@
       <!-- menu -->
       <v-card class="mx-auto" max-width="300" tile @click="drawer = !drawer">
         <v-list>
-          <v-subheader>MENU</v-subheader>
+          <v-subheader>Меню</v-subheader>
           <v-list-item-group v-model="selectedItem" color="primary">
             <v-list-item
               v-for="(item, i) in items"

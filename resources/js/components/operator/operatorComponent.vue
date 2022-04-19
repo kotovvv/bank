@@ -1,15 +1,5 @@
 <template>
   <v-app id="inspire">
-    <!-- <v-system-bar app>
-      <v-spacer></v-spacer>
-
-      <v-icon>mdi-square</v-icon>
-
-      <v-icon>mdi-circle</v-icon>
-
-      <v-icon>mdi-triangle</v-icon>
-    </v-system-bar> -->
-
     <v-app-bar app>
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
@@ -27,7 +17,7 @@
       <!-- menu -->
       <v-card class="mx-auto" max-width="300" tile @click="drawer = !drawer">
         <v-list>
-          <v-subheader>MENU</v-subheader>
+          <v-subheader>Меню</v-subheader>
           <v-list-item-group v-model="selectedItem" color="primary">
             <v-list-item
               v-for="(item, i) in items"
