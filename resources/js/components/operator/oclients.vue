@@ -113,6 +113,18 @@
                       >Перезвонить</v-btn
                     >
                   </div>
+                  <div class="my-5">
+                    <v-btn
+                      depressed
+                      color="red accent-3"
+                      @click="
+                        selectedFunnel = 13;
+                        other = '';
+                        dialogf = true;
+                      "
+                      >Отказ</v-btn
+                    >
+                  </div>
                 </div>
                 <div
                   class="mt-5"
@@ -275,43 +287,43 @@
                         v-model="productsAlfa"
                         label="РКО"
                         value="LP_RKO"
-                      hide-details="auto"
+                        hide-details="auto"
                       ></v-checkbox>
                       <v-checkbox
                         v-model="productsAlfa"
                         label="Эквайринг (Торговый)"
                         value="LP_ACQ_TR"
-                      hide-details="auto"
+                        hide-details="auto"
                       ></v-checkbox>
                       <v-checkbox
                         v-model="productsAlfa"
                         label="Альфа-касса"
                         value="LP_AKASSA"
-                      hide-details="auto"
+                        hide-details="auto"
                       ></v-checkbox>
                       <v-checkbox
                         v-model="productsAlfa"
                         label="Бизнес кредит - кредит на ЮЛ/ИП"
                         value="LP_LOAN_BUS"
-                      hide-details="auto"
+                        hide-details="auto"
                       ></v-checkbox>
                       <v-checkbox
                         v-model="productsAlfa"
                         label="Овердрафт для новых клиентов банка"
                         value="LP_OVER_ADV"
-                      hide-details="auto"
+                        hide-details="auto"
                       ></v-checkbox>
                       <v-checkbox
                         v-model="productsAlfa"
                         label="Спец. счет 44-ФЗ"
                         value="LP_SPECACC44"
-                      hide-details="auto"
+                        hide-details="auto"
                       ></v-checkbox>
                       <v-checkbox
                         v-model="productsAlfa"
                         label="Эквайринг (Интернет)"
                         value="LP_ACQ_E"
-                      hide-details="auto"
+                        hide-details="auto"
                       ></v-checkbox>
                     </v-col>
                     <v-col cols="6" v-if="selectedBank == 1">
@@ -1070,7 +1082,6 @@ export default {
     },
     updateStatus(status) {
       const self = this;
-      console.log(self.selectedBank);
       if (self.selectedBank != 1 && status == "agree") {
         return;
       }
@@ -1166,7 +1177,7 @@ export default {
   margin-right: 4px;
   padding: 0 3px;
 }
-.products{
-    columns:2
+.products {
+  columns: 2;
 }
 </style>

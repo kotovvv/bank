@@ -97,14 +97,14 @@ class BanksController extends Controller
     public function canTel(Request $request)
     {
 
-        // =======dddddddddddddddddddDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD===========
-        return response([
+        if (env('APP_ENV') == 'local') {
+            return response([
+                "status" => "allowed",
+                "status_translate" => "Звонок разрешен",
+                'fromcash' => 'delete'
+            ]);
+        }
 
-            "status" => "allowed",
-            "status_translate" => "Звонок разрешен",
-            'fromcash' => 'delete'
-        ]);
-        // =======dddddddddddddddddddDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD===========
 
 
         $data = $request->All();
