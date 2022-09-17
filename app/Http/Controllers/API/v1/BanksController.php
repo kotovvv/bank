@@ -10,7 +10,6 @@ use Barryvdh\Debugbar\Twig\Extension\Debug;
 use Illuminate\Support\Facades\Http;
 use DB;
 use Debugbar;
-use DebugBar\DebugBar as DebugBarDebugBar;
 use Illuminate\Support\Facades\Log as Loging;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -312,11 +311,8 @@ class BanksController extends Controller
             'Content-Type' => 'application/json'
         ])->get($bank['url'] . $action);
 
-        // $a_ans = $response->json();
-        // $entries = $response->object()->entries;
         $entries = $response['entries'];
 
-        // $hm_page = ceil($a_ans['total_entries'] / $a_ans['per_page']);
         $hm_page = ceil($response['total_entries'] / $response['per_page']);
         if ($hm_page > 1) {
             for ($i = 2; $i <= $hm_page; $i++) {
@@ -387,6 +383,32 @@ class BanksController extends Controller
         $a_log = [];
         $a_log = ['client_id' => $data['client_id'], 'user_id' => $data['user_id'], 'bank_id' => $data['bank_id'],  'other' => $data['add_info'], 'dateadd' => Now(), 'timeadd' => Now()];
         Log::insert($a_log);
+    }
+
+    private function getVTBToken($bank)
+    {
+        $id_cod = explode(':',$bank['token'] );
+        if (count($id_cod) != 2 ) return response(['successful' => false, 'message' => 'Установите в банке ID:Cod']);
+        $data = ["grant_type"=>"client_credentials","client_id"=>$id_cod[0],"client_secret"=>$id_cod[1]];
+        $response = Http::asForm()->withHeaders([
+            'Content-Type' => 'application/x-www-form-urlencoded'
+        ])->post('https://passport.api.vtb.ru/passport/oauth2/token', $data);
+
+        if (isset($response['access_token'])) return response(['data' => $response->object(), 'successful' => true, 'token' => $response['access_token']]);
+
+        return response(['data' => $response->object(), 'successful' => false, 'status' => $response->error_description]);
+    }
+
+    public function chekLidsVTB(Request $request)
+    {
+        $data = $request->All();
+        $bank = Bank::where('id', $data['bank_id'])->first();
+        $lids = $data['clients'];
+        $status_token = $this->getVTBToken($bank);
+        if (isset($status_token->token) && $status_token->successful == true) {
+            return $status_token;
+        }
+        return response(['data' => $status_token, 'successful' => false]);
     }
 
     /**

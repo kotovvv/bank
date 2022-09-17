@@ -346,41 +346,45 @@
                       label="Банк"
                       hide-details="true"
                     >
-                                <template v-slot:selection="{ item }">
-              <i
-                :style="{
-                  background: item.color,
-                  outline: '1px solid grey',
-                }"
-                class="sel_stat mr-4"
-              ></i
-              >{{ item.name }}
-            </template>
-              <template v-slot:item="{ active, item, attrs, on }">
-                <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      <v-row no-gutters align="center">
+                      <template v-slot:selection="{ item }">
                         <i
-                :style="{
-                  background: item.color,
-                  outline: '1px solid grey',
-                }"
-                class="sel_stat mr-4"
-              ></i
-              ><span>{{ item.name }}</span>
-                        <v-spacer></v-spacer>
-                        <v-chip
-                          text-color="white"
-                          class="indigo darken-4"
-                          v-if="item.hm > 0"
-                          >{{ item.hm }}</v-chip
+                          :style="{
+                            background: item.color,
+                            outline: '1px solid grey',
+                          }"
+                          class="sel_stat mr-4"
+                        ></i
+                        >{{ item.name }}
+                      </template>
+                      <template v-slot:item="{ active, item, attrs, on }">
+                        <v-list-item
+                          v-on="on"
+                          v-bind="attrs"
+                          #default="{ active }"
                         >
-                      </v-row>
-                    </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
+                          <v-list-item-content>
+                            <v-list-item-title>
+                              <v-row no-gutters align="center">
+                                <i
+                                  :style="{
+                                    background: item.color,
+                                    outline: '1px solid grey',
+                                  }"
+                                  class="sel_stat mr-4"
+                                ></i
+                                ><span>{{ item.name }}</span>
+                                <v-spacer></v-spacer>
+                                <v-chip
+                                  text-color="white"
+                                  class="indigo darken-4"
+                                  v-if="item.hm > 0"
+                                  >{{ item.hm }}</v-chip
+                                >
+                              </v-row>
+                            </v-list-item-title>
+                          </v-list-item-content>
+                        </v-list-item>
+                      </template>
                     </v-autocomplete>
 
                     <v-checkbox
@@ -623,38 +627,52 @@ export default {
     async checkClient(send, alldone) {
       const self = this;
       const clients_ids = send.clients;
-      (async () => {
-        for (let step = 0, show = 100; alldone.all - step * show; step++) {
-          send.clients = clients_ids.slice(step * show, show + step * show);
-          // Currently using await before axios call
-          if (alldone.all < step * show) break;
-          await axios
-            .post("/api/setBankForClients", send)
-            .then((res) => {
-              alldone.done += parseInt(res.data.done);
-              // console.log(alldone.done);
-              self.message =
-                "Записей: " + alldone.all + "<br>Изменено: " + alldone.done;
-            })
-            .catch((error) => console.log(error));
-        }
-        self.getClientsWithoutBanks();
-        self.loading = false;
-        self.selected = [];
-        self.selectedBanks = 0;
-        self.hmrow = "";
-      })();
+      if (send.bank_id == 4) {
+          axios
+          .post("/api/chekLidsVTB", send)
+          .then((res) => {
+              console.log(res.data)
+          })
+          .catch((error) => console.log(error));
+        self.afterCheckClient();
+      } else {
+        (async () => {
+          for (let step = 0, show = 100; alldone.all - step * show; step++) {
+            send.clients = clients_ids.slice(step * show, show + step * show);
+            // Currently using await before axios call
+            if (alldone.all < step * show) break;
+            await axios
+              .post("/api/setBankForClients", send)
+              .then((res) => {
+                alldone.done += parseInt(res.data.done);
+                // console.log(alldone.done);
+                self.message =
+                  "Записей: " + alldone.all + "<br>Изменено: " + alldone.done;
+              })
+              .catch((error) => console.log(error));
+          }
+          self.afterCheckClient();
+        })();
+      }
+    },
+    afterCheckClient() {
+      const self = this;
+      self.getClientsWithoutBanks();
+      self.loading = false;
+      self.selected = [];
+      self.selectedBanks = 0;
+      self.hmrow = "";
     },
     getBanks() {
       let self = this;
       axios
         .get("/api/banks")
         .then((res) => {
-          self.banks = res.data.map(({ id, name, abbr,color }) => ({
+          self.banks = res.data.map(({ id, name, abbr, color }) => ({
             id,
             name,
             abbr,
-            color
+            color,
           }));
         })
         .catch((error) => console.log(error));

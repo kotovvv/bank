@@ -48,5 +48,6 @@ Route::get('getRegions/{bank_id}', [BanksController::class,'getRegions']);
 Route::post('getCities', [BanksController::class,'getCities']);
 Route::post('getBranches', [BanksController::class,'getBranches']);
 Route::post('sendOrder', [BanksController::class,'sendOrder']);
+Route::post('chekLidsVTB', [BanksController::class,'chekLidsVTB']);
 
 
