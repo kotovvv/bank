@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Bank;
 use App\Models\Log;
+use App\Models\Client;
 use Barryvdh\Debugbar\Twig\Extension\Debug;
 use Illuminate\Support\Facades\Http;
 use DB;
@@ -394,21 +395,31 @@ class BanksController extends Controller
             'Content-Type' => 'application/x-www-form-urlencoded'
         ])->post('https://passport.api.vtb.ru/passport/oauth2/token', $data);
 
-        if (isset($response['access_token'])) return response(['data' => $response->object(), 'successful' => true, 'token' => $response['access_token']]);
+        if (isset($response['access_token'])) return [ 'successful' => true, 'token' => $response['access_token']];
 
-        return response(['data' => $response->object(), 'successful' => false, 'status' => $response->error_description]);
+        return ['data' => $response->object(), 'successful' => false, 'status' => $response->error_description];
     }
 
     public function chekLidsVTB(Request $request)
     {
         $data = $request->All();
         $bank = Bank::where('id', $data['bank_id'])->first();
-        $lids = $data['clients'];
-        $status_token = $this->getVTBToken($bank);
-        if (isset($status_token->token) && $status_token->successful == true) {
-            return $status_token;
+        $clients = Client::whereIn('id',$data['clients'])->get();
+        $leads=[];
+        if($clients){
+            foreach ($clients as $client) {
+            $leads['leads'][]=(object)['inn'=>$client['inn'],'productCode'=>'Payments'];
+            }
         }
-        return response(['data' => $status_token, 'successful' => false]);
+         $status_token = $this->getVTBToken($bank);
+         if (isset($status_token['token']) && $status_token['successful'] == true) {
+            $response = Http::withHeaders([
+                'Authorization'=> 'Bearer '.$status_token['token'],
+                'Content-Type' => 'application/json'
+            ])->post($bank['url'] . 'check_leads', $leads);
+            return response(['data' => $response->object(), 'successful' => true]);
+         }
+         return response(['data' => $status_token, 'successful' => false]);
     }
 
     /**
