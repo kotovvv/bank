@@ -412,27 +412,43 @@ class BanksController extends Controller
                 $leads['leads'][] = (object)['inn' => $client['inn'], 'productCode' => 'Payments'];
             }
         }
+
+        // get token from bank
         $status_token = $this->getVTBToken($bank);
         if (isset($status_token['token']) && $status_token['successful'] == true) {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $status_token['token'],
                 'Content-Type' => 'application/json'
             ])->post($bank['url'] . 'check_leads', $leads);
-            $leads = json_decode($response->body('data'))->leads;
-            $a_leads_status = [];
-            foreach ($leads as $lead) {
-                $a_leads_status[$lead->responseCode][] = $lead->inn;
+
+            // get array from ansver bank
+            $rclients = json_decode($response->body('data'))->leads;
+            $a_inns_status = [];
+            foreach ($rclients as $lead) {
+                $a_inns_status[$lead->responseCode][] = $lead->inn;
             }
-            foreach ($a_leads_status as $key => $leads) {
-                if ($key == 'POSITIVE') {
-                    Client::setBankFunnels($leads, $data['bank_id'], 0);
-                } else {
-                    Client::setBankFunnels($leads, $data['bank_id'], 23);
+$allow = $desallow =0;
+            // merge clients and response
+            foreach ($clients as $key => $o_client) {
+                foreach ($rclients as $o_rclient) {
+                    if ($o_rclient->inn == $o_client->inn) {
+                        if ($o_rclient->responseCode == 'POSITIVE') {
+                            Client::setBankFunnels([$o_client->id], $bank['id'], 0);
+                            Log::insert(['client_id' => $o_client->id, 'user_id' => $data['user_id'], 'bank_id' => $bank['id'],  'other' => 'response bank '.$o_rclient->responseCode, 'funnel_id' => 0, 'dateadd' => Now(), 'timeadd' => Now()]);
+                            $allow++;
+                        } else {
+                            Client::setBankFunnels([$o_client->id], $bank['id'], 2);
+                            Log::insert(['client_id' => $o_client->id, 'user_id' => $data['user_id'], 'bank_id' => $bank['id'],  'other' => 'response bank '.$o_rclient->responseCode, 'funnel_id' => 2, 'dateadd' => Now(), 'timeadd' => Now()]);
+                            $desallow++;
+                        }
+                        // $clients[$key]->responseCodeDescription = $o_rclient->responseCodeDescription;
+                        // $clients[$key]->responseCode = $o_rclient->responseCode;
+                    }
                 }
             }
-            return response(['data' => $a_leads_status, 'successful' => true]);
+            return response(['rclients' => $rclients,'allow'=> $allow,'desallow'=> $desallow, 'successful' => true]);
         }
-        return response(['data' => $status_token, 'successful' => false]);
+        return response(['message' => $status_token, 'successful' => false]);
     }
 
     /**
