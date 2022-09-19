@@ -388,14 +388,14 @@ class BanksController extends Controller
 
     private function getVTBToken($bank)
     {
-        $id_cod = explode(':',$bank['token'] );
-        if (count($id_cod) != 2 ) return response(['successful' => false, 'message' => 'Установите в банке ID:Cod']);
-        $data = ["grant_type"=>"client_credentials","client_id"=>$id_cod[0],"client_secret"=>$id_cod[1]];
+        $id_cod = explode(':', $bank['token']);
+        if (count($id_cod) != 2) return response(['successful' => false, 'message' => 'Установите в банке ID:Cod']);
+        $data = ["grant_type" => "client_credentials", "client_id" => $id_cod[0], "client_secret" => $id_cod[1]];
         $response = Http::asForm()->withHeaders([
             'Content-Type' => 'application/x-www-form-urlencoded'
         ])->post('https://passport.api.vtb.ru/passport/oauth2/token', $data);
 
-        if (isset($response['access_token'])) return [ 'successful' => true, 'token' => $response['access_token']];
+        if (isset($response['access_token'])) return ['successful' => true, 'token' => $response['access_token']];
 
         return ['data' => $response->object(), 'successful' => false, 'status' => $response->error_description];
     }
@@ -404,22 +404,35 @@ class BanksController extends Controller
     {
         $data = $request->All();
         $bank = Bank::where('id', $data['bank_id'])->first();
-        $clients = Client::whereIn('id',$data['clients'])->get();
-        $leads=[];
-        if($clients){
+        $clients = Client::whereIn('id', $data['clients'])->get();
+        return $clients;
+        $leads = [];
+        if ($clients) {
             foreach ($clients as $client) {
-            $leads['leads'][]=(object)['inn'=>$client['inn'],'productCode'=>'Payments'];
+                $leads['leads'][] = (object)['inn' => $client['inn'], 'productCode' => 'Payments'];
             }
         }
-         $status_token = $this->getVTBToken($bank);
-         if (isset($status_token['token']) && $status_token['successful'] == true) {
+        $status_token = $this->getVTBToken($bank);
+        if (isset($status_token['token']) && $status_token['successful'] == true) {
             $response = Http::withHeaders([
-                'Authorization'=> 'Bearer '.$status_token['token'],
+                'Authorization' => 'Bearer ' . $status_token['token'],
                 'Content-Type' => 'application/json'
             ])->post($bank['url'] . 'check_leads', $leads);
-            return response(['data' => $response->object(), 'successful' => true]);
-         }
-         return response(['data' => $status_token, 'successful' => false]);
+            $leads = json_decode($response->body('data'))->leads;
+            $a_leads_status = [];
+            foreach ($leads as $lead) {
+                $a_leads_status[$lead->responseCode][] = $lead->inn;
+            }
+            foreach ($a_leads_status as $key => $leads) {
+                if ($key == 'POSITIVE') {
+                    Client::setBankFunnels($leads, $data['bank_id'], 0);
+                } else {
+                    Client::setBankFunnels($leads, $data['bank_id'], 23);
+                }
+            }
+            return response(['data' => $a_leads_status, 'successful' => true]);
+        }
+        return response(['data' => $status_token, 'successful' => false]);
     }
 
     /**
