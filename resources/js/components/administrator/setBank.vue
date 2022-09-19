@@ -434,7 +434,7 @@
                     >
                       Назначить
                     </v-btn>
-                    <v-btn v-if="checkedClientsVTB.length > 0">
+                    <v-btn v-if="checkedClientsVTB.length > 0" color="teal lighten-1">
                       <download-csv
                         :data="checkedClientsVTB"
                         delimiter=";"
@@ -652,9 +652,10 @@ export default {
         axios
           .post("/api/chekLidsVTB", send)
           .then((res) => {
-            console.log(res.data);
+
             const rclients = res.data.rclients;
             if (res.data.successful) {
+                // merge clients and ansver bank
               clients.map(
                 ({
                   inn,
@@ -694,6 +695,7 @@ export default {
           .catch((error) => console.log(error));
         self.afterCheckClient();
       } else {
+        // portion send clients in bank
         (async () => {
           for (let step = 0, show = 100; alldone.all - step * show; step++) {
             send.clients = clients_ids.slice(step * show, show + step * show);
