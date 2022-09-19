@@ -295,6 +295,23 @@
         </div>
       </v-col>
     </v-row>
+    <v-row>
+        <v-col>
+                            <v-btn v-if="checkedClientsVTB.length > 0" color="teal lighten-1">
+                      <download-csv
+                        :data="checkedClientsVTB"
+                        delimiter=";"
+                        :name="
+                          'check_clients_VTB-' +
+                          new Date().toLocaleDateString() +
+                          '.csv'
+                        "
+                      >
+                        Экспорт проверки
+                      </download-csv>
+                    </v-btn>
+      </v-col>
+    </v-row>
     <template>
       <v-row>
         <v-progress-linear
@@ -434,19 +451,7 @@
                     >
                       Назначить
                     </v-btn>
-                    <v-btn v-if="checkedClientsVTB.length > 0" color="teal lighten-1">
-                      <download-csv
-                        :data="checkedClientsVTB"
-                        delimiter=";"
-                        :name="
-                          'check_clients_VTB-' +
-                          new Date().toLocaleDateString() +
-                          '.csv'
-                        "
-                      >
-                        Экспорт проверки
-                      </download-csv>
-                    </v-btn>
+
                     <v-btn v-if="$attrs.user.role_id == 1">
                       <download-csv
                         :data="filterClients"
@@ -604,11 +609,12 @@ export default {
     },
     setBankForClients(bank_id) {
       let self = this;
+      self.message = ''
       let send = {};
       let clients = {};
       send.bank_id = bank_id;
       send.checkBanks = self.checkBanks;
-      send.user_id = $attrs.user.id;
+      send.user_id = self.$attrs.user.id;
       self.loading = true;
       if (this.selected.length > 0) {
         clients = this.selected;
@@ -616,6 +622,7 @@ export default {
         clients = this.filterClients;
       }
       send.clients = clients.map((i) => i.id);
+
       //   if need check client in bank
       if (self.checkBanks) {
         let alldone = {};
@@ -691,9 +698,10 @@ export default {
             } else {
               self.message = "Ошибка: " + res.data.message;
             }
+            self.afterCheckClient();
           })
           .catch((error) => console.log(error));
-        self.afterCheckClient();
+
       } else {
         // portion send clients in bank
         (async () => {
@@ -708,12 +716,14 @@ export default {
                 // console.log(alldone.done);
                 self.message =
                   "Записей: " + alldone.all + "<br>Изменено: " + alldone.done;
+                  self.afterCheckClient();
               })
               .catch((error) => console.log(error));
           }
-          self.afterCheckClient();
+
         })();
       }
+
     },
     afterCheckClient() {
       const self = this;

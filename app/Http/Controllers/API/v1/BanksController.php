@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 use App\Models\Bank;
 use App\Models\Log;
 use App\Models\Client;
-use Barryvdh\Debugbar\Twig\Extension\Debug;
+//use Barryvdh\Debugbar\Twig\Extension\Debug;
 use Illuminate\Support\Facades\Http;
-use DB;
-use Debugbar;
+//use DB;
+//use Debugbar;
 use Illuminate\Support\Facades\Log as Loging;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -405,50 +405,66 @@ class BanksController extends Controller
         $data = $request->All();
         $bank = Bank::where('id', $data['bank_id'])->first();
         $clients = Client::whereIn('id', $data['clients'])->get();
-        return $clients;
-        $leads = [];
+
+        $sendleads = [];
         if ($clients) {
             foreach ($clients as $client) {
-                $leads['leads'][] = (object)['inn' => $client['inn'], 'productCode' => 'Payments'];
+                $sendleads[] = (object)['inn' => $client['inn'], 'productCode' => 'Payments'];
             }
         }
 
         // get token from bank
-        $status_token = $this->getVTBToken($bank);
-        if (isset($status_token['token']) && $status_token['successful'] == true) {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $status_token['token'],
-                'Content-Type' => 'application/json'
-            ])->post($bank['url'] . 'check_leads', $leads);
+        $allow = $desallow = 0;
+        $rclientsAll = [];
+        for ($step = 0, $show = 100; (count($sendleads) - $step * $show) >= 0; $step++) {
+            $stepleads = ['leads' => array_slice($sendleads, $step * $show, $show + $step * $show)];
+            $sendClients = $clients->slice($step * $show, $show + $step * $show);
+            $status_token = $this->getVTBToken($bank);
+            if (isset($status_token['token']) && $status_token['successful'] == true) {
+                $response = Http::retry(3, 100)->withHeaders([
+                    'Authorization' => 'Bearer ' . $status_token['token'],
+                    'Content-Type' => 'application/json'
+                ])->post($bank['url'] . 'check_leads', $stepleads);
 
-            // get array from ansver bank
-            $rclients = json_decode($response->body('data'))->leads;
-            $a_inns_status = [];
-            foreach ($rclients as $lead) {
-                $a_inns_status[$lead->responseCode][] = $lead->inn;
-            }
-$allow = $desallow =0;
-            // merge clients and response
-            foreach ($clients as $key => $o_client) {
-                foreach ($rclients as $o_rclient) {
-                    if ($o_rclient->inn == $o_client->inn) {
-                        if ($o_rclient->responseCode == 'POSITIVE') {
-                            Client::setBankFunnels([$o_client->id], $bank['id'], 0);
-                            Log::insert(['client_id' => $o_client->id, 'user_id' => $data['user_id'], 'bank_id' => $bank['id'],  'other' => 'response bank '.$o_rclient->responseCode, 'funnel_id' => 0, 'dateadd' => Now(), 'timeadd' => Now()]);
-                            $allow++;
-                        } else {
-                            Client::setBankFunnels([$o_client->id], $bank['id'], 2);
-                            Log::insert(['client_id' => $o_client->id, 'user_id' => $data['user_id'], 'bank_id' => $bank['id'],  'other' => 'response bank '.$o_rclient->responseCode, 'funnel_id' => 2, 'dateadd' => Now(), 'timeadd' => Now()]);
-                            $desallow++;
-                        }
-                        // $clients[$key]->responseCodeDescription = $o_rclient->responseCodeDescription;
-                        // $clients[$key]->responseCode = $o_rclient->responseCode;
-                    }
+                if ($response->status() == 500) {
+                    // Loging::info('Response: ' . $response);
+                    return response(['message' => 'Сервер не отвечает', 'successful' => false]);
                 }
+                if ($response->status() == 200) {
+                    // get array from ansver bank
+                    $rclients = json_decode($response->body('data'))->leads;
+                    $a_inns_status = [];
+                    foreach ($rclients as $lead) {
+                        $a_inns_status[$lead->responseCode][] = $lead->inn;
+                    }
+
+                    // merge clients and response
+                    foreach ($sendClients as $o_client) {
+                        foreach ($rclients as $o_rclient) {
+                            if ($o_rclient->inn == $o_client->inn) {
+                                if ($o_rclient->responseCode == 'POSITIVE') {
+                                    Client::setBankFunnels([$o_client->id], $bank['id'], 0);
+                                    Log::insert(['client_id' => $o_client->id, 'user_id' => $data['user_id'], 'bank_id' => $bank['id'],  'other' => 'response bank ' . $o_rclient->responseCode, 'funnel_id' => 0, 'dateadd' => Now(), 'timeadd' => Now()]);
+                                    $allow++;
+                                } else {
+                                    Client::setBankFunnels([$o_client->id], $bank['id'], 2);
+                                    Log::insert(['client_id' => $o_client->id, 'user_id' => $data['user_id'], 'bank_id' => $bank['id'],  'other' => 'response bank ' . $o_rclient->responseCode, 'funnel_id' => 2, 'dateadd' => Now(), 'timeadd' => Now()]);
+                                    $desallow++;
+                                }
+                                // $clients[$key]->responseCodeDescription = $o_rclient->responseCodeDescription;
+                                // $clients[$key]->responseCode = $o_rclient->responseCode;
+                            }
+                        }
+                    }
+                    $rclientsAll = array_merge($rclientsAll, $rclients);
+                }
+            } else {
+                return response(['message' => $status_token, 'successful' => false]);
             }
-            return response(['rclients' => $rclients,'allow'=> $allow,'desallow'=> $desallow, 'successful' => true]);
+            sleep(15);
         }
-        return response(['message' => $status_token, 'successful' => false]);
+        return response(['rclients' => $rclientsAll, 'allow' => $allow, 'desallow' => $desallow, 'successful' => true]);
+
     }
 
     /**
