@@ -434,6 +434,17 @@
                     >
                       Назначить
                     </v-btn>
+                    <v-btn v-if="checkedClientsVTB.length > 0">
+                      <download-csv
+                        :data="checkedClientsVTB"
+                        delimiter=";"
+                        :name="
+                          'check_clients_VTB-' + new Date().toLocaleDateString() + '.csv'
+                        "
+                      >
+                        Экспорт проверки
+                      </download-csv>
+                    </v-btn>
                     <v-btn v-if="$attrs.user.role_id == 1">
                       <download-csv
                         :data="filterClients"
@@ -459,6 +470,7 @@
 <script>
 import axios from "axios";
 import JsonCSV from "vue-json-csv";
+import _ from "lodash";
 export default {
   data: () => ({
     dialogDelClients: false,
@@ -505,6 +517,7 @@ export default {
     message: "",
     snackbar: false,
     hmrow: "",
+    checkedClientsVTB:[],
   }),
   mounted() {
     this.getBanks();
@@ -565,6 +578,7 @@ export default {
       }
     },
     selectRow() {
+        this.checkedClientsVTB = []
       this.selected = this.filterClients.slice(0, this.hmrow);
     },
     plueral(number, words) {
@@ -589,21 +603,24 @@ export default {
     setBankForClients(bank_id) {
       let self = this;
       let send = {};
+      let clients = {}
       send.bank_id = bank_id;
       send.checkBanks = self.checkBanks;
       self.loading = true;
       if (this.selected.length > 0) {
-        send.clients = this.selected.map((i) => i.id);
+       clients = this.selected
       } else {
-        send.clients = this.filterClients.map((i) => i.id);
+        clients = this.filterClients
       }
+send.clients = clients.map(i=>i.id)
+    //   if need check client in bank
       if (self.checkBanks) {
         let alldone = {};
         alldone.all = send.clients.length;
         alldone.done = 0;
         self.snackbar = true;
 
-        self.checkClient(send, alldone);
+        self.checkClient(send, alldone,clients);
       } else {
         axios
           .post("/api/setBankForClients", send, { timeout: 60 * 15 * 1000 })
@@ -624,7 +641,7 @@ export default {
     },
     clickrow() {},
 
-    async checkClient(send, alldone) {
+    async checkClient(send, alldone, clients) {
       const self = this;
       const clients_ids = send.clients;
       if (send.bank_id == 4) {
@@ -632,6 +649,33 @@ export default {
           .post("/api/chekLidsVTB", send)
           .then((res) => {
               console.log(res.data)
+            //   const clients = res.data.clients
+              const rclients = [
+        {
+            "inn": "280803610602",
+            "productCode": "Payments",
+            "responseCode": "POSITIVE",
+            "responseCodeDescription": "Лид может быть взят в работу"
+        },
+        {
+            "inn": "121502601997",
+            "productCode": "Payments",
+            "responseCode": "POSITIVE",
+            "responseCodeDescription": "Лид может быть взят в работу"
+        },
+        {
+            "inn": "720408836890",
+            "productCode": "Payments",
+            "responseCode": "POSITIVE",
+            "responseCodeDescription": "Лид может быть взят в работу"
+        }
+    ]
+      if (clients.length > 0) {
+          clients.map(({inn, fullName, phoneNumber, organizationName, address, region, registration, initiator, date_added}) => {
+
+              self.checkedClientsVTB.push( {inn, fullName, phoneNumber, organizationName, address, region, registration, initiator, date_added, 'responseCode':_.find(rclients,{'inn':inn}).responseCodeDescription})
+        });
+      }
           })
           .catch((error) => console.log(error));
         self.afterCheckClient();
