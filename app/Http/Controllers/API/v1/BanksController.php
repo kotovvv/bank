@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\Client\RequestException;
 use App\Models\Bank;
 use App\Models\Log;
 use App\Models\Client;
@@ -413,22 +414,29 @@ class BanksController extends Controller
             }
         }
 
-        // get token from bank
         $allow = $desallow = 0;
         $rclientsAll = [];
         for ($step = 0, $show = 100; (count($sendleads) - $step * $show) >= 0; $step++) {
             $stepleads = ['leads' => array_slice($sendleads, $step * $show, $show + $step * $show)];
             $sendClients = $clients->slice($step * $show, $show + $step * $show);
+            // get token from bank
             $status_token = $this->getVTBToken($bank);
             if (isset($status_token['token']) && $status_token['successful'] == true) {
-                $response = Http::retry(3, 100)->withHeaders([
-                    'Authorization' => 'Bearer ' . $status_token['token'],
-                    'Content-Type' => 'application/json'
-                ])->post($bank['url'] . 'check_leads', $stepleads);
+                try {
+                    // send lids in bank check duble
+                    $response = Http::retry(3, 300)->withHeaders([
+                        'Authorization' => 'Bearer ' . $status_token['token'],
+                        'Content-Type' => 'application/json'
+                    ])->post($bank['url'] . 'check_leads', $stepleads);
+                    Loging::info('Response: ' . $response);
+                } catch (RequestException $e) {
+                    Loging::info('Error post check leads: ' . $e);
+                    // return response(['message' => $e, 'successful' => false]);
+                }
 
                 if ($response->status() == 500) {
-                    // Loging::info('Response: ' . $response);
-                    return response(['message' => 'Сервер не отвечает', 'successful' => false]);
+                    Loging::info('Response: ' . $response);
+                    // return response(['message' => 'Сервер не отвечает', 'successful' => false]);
                 }
                 if ($response->status() == 200) {
                     // get array from ansver bank
@@ -451,8 +459,6 @@ class BanksController extends Controller
                                     Log::insert(['client_id' => $o_client->id, 'user_id' => $data['user_id'], 'bank_id' => $bank['id'],  'other' => 'response bank ' . $o_rclient->responseCode, 'funnel_id' => 2, 'dateadd' => Now(), 'timeadd' => Now()]);
                                     $desallow++;
                                 }
-                                // $clients[$key]->responseCodeDescription = $o_rclient->responseCodeDescription;
-                                // $clients[$key]->responseCode = $o_rclient->responseCode;
                             }
                         }
                     }
@@ -461,10 +467,9 @@ class BanksController extends Controller
             } else {
                 return response(['message' => $status_token, 'successful' => false]);
             }
-            sleep(15);
+            // sleep(15);
         }
         return response(['rclients' => $rclientsAll, 'allow' => $allow, 'desallow' => $desallow, 'successful' => true]);
-
     }
 
     /**
