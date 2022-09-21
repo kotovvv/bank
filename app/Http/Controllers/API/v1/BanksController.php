@@ -415,27 +415,29 @@ class BanksController extends Controller
         }
 
         $allow = $desallow = 0;
-        $rclientsAll = [];
-        for ($step = 0, $show = 100; (count($sendleads) - $step * $show) >= 0; $step++) {
-            $stepleads = ['leads' => array_slice($sendleads, $step * $show, $show + $step * $show)];
-            $sendClients = $clients->slice($step * $show, $show + $step * $show);
+        $rclientsAll = $rclients = [];
+        for ($step = 0, $show = 50; (count($sendleads) - $step * $show) >= 0; $step++) {
+            $stepleads = ['leads' => array_slice($sendleads, $step * $show, $show )];
+            $sendClients = $clients->slice($step * $show, $show);
             // get token from bank
             $status_token = $this->getVTBToken($bank);
+            // $time_start = microtime(true);
             if (isset($status_token['token']) && $status_token['successful'] == true) {
                 try {
                     // send lids in bank check duble
-                    $response = Http::retry(3, 300)->withHeaders([
+                    $response = Http::retry(5, 10000)->withHeaders([
                         'Authorization' => 'Bearer ' . $status_token['token'],
                         'Content-Type' => 'application/json'
                     ])->post($bank['url'] . 'check_leads', $stepleads);
-                    Loging::info('Response: ' . $response);
+
                 } catch (RequestException $e) {
-                    Loging::info('Error post check leads: ' . $e);
+                     Loging::info($response->headers());
                     // return response(['message' => $e, 'successful' => false]);
                 }
-
+                // Loging::info('TIME after chek leads: '.time());
                 if ($response->status() == 500) {
-                    Loging::info('Response: ' . $response);
+                    Loging::info('Response 500: ');
+                    Loging::info($response);
                     // return response(['message' => 'Сервер не отвечает', 'successful' => false]);
                 }
                 if ($response->status() == 200) {
@@ -464,12 +466,16 @@ class BanksController extends Controller
                     }
                     $rclientsAll = array_merge($rclientsAll, $rclients);
                 }
+                // $time_end = microtime(true);
+                // $execution_time = ($time_end - $time_start)/60;
+                // Loging::info('TIME execution_time: '.$execution_time);
             } else {
                 return response(['message' => $status_token, 'successful' => false]);
             }
             // sleep(15);
         }
-        return response(['rclients' => $rclientsAll, 'allow' => $allow, 'desallow' => $desallow, 'successful' => true]);
+        //  Loging::info('END END END: allow='.$allow." desallow=".$desallow);
+         return response(['rclients' => $rclientsAll, 'allow' => $allow, 'desallow' => $desallow, 'successful' => true]);
     }
 
     /**
