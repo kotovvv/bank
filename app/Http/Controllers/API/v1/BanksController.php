@@ -431,7 +431,8 @@ class BanksController extends Controller
                     ])->post($bank['url'] . 'check_leads', $stepleads);
 
                 } catch (RequestException $e) {
-                     Loging::info($response->headers());
+                    //  Loging::info($response->headers());
+                     Loging::info( $e);
                     // return response(['message' => $e, 'successful' => false]);
                 }
                 // Loging::info('TIME after chek leads: '.time());

@@ -59,6 +59,9 @@ class ImportController extends Controller
             if($client_val['fullName'] == '' && strstr($client_val['organizationName'],'ИП')){
                 $client_val['fullName'] = trim(str_replace('ИП', '',$client_val['organizationName']));
             }
+            if($client_val['fullName'] == '' && !strstr($client_val['organizationName'],'ООО')){
+                $client_val['fullName'] = trim($client_val['organizationName']);
+            }
             if(strlen($client_val['inn']) == 12){
                  $client_val['organizationName'] = "ИП ".$client_val['fullName'];
             }
@@ -74,7 +77,9 @@ class ImportController extends Controller
             $client_val['phoneNumber'] =  preg_replace('/^8/', '7',$client_val['phoneNumber'], 1 );
             $client_val = array_merge($client_val, ['date_added' => date("Y-m-d H:i:s")]);
             $client_val['registration'] = date( 'Y-m-d', strtotime( $client_val['registration'] ) );
-
+            $client_val = array_filter($client_val, function($k) {
+                return $k != '';
+            }, ARRAY_FILTER_USE_KEY);
             try {
                 DB::table('clients')->insert($client_val);
               } catch(\Illuminate\Database\QueryException $ex){

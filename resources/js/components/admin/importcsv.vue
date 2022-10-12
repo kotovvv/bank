@@ -160,6 +160,7 @@ export default {
 
         var obj = {};
         line = line.trim();
+        if (line.substring(0, 1) == ';') return;
         var currentline = line.split(";");
 
         headers.map(function (header, indexHeader) {
