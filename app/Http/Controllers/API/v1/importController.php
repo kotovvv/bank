@@ -56,6 +56,9 @@ class ImportController extends Controller
             if(strlen($client_val['inn']) == 11 || strlen($client_val['inn']) == 9 ){
                 $client_val['inn'] = '0'.$client_val['inn'];
             }
+            if($client_val['fullName'] == '' && strstr($client_val['organizationName'],'ИП')){
+                $client_val['fullName'] = trim(str_replace('ИП', '',$client_val['organizationName']));
+            }
             if(strlen($client_val['inn']) == 12){
                  $client_val['organizationName'] = "ИП ".$client_val['fullName'];
             }
