@@ -21,6 +21,7 @@ class User extends Authenticatable
         'role_id',
         'fio',
         'group_id',
+        'bank_id',
         // 'password'
     ];
 

@@ -441,7 +441,7 @@
         <v-row id="filter" class="my-3">
           <!-- bank -->
           <v-col cols="3">
-            <v-select
+            <!-- <v-select
               v-model="selectedBank"
               :items="banks"
               outlined
@@ -486,7 +486,8 @@
                   </v-list-item-content>
                 </v-list-item>
               </template>
-            </v-select>
+            </v-select> -->
+            {{ bankName }}
           </v-col>
           <v-col
             >Всего: <span class="text-h5">{{ all }}</span></v-col
@@ -632,7 +633,7 @@ export default {
     clients: [],
     selected: {},
     banks: [],
-    selectedBank: "",
+    selectedBank: 0,
     funnels: [],
     selectedFunnel: 0,
     message: "",
@@ -746,6 +747,9 @@ export default {
     },
   },
   computed: {
+    bankName(){
+        if(this.banks.length) return this.banks.find((b)=> b.id == this.$attrs.user.bank_id).name
+},
     filteredItems() {
       return this.clients.filter((i) => {
         return (
@@ -760,6 +764,7 @@ export default {
     },
   },
   methods: {
+
     recall() {
       let self = this;
       let send = {};
@@ -914,11 +919,11 @@ export default {
           if (el[1] == 0) a[el[0]] += 1;
         }
       });
-      self.banks = self.banks.filter(function (i) {
-        if (i.id > 0) i.hm = a[i.id] != undefined ? a[i.id] : 0;
-        if (i.hm > 0) return i;
-      });
-      self.selectedBank = self.banks[0].id;
+    //   self.banks = self.banks.filter(function (i) {
+    //     if (i.id > 0) i.hm = a[i.id] != undefined ? a[i.id] : 0;
+    //     if (i.hm > 0) return i;
+    //   });
+    //   self.selectedBank = self.banks[0].id;
     },
     getBanks() {
       let self = this;
@@ -926,6 +931,7 @@ export default {
         .get("/api/banks")
         .then((res) => {
           self.banks = res.data;
+          self.selectedBank = self.$attrs.user.bank_id
         })
         .catch((error) => console.log(error));
     },
@@ -963,7 +969,7 @@ export default {
     getUserClients() {
       const self = this;
       const id = self.$attrs.user.id;
-      let bank_id = 0;
+      let bank_id = self.$attrs.user.bank_id;
       let funnel_id = 0;
       self.recallist = [];
       // if (self.selectedBank) bank_id = self.selectedBank;

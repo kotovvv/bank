@@ -70,13 +70,22 @@
                     </v-col>
                     <v-col cols="6">
                       <v-select
+                        :items="banks"
+                        v-model="editedItem.bank_id"
+                        item-text="name"
+                        item-value="id"
+                        label="Банк"
+                      ></v-select>
+                    </v-col>
+                    <!-- <v-col cols="6">
+                      <v-select
                         :items="group"
                         v-model="editedItem.group_id"
                         item-text="fio"
                         item-value="id"
                         label="Группа"
                       ></v-select>
-                    </v-col>
+                    </v-col> -->
                   </v-row>
                 </v-container>
               </v-card-text>
@@ -143,7 +152,9 @@ export default {
       { text: "Логин", value: "name" },
       { text: "ФИО", value: "fio" },
       { text: "Роль", value: "role" },
-      { text: "Группа", value: "group_id" },
+      //   { text: "Группа", value: "group_id" },
+      { text: "Банк", value: "bank" },
+
       { text: "Действия", value: "actions", sortable: false },
     ],
 
@@ -153,15 +164,18 @@ export default {
       fio: "",
       role_id: 0,
       password: "",
+      bank_id:0
     },
     defaultItem: {
       name: "",
       fio: "",
       role_id: 0,
       password: "",
+      bank_id:0
     },
     message: "",
     snackbar: false,
+    banks: [],
   }),
 
   computed: {
@@ -183,13 +197,29 @@ export default {
 
   mounted() {
     // this.initialize(),
-    this.getUsers();
+    this.getBanks();
+
   },
 
   methods: {
     rolename(user) {
       let self = this;
       user.role = self.roles.find((r) => r.id == user.role_id).name;
+    },
+    getBanks() {
+      let self = this;
+      axios
+        .get("/api/banks")
+        .then((res) => {
+          self.banks = res.data;
+          self.getUsers();
+        })
+        .catch((error) => console.log(error));
+    },
+    getBank(user){
+        let self = this;
+
+user.bank = this.banks.find((b) => {return b.id == user.bank_id}).name
     },
     getUsers() {
       let self = this;
@@ -203,8 +233,10 @@ export default {
             self.users = self.users.filter((u) => u.role_id == 3);
           }
           self.users.map(function (u) {
+            u.bank = self.banks.find((b) => {return b.id == u.bank_id}).name
             self.rolename(u);
             if (u.role_id == 2) self.group.push(u);
+
           });
         })
         .catch((error) => console.log(error));
