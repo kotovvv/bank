@@ -123,6 +123,7 @@ class ClientsController extends Controller
                 $a_log = ['client_id' => $cl, 'user_id' => $data['user_id'], 'bank_id' => $data['bank_id'], 'funnel_id' => $data['funnel'], 'other' => $data['other'], 'dateadd' => Now(), 'timeadd' => Now()];
             }
             Log::insert($a_log);
+            Client::where('id',$data['clients'][0])->update(['user_id'=>0]);
         }
         // Check clinets in bank
         if (isset($data['checkBanks']) && $data['checkBanks']) {
