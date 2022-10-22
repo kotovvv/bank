@@ -244,13 +244,16 @@ class BanksController extends Controller
                     }
                 }
                 Cache::store('file')->put('regions' . $bank_id, $entries, 2592000);
+
             }
             if ($bank_id == 2) {
                 if (Storage::exists('regions' . $bank_id . '.json')) {
-                    $regions = json_decode(Storage::get('regions' . $bank_id . '.json'));
-                    Cache::store('file')->put('regions' . $bank_id, $regions, 2592000);
+                    $entries = json_decode(Storage::get('regions' . $bank_id . '.json'));
+                    Cache::store('file')->put('regions' . $bank_id, $entries, 2592000);
+
                 } else {
                     Artisan::call("Alfa:references");
+                    $entries = [];
                 }
             }
         }
